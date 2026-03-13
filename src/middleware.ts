@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
-const publicPaths = ["/login", "/register"];
+const publicPaths = ["/login", "/register", "/landing"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
