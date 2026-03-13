@@ -10,6 +10,7 @@ import Link from "next/link";
 import { DeleteCertificateButton } from "./DeleteCertificateButton";
 import { SendEmailButton } from "@/components/ui/SendEmailButton";
 import { sendCertificateByEmail } from "@/app/actions/email";
+import { RequestReviewButton } from "@/components/workflow/RequestReviewButton";
 
 const conditionLabels: Record<string, { label: string; variant: "success" | "warning" | "danger" }> = {
   bon_etat: { label: "Bon état", variant: "success" },
@@ -97,6 +98,11 @@ export default async function CertificateDetailPage({
               action={sendCertificateByEmail}
               id={certificate.id}
               email={certificate.client.email}
+            />
+            <RequestReviewButton
+              clientId={certificate.client.id}
+              clientEmail={certificate.client.email}
+              certificateNumber={certificate.number}
             />
             <DeleteCertificateButton id={certificate.id} />
           </div>

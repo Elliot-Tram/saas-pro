@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate } from "@/lib/utils";
-import { Users, Plus, Eye, Phone, MapPin, Filter } from "lucide-react";
+import { Users, Plus, Eye, Phone, MapPin, Filter, Upload } from "lucide-react";
 import Link from "next/link";
 
 interface ClientsPageProps {
@@ -38,6 +38,12 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   return (
     <>
       <Header title="Clients" description="Gérez votre fichier client">
+        <Link href="/clients/import">
+          <Button variant="secondary">
+            <Upload className="h-4 w-4" />
+            Importer
+          </Button>
+        </Link>
         <Link href="/clients/new">
           <Button>
             <Plus className="h-4 w-4" />

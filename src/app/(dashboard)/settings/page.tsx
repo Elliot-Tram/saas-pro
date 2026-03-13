@@ -24,6 +24,7 @@ export default async function SettingsPage() {
       insuranceNumber: true,
       insurerName: true,
       qualification: true,
+      googleReviewLink: true,
     },
   });
 

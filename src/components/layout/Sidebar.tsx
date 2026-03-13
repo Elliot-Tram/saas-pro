@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   FileSignature,
   Bell,
+  BarChart3,
   Settings,
   Flame,
   Menu,
@@ -29,6 +30,7 @@ const navigation = [
   { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
   { name: "Contrats", href: "/contracts", icon: FileSignature },
   { name: "Rappels", href: "/reminders", icon: Bell },
+  { name: "Statistiques", href: "/stats", icon: BarChart3 },
   { name: "Paramètres", href: "/settings", icon: Settings },
 ];
 

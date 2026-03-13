@@ -24,6 +24,7 @@ model User {
   insuranceNumber String?  // N° police RC Pro
   insurerName     String?  // Nom de l'assureur
   qualification   String?  // Qualibat, CTM, etc.
+  googleReviewLink String?  // ex: https://g.page/r/xxx/review
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

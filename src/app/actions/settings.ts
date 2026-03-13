@@ -20,6 +20,7 @@ export async function updateProfile(_prevState: unknown, formData: FormData) {
     insuranceNumber: (formData.get("insuranceNumber") as string) || null,
     insurerName: (formData.get("insurerName") as string) || null,
     qualification: (formData.get("qualification") as string) || null,
+    googleReviewLink: (formData.get("googleReviewLink") as string) || null,
   };
 
   if (!data.name || !data.email) {

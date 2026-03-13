@@ -20,6 +20,7 @@ interface User {
   insuranceNumber: string | null;
   insurerName: string | null;
   qualification: string | null;
+  googleReviewLink: string | null;
 }
 
 export function SettingsForm({ user }: { user: User }) {
@@ -125,6 +126,18 @@ export function SettingsForm({ user }: { user: User }) {
                 label="Nom de l'assureur"
                 defaultValue={user.insurerName || ""}
               />
+            </div>
+            <div>
+              <Input
+                id="googleReviewLink"
+                name="googleReviewLink"
+                label="Lien avis Google"
+                placeholder="https://g.page/r/votre-lien/review"
+                defaultValue={user.googleReviewLink || ""}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Trouvez votre lien dans Google My Business &rarr; Accueil &rarr; Demander des avis
+              </p>
             </div>
           </CardContent>
         </Card>
