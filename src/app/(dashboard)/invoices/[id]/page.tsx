@@ -8,6 +8,8 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { ArrowLeft, Send, CheckCircle, Download, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoices";
+import { SendEmailButton } from "@/components/ui/SendEmailButton";
+import { sendInvoiceByEmail } from "@/app/actions/email";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "warning" | "success" }> = {
   draft: { label: "Brouillon", variant: "default" },
@@ -80,6 +82,11 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               Télécharger PDF
             </Button>
           </a>
+          <SendEmailButton
+            action={sendInvoiceByEmail}
+            id={invoice.id}
+            email={invoice.client.email}
+          />
           <form action={handleDelete}>
             <Button variant="danger" type="submit">
               <Trash2 className="h-4 w-4" />

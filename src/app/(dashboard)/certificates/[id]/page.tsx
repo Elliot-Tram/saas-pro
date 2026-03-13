@@ -8,6 +8,8 @@ import { formatDate } from "@/lib/utils";
 import { ArrowLeft, Download, User, Home, Wrench, AlertTriangle, FileCheck, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { DeleteCertificateButton } from "./DeleteCertificateButton";
+import { SendEmailButton } from "@/components/ui/SendEmailButton";
+import { sendCertificateByEmail } from "@/app/actions/email";
 
 const conditionLabels: Record<string, { label: string; variant: "success" | "warning" | "danger" }> = {
   bon_etat: { label: "Bon état", variant: "success" },
@@ -91,6 +93,11 @@ export default async function CertificateDetailPage({
                 Télécharger PDF
               </Button>
             </a>
+            <SendEmailButton
+              action={sendCertificateByEmail}
+              id={certificate.id}
+              email={certificate.client.email}
+            />
             <DeleteCertificateButton id={certificate.id} />
           </div>
         </div>

@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import {
   Euro,
   Users,
@@ -12,6 +13,11 @@ import {
   FileText,
   ArrowUpRight,
   Clock,
+  Plus,
+  ClipboardCheck,
+  AlertTriangle,
+  MapPin,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,40 +26,54 @@ export default async function DashboardPage() {
   if (!session) redirect("/login");
 
   const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  const [clientCount, appointmentsThisMonth, upcomingAppointments, invoicesThisMonth, recentClients] =
-    await Promise.all([
-      prisma.client.count({ where: { userId: session.userId } }),
-      prisma.appointment.count({
-        where: {
-          userId: session.userId,
-          date: { gte: startOfMonth, lte: endOfMonth },
-        },
-      }),
-      prisma.appointment.findMany({
-        where: {
-          userId: session.userId,
-          date: { gte: now },
-          status: "scheduled",
-        },
-        include: { client: true },
-        orderBy: { date: "asc" },
-        take: 5,
-      }),
-      prisma.invoice.findMany({
-        where: {
-          userId: session.userId,
-          date: { gte: startOfMonth, lte: endOfMonth },
-        },
-      }),
-      prisma.client.findMany({
-        where: { userId: session.userId },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-    ]);
+  const [
+    clientCount,
+    appointmentsThisMonth,
+    todayAppointments,
+    upcomingAppointments,
+    invoicesThisMonth,
+    overdueInvoices,
+    recentClients,
+  ] = await Promise.all([
+    prisma.client.count({ where: { userId: session.userId } }),
+    prisma.appointment.count({
+      where: { userId: session.userId, date: { gte: startOfMonth, lte: endOfMonth } },
+    }),
+    prisma.appointment.findMany({
+      where: { userId: session.userId, date: { gte: startOfDay, lte: endOfDay } },
+      include: { client: true },
+      orderBy: { date: "asc" },
+    }),
+    prisma.appointment.findMany({
+      where: { userId: session.userId, date: { gt: endOfDay }, status: "scheduled" },
+      include: { client: true },
+      orderBy: { date: "asc" },
+      take: 5,
+    }),
+    prisma.invoice.findMany({
+      where: { userId: session.userId, date: { gte: startOfMonth, lte: endOfMonth } },
+    }),
+    prisma.invoice.findMany({
+      where: {
+        userId: session.userId,
+        status: "sent",
+        dueDate: { lt: now },
+      },
+      include: { client: true },
+      orderBy: { dueDate: "asc" },
+      take: 5,
+    }),
+    prisma.client.findMany({
+      where: { userId: session.userId },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+  ]);
 
   const caThisMonth = invoicesThisMonth
     .filter((inv) => inv.status === "paid")
@@ -64,42 +84,42 @@ export default async function DashboardPage() {
     .reduce((sum, inv) => sum + inv.total, 0);
 
   const stats = [
-    {
-      label: "CA du mois",
-      value: formatCurrency(caThisMonth),
-      icon: Euro,
-      color: "text-green-600",
-      bg: "bg-green-50",
-    },
-    {
-      label: "Clients",
-      value: clientCount.toString(),
-      icon: Users,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-    },
-    {
-      label: "RDV ce mois",
-      value: appointmentsThisMonth.toString(),
-      icon: Calendar,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
-    },
-    {
-      label: "En attente",
-      value: formatCurrency(pendingAmount),
-      icon: FileText,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
+    { label: "CA du mois", value: formatCurrency(caThisMonth), icon: Euro, color: "text-green-600", bg: "bg-green-50" },
+    { label: "Clients", value: clientCount.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "RDV ce mois", value: appointmentsThisMonth.toString(), icon: Calendar, color: "text-purple-600", bg: "bg-purple-50" },
+    { label: "En attente", value: formatCurrency(pendingAmount), icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
   ];
+
+  const formatTime = (date: Date) =>
+    new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(date));
 
   return (
     <>
-      <Header title="Tableau de bord" description="Vue d'ensemble de votre activité" />
+      <Header title="Tableau de bord" description="Vue d'ensemble de votre activité">
+        <div className="flex items-center gap-2">
+          <Link href="/certificates/new">
+            <Button size="sm" variant="secondary">
+              <ClipboardCheck className="h-4 w-4" />
+              Certificat
+            </Button>
+          </Link>
+          <Link href="/clients/new">
+            <Button size="sm" variant="secondary">
+              <Plus className="h-4 w-4" />
+              Client
+            </Button>
+          </Link>
+          <Link href="/calendar">
+            <Button size="sm">
+              <Plus className="h-4 w-4" />
+              RDV
+            </Button>
+          </Link>
+        </div>
+      </Header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardContent className="flex items-center gap-4 py-5">
@@ -115,9 +135,109 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Two columns */}
+      {/* Overdue Invoices Alert */}
+      {overdueInvoices.length > 0 && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
+            <h3 className="font-semibold text-red-800">
+              {overdueInvoices.length} facture{overdueInvoices.length > 1 ? "s" : ""} en retard
+            </h3>
+          </div>
+          <ul className="space-y-2">
+            {overdueInvoices.map((inv) => (
+              <li key={inv.id} className="flex items-center justify-between">
+                <Link href={`/invoices/${inv.id}`} className="text-sm text-red-700 hover:text-red-900 font-medium">
+                  {inv.number} — {inv.client.firstName} {inv.client.lastName}
+                </Link>
+                <span className="text-sm font-bold text-red-700">{formatCurrency(inv.total)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* MA JOURNÉE */}
+      <Card className="mb-6">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4.5 w-4.5 text-blue-600" />
+            <h2 className="font-semibold text-gray-900">Ma journée</h2>
+            <Badge variant="info">{todayAppointments.length} RDV</Badge>
+          </div>
+          <Link href="/calendar" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
+            Planning <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <CardContent className="p-0">
+          {todayAppointments.length === 0 ? (
+            <div className="px-6 py-10 text-center">
+              <p className="text-sm text-gray-500 mb-3">Aucun rendez-vous aujourd&apos;hui</p>
+              <Link href="/calendar">
+                <Button size="sm" variant="secondary">
+                  <Plus className="h-4 w-4" />
+                  Planifier un RDV
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <ul className="divide-y divide-gray-50">
+              {todayAppointments.map((apt) => {
+                const isCompleted = apt.status === "completed";
+                const isCancelled = apt.status === "cancelled";
+                return (
+                  <li key={apt.id} className={`px-6 py-4 flex items-center justify-between ${isCompleted ? "opacity-60" : ""}`}>
+                    <div className="flex items-center gap-4">
+                      {/* Time */}
+                      <div className="text-center min-w-[52px]">
+                        <p className="text-lg font-bold text-gray-900">{formatTime(apt.date)}</p>
+                        <p className="text-xs text-gray-400">{formatTime(apt.endDate)}</p>
+                      </div>
+                      {/* Divider */}
+                      <div className={`w-1 h-12 rounded-full ${isCompleted ? "bg-green-400" : isCancelled ? "bg-red-300" : "bg-blue-500"}`} />
+                      {/* Details */}
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {apt.title}
+                          {isCompleted && <CheckCircle2 className="inline h-3.5 w-3.5 text-green-600 ml-1.5" />}
+                        </p>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <p className="text-sm text-gray-500">
+                            {apt.client.firstName} {apt.client.lastName}
+                          </p>
+                          {apt.client.address && (
+                            <span className="text-xs text-gray-400 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {apt.client.city || apt.client.address}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Quick actions */}
+                    {!isCompleted && !isCancelled && (
+                      <div className="flex items-center gap-2">
+                        <Link href={`/certificates/new?clientId=${apt.clientId}`}>
+                          <Button size="sm" variant="secondary">
+                            <ClipboardCheck className="h-3.5 w-3.5" />
+                            Certificat
+                          </Button>
+                        </Link>
+                        <Link href={`/clients/${apt.clientId}`}>
+                          <Button size="sm" variant="ghost">Fiche</Button>
+                        </Link>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Two columns: Upcoming + Recent Clients */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Appointments */}
         <Card>
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Prochains rendez-vous</h2>
@@ -142,7 +262,7 @@ export default async function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-gray-500">
                       <Clock className="h-3.5 w-3.5" />
-                      {formatDate(apt.date)}
+                      {formatDateTime(apt.date)}
                     </div>
                   </li>
                 ))}
@@ -151,7 +271,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Clients */}
         <Card>
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Derniers clients</h2>
@@ -168,10 +287,9 @@ export default async function DashboardPage() {
               <ul className="divide-y divide-gray-50">
                 {recentClients.map((client) => (
                   <li key={client.id} className="px-6 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <Link href={`/clients/${client.id}`} className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600">
-                        {client.firstName[0]}
-                        {client.lastName[0]}
+                        {client.firstName[0]}{client.lastName[0]}
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">
@@ -179,10 +297,8 @@ export default async function DashboardPage() {
                         </p>
                         <p className="text-xs text-gray-500">{client.city || client.address}</p>
                       </div>
-                    </div>
-                    {client.chimneyType && (
-                      <Badge variant="info">{client.chimneyType}</Badge>
-                    )}
+                    </Link>
+                    {client.chimneyType && <Badge variant="info">{client.chimneyType}</Badge>}
                   </li>
                 ))}
               </ul>
