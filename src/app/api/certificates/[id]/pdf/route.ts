@@ -691,15 +691,15 @@ export async function GET(
 
   if (anomalies.length === 0) {
     // Checkmark + green text
-    page.drawText("✓", {
+    page.drawText("OK", {
       x: marginL + 12,
       y,
-      size: 11,
-      font: fontR,
+      size: 9,
+      font: fontB,
       color: GREEN,
     });
-    page.drawText("Aucune anomalie constatée", {
-      x: marginL + 26,
+    page.drawText("Aucune anomalie constatee", {
+      x: marginL + 30,
       y,
       size: 9,
       font: fontB,
