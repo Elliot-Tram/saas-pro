@@ -13,12 +13,10 @@ import {
   FileSignature,
   Bell,
   Settings,
-  LogOut,
   Flame,
   Menu,
   X,
 } from "lucide-react";
-import { logout } from "@/app/actions/auth";
 
 const navigation = [
   { name: "Tableau de bord", href: "/", icon: LayoutDashboard },
@@ -99,17 +97,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="border-t border-gray-100 px-3 py-3">
-        <form action={logout}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
-          >
-            <LogOut className="h-4.5 w-4.5" />
-            Déconnexion
-          </button>
-        </form>
+      {/* Bottom spacer */}
+      <div className="border-t border-gray-100 px-4 py-3">
+        <p className="text-xs text-gray-400">SaaS-Pro v1.0</p>
       </div>
     </>
   );

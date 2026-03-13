@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth";
+import { UserMenu } from "./UserMenu";
 
 interface HeaderProps {
   title: string;
@@ -19,11 +20,10 @@ export async function Header({ title, description, children }: HeaderProps) {
       </div>
       <div className="flex items-center gap-3">
         {children}
-        <div className="flex items-center gap-2 pl-3 border-l border-gray-200">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
-            {session?.name?.charAt(0).toUpperCase() || "U"}
-          </div>
-        </div>
+        <UserMenu
+          name={session?.name || "Utilisateur"}
+          email={session?.email || ""}
+        />
       </div>
     </div>
   );

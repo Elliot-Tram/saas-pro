@@ -3,15 +3,20 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from "pdf-lib";
 
-const BLUE = rgb(0.22, 0.4, 0.87);
-const DARK = rgb(0.1, 0.1, 0.1);
+// ── Color Palette ──────────────────────────────────────────────────────────────
+const BLUE = rgb(0.16, 0.29, 0.55);
+const BLUE_LIGHT = rgb(0.16, 0.29, 0.55);
+const DARK = rgb(0.13, 0.13, 0.13);
 const GRAY = rgb(0.45, 0.45, 0.45);
-const LIGHT_BG = rgb(0.96, 0.96, 0.96);
+const GRAY_LIGHT = rgb(0.7, 0.7, 0.7);
+const GRAY_BG = rgb(0.97, 0.97, 0.97);
+const GRAY_BORDER = rgb(0.85, 0.85, 0.85);
 const GREEN = rgb(0.13, 0.55, 0.13);
-const RED = rgb(0.8, 0.15, 0.15);
-const ORANGE = rgb(0.85, 0.55, 0.1);
+const RED = rgb(0.75, 0.15, 0.15);
+const ORANGE = rgb(0.82, 0.52, 0.08);
 const WHITE = rgb(1, 1, 1);
 
+// ── Label translations ─────────────────────────────────────────────────────────
 const labels: Record<string, string> = {
   mecanique_haut: "Mécanique par le haut",
   mecanique_bas: "Mécanique par le bas",
@@ -25,8 +30,10 @@ const labels: Record<string, string> = {
   syndic: "Syndic",
   annuel: "Annuel",
   semestriel: "Semestriel",
-  anomaly_distance_plancher: "Distance de sécurité aux traversées de plancher non conforme",
-  anomaly_distance_toiture: "Distance de sécurité au niveau de la toiture non conforme",
+  anomaly_distance_plancher:
+    "Distance de sécurité aux traversées de plancher non conforme",
+  anomaly_distance_toiture:
+    "Distance de sécurité au niveau de la toiture non conforme",
   anomaly_etancheite: "Défaut d'étanchéité du conduit",
   anomaly_coudes: "Coudes non conformes (>2 coudes à 90° par DTU 24.1)",
   anomaly_souche: "Souche de cheminée défectueuse",
@@ -36,27 +43,30 @@ const labels: Record<string, string> = {
   anomaly_autre: "Autre anomalie",
 };
 
-function t(key: string) {
+function t(key: string | null | undefined): string {
+  if (!key) return "—";
   return labels[key] || key;
 }
 
-function fmtDate(date: Date): string {
-  return new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(date));
+function safe(val: string | null | undefined, fallback = "—"): string {
+  return val && val.trim() ? val.trim() : fallback;
 }
 
-function drawSectionTitle(page: PDFPage, title: string, y: number, font: PDFFont, width: number) {
-  page.drawRectangle({ x: 40, y: y - 4, width: width - 80, height: 20, color: BLUE });
-  page.drawText(title, { x: 50, y: y, size: 9, font, color: WHITE });
-  return y - 28;
+function fmtDate(date: Date | null | undefined): string {
+  if (!date) return "—";
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(date));
 }
 
-function drawField(page: PDFPage, label: string, value: string, x: number, y: number, fontR: PDFFont, fontB: PDFFont) {
-  page.drawText(label + " :", { x, y, size: 8, font: fontR, color: GRAY });
-  page.drawText(value, { x: x + 2, y: y - 12, size: 9, font: fontB, color: DARK });
-  return y - 28;
-}
-
-function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+function wrapText(
+  text: string,
+  font: PDFFont,
+  size: number,
+  maxWidth: number
+): string[] {
   const words = text.split(" ");
   const lines: string[] = [];
   let current = "";
@@ -73,206 +83,935 @@ function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): 
   return lines;
 }
 
+// ── Helper: embed a base64 image (PNG or JPG) safely ────────────────────────
+async function embedBase64Image(
+  pdfDoc: Awaited<ReturnType<typeof PDFDocument.create>>,
+  dataUrl: string
+) {
+  const base64Data = dataUrl.split(",")[1];
+  if (!base64Data) return null;
+  const imageBytes = Uint8Array.from(atob(base64Data), (c) =>
+    c.charCodeAt(0)
+  );
+  const isPng = dataUrl.includes("image/png");
+  return isPng ? pdfDoc.embedPng(imageBytes) : pdfDoc.embedJpg(imageBytes);
+}
+
+// ── Helper: draw centered text ──────────────────────────────────────────────
+function drawCentered(
+  page: PDFPage,
+  text: string,
+  y: number,
+  font: PDFFont,
+  size: number,
+  color: ReturnType<typeof rgb>,
+  pageWidth: number
+) {
+  const w = font.widthOfTextAtSize(text, size);
+  page.drawText(text, { x: (pageWidth - w) / 2, y, size, font, color });
+}
+
+// ── Helper: draw right-aligned text ─────────────────────────────────────────
+function drawRight(
+  page: PDFPage,
+  text: string,
+  y: number,
+  font: PDFFont,
+  size: number,
+  color: ReturnType<typeof rgb>,
+  rightX: number
+) {
+  const w = font.widthOfTextAtSize(text, size);
+  page.drawText(text, { x: rightX - w, y, size, font, color });
+}
+
+// ── Helper: section header with blue accent bar ─────────────────────────────
+function drawSectionHeader(
+  page: PDFPage,
+  title: string,
+  y: number,
+  fontB: PDFFont,
+  leftX: number
+): number {
+  // Small blue accent rectangle
+  page.drawRectangle({
+    x: leftX,
+    y: y - 2,
+    width: 3,
+    height: 12,
+    color: BLUE,
+  });
+  page.drawText(title, {
+    x: leftX + 10,
+    y,
+    size: 9,
+    font: fontB,
+    color: BLUE,
+  });
+  return y - 18;
+}
+
+// ── Helper: draw a labeled value ────────────────────────────────────────────
+function drawLabelValue(
+  page: PDFPage,
+  label: string,
+  value: string,
+  x: number,
+  y: number,
+  fontR: PDFFont,
+  fontB: PDFFont,
+  valueSize = 9
+): number {
+  page.drawText(label, { x, y, size: 8, font: fontR, color: GRAY });
+  page.drawText(value, {
+    x,
+    y: y - 12,
+    size: valueSize,
+    font: fontB,
+    color: DARK,
+  });
+  return y - 28;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ROUTE HANDLER
+// ═══════════════════════════════════════════════════════════════════════════════
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const { id } = await params;
   const cert = await prisma.certificate.findFirst({
     where: { id, userId: session.userId },
     include: { client: true, user: true },
   });
-  if (!cert) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
+  if (!cert)
+    return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]);
-  const { width, height } = page.getSize();
+  const page = pdfDoc.addPage([595, 842]); // A4
+  const { width } = page.getSize();
   const fontR = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontI = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  let y = height - 40;
+  const marginL = 45;
+  const marginR = 45;
+  const contentW = width - marginL - marginR;
+  const col2X = marginL + contentW / 2 + 10;
 
-  // ── LOGO ──
-  let logoEndX = 40;
+  // ════════════════════════════════════════════════════════════════════════════
+  // 1. TOP ACCENT BAR
+  // ════════════════════════════════════════════════════════════════════════════
+  page.drawRectangle({
+    x: 0,
+    y: 842 - 6,
+    width,
+    height: 6,
+    color: BLUE,
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // 2. HEADER AREA (y: 790 to ~720)
+  // ════════════════════════════════════════════════════════════════════════════
+  let headerY = 790;
+  let logoEndX = marginL;
+
+  // Logo
   if (cert.user.logo) {
     try {
-      const base64Data = cert.user.logo.split(",")[1];
-      const imageBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-      const isPng = cert.user.logo.includes("image/png");
-      const img = isPng
-        ? await pdfDoc.embedPng(imageBytes)
-        : await pdfDoc.embedJpg(imageBytes);
-      const scale = 60 / img.height;
-      const w = img.width * scale;
-      page.drawImage(img, { x: 40, y: y - 50, width: w, height: 60 });
-      logoEndX = 40 + w + 15;
+      const img = await embedBase64Image(pdfDoc, cert.user.logo);
+      if (img) {
+        const maxH = 55;
+        const scale = maxH / img.height;
+        const w = img.width * scale;
+        page.drawImage(img, {
+          x: marginL,
+          y: headerY - maxH + 8,
+          width: w,
+          height: maxH,
+        });
+        logoEndX = marginL + w + 12;
+      }
     } catch {
-      // Skip logo if invalid
+      /* skip invalid logo */
     }
   }
 
-  // ── COMPANY INFO ──
+  // Company info (left side)
   const companyX = logoEndX;
-  page.drawText(cert.user.company || cert.user.name, { x: companyX, y, size: 14, font: fontB, color: BLUE });
-  let infoY = y - 14;
-  const infoLines = [
+  page.drawText(safe(cert.user.company || cert.user.name, "Entreprise"), {
+    x: companyX,
+    y: headerY,
+    size: 14,
+    font: fontB,
+    color: BLUE,
+  });
+
+  let infoY = headerY - 15;
+  const companyLines = [
     cert.user.address,
     [cert.user.postalCode, cert.user.city].filter(Boolean).join(" "),
-    [cert.user.phone, cert.user.email].filter(Boolean).join(" — "),
-    cert.user.siret ? `SIRET: ${cert.user.siret}` : null,
-    cert.user.insurerName ? `Assurance RC: ${cert.user.insurerName}${cert.user.insuranceNumber ? ` — Police n°${cert.user.insuranceNumber}` : ""}` : null,
-    cert.user.qualification ? `Qualification: ${cert.user.qualification}` : null,
+    cert.user.phone,
+    cert.user.email,
   ].filter(Boolean) as string[];
 
-  for (const line of infoLines) {
-    page.drawText(line, { x: companyX, y: infoY, size: 7.5, font: fontR, color: GRAY });
-    infoY -= 11;
+  for (const line of companyLines) {
+    page.drawText(line, {
+      x: companyX,
+      y: infoY,
+      size: 8,
+      font: fontR,
+      color: GRAY,
+    });
+    infoY -= 12;
   }
 
-  // ── TITLE ──
-  const title = "CERTIFICAT DE RAMONAGE";
-  const titleW = fontB.widthOfTextAtSize(title, 18);
-  page.drawText(title, { x: width - 40 - titleW, y: height - 40, size: 18, font: fontB, color: DARK });
-  page.drawText(`N° ${cert.number}`, { x: width - 40 - fontR.widthOfTextAtSize(`N° ${cert.number}`, 9), y: height - 56, size: 9, font: fontR, color: GRAY });
-  page.drawText(`Date : ${fmtDate(cert.date)}`, { x: width - 40 - fontR.widthOfTextAtSize(`Date : ${fmtDate(cert.date)}`, 9), y: height - 69, size: 9, font: fontR, color: GRAY });
+  // Title block (right side)
+  const titleText = "CERTIFICAT DE RAMONAGE";
+  drawRight(page, titleText, headerY, fontB, 20, DARK, width - marginR);
 
-  // ── SEPARATOR ──
-  y = height - 130;
-  page.drawLine({ start: { x: 40, y }, end: { x: width - 40, y }, thickness: 0.5, color: rgb(0.85, 0.85, 0.85) });
+  const certNumber = safe(cert.number, "—");
+  drawRight(
+    page,
+    `N° ${certNumber}`,
+    headerY - 22,
+    fontR,
+    10,
+    GRAY,
+    width - marginR
+  );
+  drawRight(
+    page,
+    `Date : ${fmtDate(cert.date)}`,
+    headerY - 36,
+    fontR,
+    9,
+    GRAY,
+    width - marginR
+  );
 
-  // ── CLIENT SECTION ──
-  y -= 8;
-  y = drawSectionTitle(page, "CLIENT", y, fontB, width);
-  const col1 = 50;
-  const col2 = 300;
-  y = drawField(page, "Nom", `${cert.client.firstName} ${cert.client.lastName}`, col1, y, fontR, fontB);
-  drawField(page, "Qualité", t(cert.clientQuality), col2, y + 28, fontR, fontB);
-  y = drawField(page, "Adresse", `${cert.client.address}${cert.client.postalCode ? `, ${cert.client.postalCode}` : ""}${cert.client.city ? ` ${cert.client.city}` : ""}`, col1, y, fontR, fontB);
-  if (cert.client.phone) drawField(page, "Téléphone", cert.client.phone, col2, y + 28, fontR, fontB);
+  // ════════════════════════════════════════════════════════════════════════════
+  // 3. SEPARATOR LINE
+  // ════════════════════════════════════════════════════════════════════════════
+  const sepY = 712;
+  page.drawLine({
+    start: { x: marginL, y: sepY },
+    end: { x: width - marginR, y: sepY },
+    thickness: 0.5,
+    color: GRAY_BORDER,
+  });
 
-  // ── INSTALLATION SECTION ──
-  y -= 5;
-  y = drawSectionTitle(page, "INSTALLATION", y, fontB, width);
-  y = drawField(page, "Type d'appareil", cert.chimneyType, col1, y, fontR, fontB);
-  drawField(page, "Combustible", cert.fuelType || "—", col2, y + 28, fontR, fontB);
-  if (cert.applianceBrand || cert.applianceModel) {
-    y = drawField(page, "Marque / Modèle", [cert.applianceBrand, cert.applianceModel].filter(Boolean).join(" — "), col1, y, fontR, fontB);
+  // ════════════════════════════════════════════════════════════════════════════
+  // 4. PROFESSIONAL INFO BAR
+  // ════════════════════════════════════════════════════════════════════════════
+  const proBarY = 697;
+  page.drawRectangle({
+    x: marginL,
+    y: proBarY - 5,
+    width: contentW,
+    height: 18,
+    color: GRAY_BG,
+  });
+
+  const proParts = [
+    cert.user.siret ? `SIRET : ${cert.user.siret}` : null,
+    cert.user.insurerName
+      ? `Assurance RC : ${cert.user.insurerName}${cert.user.insuranceNumber ? ` — Police n°${cert.user.insuranceNumber}` : ""}`
+      : null,
+    cert.user.qualification
+      ? `Qualification : ${cert.user.qualification}`
+      : null,
+  ].filter(Boolean) as string[];
+
+  const proText = proParts.join("  |  ");
+  if (proText) {
+    drawCentered(page, proText, proBarY, fontR, 7.5, GRAY, width);
   }
-  if (cert.chimneyLocation) {
-    y = drawField(page, "Localisation", cert.chimneyLocation, col1, y, fontR, fontB);
-    if (cert.conduitType) drawField(page, "Type de conduit", cert.conduitType, col2, y + 28, fontR, fontB);
-  } else if (cert.conduitType) {
-    y = drawField(page, "Type de conduit", cert.conduitType, col1, y, fontR, fontB);
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // 5. CLIENT BOX
+  // ════════════════════════════════════════════════════════════════════════════
+  let y = 670;
+
+  // Background box
+  page.drawRectangle({
+    x: marginL,
+    y: y - 60,
+    width: contentW,
+    height: 68,
+    color: GRAY_BG,
+  });
+
+  // Section label
+  page.drawText("CLIENT", {
+    x: marginL + 10,
+    y: y,
+    size: 8,
+    font: fontB,
+    color: BLUE,
+  });
+
+  // Client details - left side
+  const clientName = `${safe(cert.client.firstName, "")} ${safe(cert.client.lastName, "")}`.trim() || "—";
+  page.drawText(clientName, {
+    x: marginL + 10,
+    y: y - 16,
+    size: 10,
+    font: fontB,
+    color: DARK,
+  });
+
+  page.drawText(t(cert.clientQuality), {
+    x: marginL + 10,
+    y: y - 30,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+
+  const clientAddr = [
+    cert.client.address,
+    [cert.client.postalCode, cert.client.city].filter(Boolean).join(" "),
+  ]
+    .filter(Boolean)
+    .join(", ");
+  page.drawText(safe(clientAddr), {
+    x: marginL + 10,
+    y: y - 44,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+
+  // Client details - right side
+  let clientRightY = y - 16;
+  if (cert.client.phone) {
+    page.drawText("Tél.", {
+      x: col2X,
+      y: clientRightY,
+      size: 8,
+      font: fontR,
+      color: GRAY,
+    });
+    page.drawText(cert.client.phone, {
+      x: col2X + 30,
+      y: clientRightY,
+      size: 9,
+      font: fontR,
+      color: DARK,
+    });
+    clientRightY -= 16;
   }
-  if (cert.conduitDiameter || cert.conduitLength) {
-    y = drawField(page, "Dimensions", [cert.conduitDiameter ? `Ø ${cert.conduitDiameter}` : null, cert.conduitLength ? `L ${cert.conduitLength}` : null].filter(Boolean).join(" — "), col1, y, fontR, fontB);
+  if (cert.client.email) {
+    page.drawText("Email", {
+      x: col2X,
+      y: clientRightY,
+      size: 8,
+      font: fontR,
+      color: GRAY,
+    });
+    page.drawText(cert.client.email, {
+      x: col2X + 30,
+      y: clientRightY,
+      size: 9,
+      font: fontR,
+      color: DARK,
+    });
   }
 
-  // ── INTERVENTION SECTION ──
-  y -= 5;
-  y = drawSectionTitle(page, "INTERVENTION & ÉVALUATION", y, fontB, width);
-  y = drawField(page, "Méthode", t(cert.method), col1, y, fontR, fontB);
-  drawField(page, "Périodicité", t(cert.periodicity), col2, y + 28, fontR, fontB);
+  // ════════════════════════════════════════════════════════════════════════════
+  // 6. INSTALLATION BOX
+  // ════════════════════════════════════════════════════════════════════════════
+  y = 595;
 
-  // Vacuum test
-  page.drawText("Vacuité du conduit :", { x: col1, y, size: 8, font: fontR, color: GRAY });
+  // Thin border box
+  page.drawRectangle({
+    x: marginL,
+    y: y - 75,
+    width: contentW,
+    height: 85,
+    borderColor: GRAY_BORDER,
+    borderWidth: 0.5,
+    color: WHITE,
+  });
+
+  // Header accent
+  y = drawSectionHeader(page, "INSTALLATION", y, fontB, marginL + 8);
+
+  // Column 1 fields
+  let instY1 = y;
+  // Type d'appareil
+  page.drawText("Type d'appareil", {
+    x: marginL + 12,
+    y: instY1,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(safe(cert.chimneyType), {
+    x: marginL + 95,
+    y: instY1,
+    size: 9,
+    font: fontB,
+    color: DARK,
+  });
+  instY1 -= 18;
+
+  // Marque / Modele
+  const brandModel = [cert.applianceBrand, cert.applianceModel]
+    .filter(Boolean)
+    .join(" — ");
+  page.drawText("Marque / Modèle", {
+    x: marginL + 12,
+    y: instY1,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(safe(brandModel), {
+    x: marginL + 95,
+    y: instY1,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+  instY1 -= 18;
+
+  // Combustible
+  page.drawText("Combustible", {
+    x: marginL + 12,
+    y: instY1,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(safe(cert.fuelType), {
+    x: marginL + 95,
+    y: instY1,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+
+  // Column 2 fields
+  let instY2 = y;
+  const instCol2 = col2X + 10;
+
+  page.drawText("Type de conduit", {
+    x: instCol2,
+    y: instY2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(safe(cert.conduitType), {
+    x: instCol2 + 85,
+    y: instY2,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+  instY2 -= 18;
+
+  page.drawText("Diamètre", {
+    x: instCol2,
+    y: instY2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(
+    cert.conduitDiameter ? `Ø ${cert.conduitDiameter}` : "—",
+    {
+      x: instCol2 + 85,
+      y: instY2,
+      size: 9,
+      font: fontR,
+      color: DARK,
+    }
+  );
+
+  // Longueur on same line further right (or next line if needed)
+  const dimDetailX = instCol2 + 150;
+  page.drawText("Long.", {
+    x: dimDetailX,
+    y: instY2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(cert.conduitLength ? `${cert.conduitLength}` : "—", {
+    x: dimDetailX + 32,
+    y: instY2,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+  instY2 -= 18;
+
+  page.drawText("Localisation", {
+    x: instCol2,
+    y: instY2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(safe(cert.chimneyLocation), {
+    x: instCol2 + 85,
+    y: instY2,
+    size: 9,
+    font: fontR,
+    color: DARK,
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // 7. INTERVENTION & EVALUATION
+  // ════════════════════════════════════════════════════════════════════════════
+  y = 500;
+
+  // Background
+  page.drawRectangle({
+    x: marginL,
+    y: y - 75,
+    width: contentW,
+    height: 85,
+    color: GRAY_BG,
+  });
+
+  y = drawSectionHeader(page, "INTERVENTION & ÉVALUATION", y, fontB, marginL + 8);
+
+  // Method + Periodicity on same line
+  page.drawText("Méthode", {
+    x: marginL + 12,
+    y,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(t(cert.method), {
+    x: marginL + 60,
+    y,
+    size: 9,
+    font: fontB,
+    color: DARK,
+  });
+
+  page.drawText("Périodicité", {
+    x: instCol2,
+    y,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(t(cert.periodicity), {
+    x: instCol2 + 60,
+    y,
+    size: 9,
+    font: fontB,
+    color: DARK,
+  });
+
+  y -= 24;
+
+  // Vacuity result
+  page.drawText("VACUITÉ DU CONDUIT", {
+    x: marginL + 12,
+    y: y + 2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
   const vacLabel = cert.vacuumTest ? "CONFORME" : "NON CONFORME";
   const vacColor = cert.vacuumTest ? GREEN : RED;
-  page.drawText(vacLabel, { x: col1 + 2, y: y - 12, size: 10, font: fontB, color: vacColor });
+  page.drawText(vacLabel, {
+    x: marginL + 12,
+    y: y - 14,
+    size: 12,
+    font: fontB,
+    color: vacColor,
+  });
 
-  // Condition
-  page.drawText("État général :", { x: col2, y, size: 8, font: fontR, color: GRAY });
-  const condColor = cert.condition === "bon_etat" ? GREEN : cert.condition === "a_surveiller" ? ORANGE : RED;
-  page.drawText(t(cert.condition).toUpperCase(), { x: col2 + 2, y: y - 12, size: 10, font: fontB, color: condColor });
-  y -= 30;
+  // General condition
+  page.drawText("ÉTAT GÉNÉRAL", {
+    x: instCol2,
+    y: y + 2,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  const condColor =
+    cert.condition === "bon_etat"
+      ? GREEN
+      : cert.condition === "a_surveiller"
+        ? ORANGE
+        : RED;
+  page.drawText(t(cert.condition).toUpperCase(), {
+    x: instCol2,
+    y: y - 14,
+    size: 12,
+    font: fontB,
+    color: condColor,
+  });
 
-  // ── ANOMALIES SECTION ──
-  y -= 5;
-  y = drawSectionTitle(page, "ANOMALIES CONSTATÉES", y, fontB, width);
+  // ════════════════════════════════════════════════════════════════════════════
+  // 8. ANOMALIES
+  // ════════════════════════════════════════════════════════════════════════════
+  y = 410;
   const anomalies = (cert.anomalies as string[] | null) || [];
+
+  // Calculate height needed
+  const anomalyLineH = 15;
+  const anomalyContentH =
+    anomalies.length === 0 ? 20 : anomalies.length * anomalyLineH;
+  const anomalyBoxH = anomalyContentH + 24;
+
+  page.drawRectangle({
+    x: marginL,
+    y: y - anomalyBoxH + 12,
+    width: contentW,
+    height: anomalyBoxH,
+    borderColor: GRAY_BORDER,
+    borderWidth: 0.5,
+    color: WHITE,
+  });
+
+  y = drawSectionHeader(
+    page,
+    "ANOMALIES CONSTATÉES",
+    y,
+    fontB,
+    marginL + 8
+  );
+
   if (anomalies.length === 0) {
-    page.drawText("Aucune anomalie constatée", { x: col1, y, size: 9, font: fontB, color: GREEN });
-    y -= 16;
+    // Checkmark + green text
+    page.drawText("✓", {
+      x: marginL + 12,
+      y,
+      size: 11,
+      font: fontR,
+      color: GREEN,
+    });
+    page.drawText("Aucune anomalie constatée", {
+      x: marginL + 26,
+      y,
+      size: 9,
+      font: fontB,
+      color: GREEN,
+    });
+    y -= 20;
   } else {
     for (const a of anomalies) {
-      page.drawText("•  " + t(a), { x: col1, y, size: 8, font: fontR, color: RED });
-      y -= 14;
+      // Red bullet
+      page.drawRectangle({
+        x: marginL + 14,
+        y: y + 2,
+        width: 4,
+        height: 4,
+        color: RED,
+      });
+      page.drawText(t(a), {
+        x: marginL + 24,
+        y,
+        size: 8.5,
+        font: fontR,
+        color: RED,
+      });
+      y -= anomalyLineH;
     }
   }
 
-  // ── OBSERVATIONS ──
-  if (cert.observations || cert.recommendations) {
-    y -= 5;
-    y = drawSectionTitle(page, "OBSERVATIONS & RECOMMANDATIONS", y, fontB, width);
+  // ════════════════════════════════════════════════════════════════════════════
+  // 9. OBSERVATIONS & RECOMMANDATIONS
+  // ════════════════════════════════════════════════════════════════════════════
+  if (cert.observations || cert.recommendations || cert.nextVisit) {
+    y -= 8;
+
+    // Pre-calculate content to determine box height
+    const obsLines = cert.observations
+      ? wrapText(cert.observations, fontR, 8.5, contentW - 30)
+      : [];
+    const recLines = cert.recommendations
+      ? wrapText(cert.recommendations, fontI, 8.5, contentW - 30)
+      : [];
+    const totalLines =
+      obsLines.length +
+      (cert.recommendations ? recLines.length + 1 : 0) +
+      (cert.nextVisit ? 2 : 0);
+    const obsBoxH = totalLines * 13 + 28;
+
+    page.drawRectangle({
+      x: marginL,
+      y: y - obsBoxH + 12,
+      width: contentW,
+      height: obsBoxH,
+      color: GRAY_BG,
+    });
+
+    y = drawSectionHeader(
+      page,
+      "OBSERVATIONS & RECOMMANDATIONS",
+      y,
+      fontB,
+      marginL + 8
+    );
+
+    // Observations text
     if (cert.observations) {
-      const lines = wrapText(cert.observations, fontR, 8, width - 100);
-      for (const line of lines) {
-        page.drawText(line, { x: col1, y, size: 8, font: fontR, color: DARK });
-        y -= 12;
+      for (const line of obsLines) {
+        page.drawText(line, {
+          x: marginL + 12,
+          y,
+          size: 8.5,
+          font: fontR,
+          color: DARK,
+        });
+        y -= 13;
       }
       y -= 4;
     }
+
+    // Recommendations in italic
     if (cert.recommendations) {
-      page.drawText("Recommandations :", { x: col1, y, size: 8, font: fontB, color: GRAY });
-      y -= 12;
-      const lines = wrapText(cert.recommendations, fontR, 8, width - 100);
-      for (const line of lines) {
-        page.drawText(line, { x: col1, y, size: 8, font: fontR, color: DARK });
-        y -= 12;
+      page.drawText("Recommandations :", {
+        x: marginL + 12,
+        y,
+        size: 8,
+        font: fontB,
+        color: GRAY,
+      });
+      y -= 13;
+      for (const line of recLines) {
+        page.drawText(line, {
+          x: marginL + 12,
+          y,
+          size: 8.5,
+          font: fontI,
+          color: DARK,
+        });
+        y -= 13;
       }
+    }
+
+    // Next visit
+    if (cert.nextVisit) {
+      y -= 4;
+      page.drawText(
+        `Prochain passage recommandé : ${fmtDate(cert.nextVisit)}`,
+        {
+          x: marginL + 12,
+          y,
+          size: 9,
+          font: fontB,
+          color: BLUE,
+        }
+      );
+      y -= 16;
     }
   }
 
-  if (cert.nextVisit) {
-    y -= 4;
-    page.drawText(`Prochain passage recommandé : ${fmtDate(cert.nextVisit)}`, { x: col1, y, size: 9, font: fontB, color: BLUE });
-    y -= 16;
-  }
+  // ════════════════════════════════════════════════════════════════════════════
+  // 10. SIGNATURES
+  // ════════════════════════════════════════════════════════════════════════════
+  const sigAreaTop = Math.min(y - 20, 165);
 
-  // ── SIGNATURES ──
-  const sigY = Math.min(y - 20, 160);
-  page.drawLine({ start: { x: 40, y: sigY + 80 }, end: { x: width - 40, y: sigY + 80 }, thickness: 0.5, color: rgb(0.85, 0.85, 0.85) });
+  // Horizontal separator line
+  page.drawLine({
+    start: { x: marginL, y: sigAreaTop + 75 },
+    end: { x: width - marginR, y: sigAreaTop + 75 },
+    thickness: 0.5,
+    color: GRAY_BORDER,
+  });
+
+  const sigBoxW = 220;
+  const sigBoxH = 60;
+  const proSigX = marginL + 20;
+  const clientSigX = width - marginR - sigBoxW - 20;
 
   // Pro signature
-  page.drawText("Le professionnel", { x: 50, y: sigY + 60, size: 9, font: fontB, color: DARK });
-  page.drawRectangle({ x: 50, y: sigY - 5, width: 200, height: 55, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 0.5, color: LIGHT_BG });
+  page.drawText("Le professionnel", {
+    x: proSigX,
+    y: sigAreaTop + 58,
+    size: 9,
+    font: fontB,
+    color: DARK,
+  });
+
+  // Dashed border effect (series of short lines)
+  const dashLen = 4;
+  const gapLen = 3;
+  const drawDashedRect = (
+    rx: number,
+    ry: number,
+    rw: number,
+    rh: number
+  ) => {
+    // Top
+    for (let dx = 0; dx < rw; dx += dashLen + gapLen) {
+      const end = Math.min(dx + dashLen, rw);
+      page.drawLine({
+        start: { x: rx + dx, y: ry + rh },
+        end: { x: rx + end, y: ry + rh },
+        thickness: 0.5,
+        color: GRAY_LIGHT,
+      });
+    }
+    // Bottom
+    for (let dx = 0; dx < rw; dx += dashLen + gapLen) {
+      const end = Math.min(dx + dashLen, rw);
+      page.drawLine({
+        start: { x: rx + dx, y: ry },
+        end: { x: rx + end, y: ry },
+        thickness: 0.5,
+        color: GRAY_LIGHT,
+      });
+    }
+    // Left
+    for (let dy = 0; dy < rh; dy += dashLen + gapLen) {
+      const end = Math.min(dy + dashLen, rh);
+      page.drawLine({
+        start: { x: rx, y: ry + dy },
+        end: { x: rx, y: ry + end },
+        thickness: 0.5,
+        color: GRAY_LIGHT,
+      });
+    }
+    // Right
+    for (let dy = 0; dy < rh; dy += dashLen + gapLen) {
+      const end = Math.min(dy + dashLen, rh);
+      page.drawLine({
+        start: { x: rx + rw, y: ry + dy },
+        end: { x: rx + rw, y: ry + end },
+        thickness: 0.5,
+        color: GRAY_LIGHT,
+      });
+    }
+  };
+
+  drawDashedRect(proSigX, sigAreaTop - 5, sigBoxW, sigBoxH);
+
+  // Embed pro signature image
   if (cert.proSignature) {
     try {
-      const base64Data = cert.proSignature.split(",")[1];
-      const sigBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-      const sigImg = await pdfDoc.embedPng(sigBytes);
-      const scale = Math.min(190 / sigImg.width, 45 / sigImg.height);
-      page.drawImage(sigImg, { x: 55, y: sigY, width: sigImg.width * scale, height: sigImg.height * scale });
-    } catch { /* skip */ }
+      const sigImg = await embedBase64Image(pdfDoc, cert.proSignature);
+      if (sigImg) {
+        const scale = Math.min(
+          (sigBoxW - 20) / sigImg.width,
+          (sigBoxH - 10) / sigImg.height
+        );
+        const sw = sigImg.width * scale;
+        const sh = sigImg.height * scale;
+        page.drawImage(sigImg, {
+          x: proSigX + (sigBoxW - sw) / 2,
+          y: sigAreaTop - 5 + (sigBoxH - sh) / 2,
+          width: sw,
+          height: sh,
+        });
+      }
+    } catch {
+      /* skip invalid signature */
+    }
   }
-  page.drawText(`Date : ${fmtDate(cert.date)}`, { x: 50, y: sigY - 16, size: 7, font: fontR, color: GRAY });
+
+  // Pro name + date below box
+  page.drawText(
+    safe(cert.user.company || cert.user.name, ""),
+    {
+      x: proSigX,
+      y: sigAreaTop - 18,
+      size: 8,
+      font: fontR,
+      color: GRAY,
+    }
+  );
+  page.drawText(`Date : ${fmtDate(cert.date)}`, {
+    x: proSigX,
+    y: sigAreaTop - 30,
+    size: 7.5,
+    font: fontR,
+    color: GRAY,
+  });
 
   // Client signature
-  page.drawText("Le client", { x: 330, y: sigY + 60, size: 9, font: fontB, color: DARK });
-  page.drawRectangle({ x: 330, y: sigY - 5, width: 200, height: 55, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 0.5, color: LIGHT_BG });
+  page.drawText("Le client", {
+    x: clientSigX,
+    y: sigAreaTop + 58,
+    size: 9,
+    font: fontB,
+    color: DARK,
+  });
+
+  drawDashedRect(clientSigX, sigAreaTop - 5, sigBoxW, sigBoxH);
+
+  // Embed client signature image
   if (cert.clientSignature) {
     try {
-      const base64Data = cert.clientSignature.split(",")[1];
-      const sigBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-      const sigImg = await pdfDoc.embedPng(sigBytes);
-      const scale = Math.min(190 / sigImg.width, 45 / sigImg.height);
-      page.drawImage(sigImg, { x: 335, y: sigY, width: sigImg.width * scale, height: sigImg.height * scale });
-    } catch { /* skip */ }
+      const sigImg = await embedBase64Image(pdfDoc, cert.clientSignature);
+      if (sigImg) {
+        const scale = Math.min(
+          (sigBoxW - 20) / sigImg.width,
+          (sigBoxH - 10) / sigImg.height
+        );
+        const sw = sigImg.width * scale;
+        const sh = sigImg.height * scale;
+        page.drawImage(sigImg, {
+          x: clientSigX + (sigBoxW - sw) / 2,
+          y: sigAreaTop - 5 + (sigBoxH - sh) / 2,
+          width: sw,
+          height: sh,
+        });
+      }
+    } catch {
+      /* skip invalid signature */
+    }
   }
-  page.drawText(`Date : ${fmtDate(cert.date)}`, { x: 330, y: sigY - 16, size: 7, font: fontR, color: GRAY });
 
-  // ── LEGAL FOOTER ──
-  const footerY = 25;
-  const legal1 = "Établi conformément au décret n°2023-641 du 20 juillet 2023";
-  const legal2 = "Ce document doit être conservé pendant une durée minimale de 2 ans";
-  const legal3 = `Validité : ${t(cert.periodicity)}`;
-  page.drawText(legal1, { x: (width - fontR.widthOfTextAtSize(legal1, 7)) / 2, y: footerY + 16, size: 7, font: fontR, color: GRAY });
-  page.drawText(legal2, { x: (width - fontR.widthOfTextAtSize(legal2, 7)) / 2, y: footerY + 7, size: 7, font: fontR, color: GRAY });
-  page.drawText(legal3, { x: (width - fontB.widthOfTextAtSize(legal3, 7)) / 2, y: footerY - 2, size: 7, font: fontB, color: BLUE });
+  // Client name + date below box
+  page.drawText(clientName, {
+    x: clientSigX,
+    y: sigAreaTop - 18,
+    size: 8,
+    font: fontR,
+    color: GRAY,
+  });
+  page.drawText(`Date : ${fmtDate(cert.date)}`, {
+    x: clientSigX,
+    y: sigAreaTop - 30,
+    size: 7.5,
+    font: fontR,
+    color: GRAY,
+  });
 
+  // ════════════════════════════════════════════════════════════════════════════
+  // 11. LEGAL FOOTER
+  // ════════════════════════════════════════════════════════════════════════════
+  const footerY = 36;
+
+  // Thin separator
+  page.drawLine({
+    start: { x: marginL + 60, y: footerY + 14 },
+    end: { x: width - marginR - 60, y: footerY + 14 },
+    thickness: 0.3,
+    color: GRAY_BORDER,
+  });
+
+  const legal1 =
+    "Établi conformément au décret n°2023-641 du 20 juillet 2023";
+  drawCentered(page, legal1, footerY + 4, fontR, 7, GRAY, width);
+
+  const validityText = t(cert.periodicity).toLowerCase();
+  const legal2 = `Ce document doit être conservé pendant une durée minimale de 2 ans — Validité : ${validityText}`;
+  drawCentered(page, legal2, footerY - 6, fontR, 7, GRAY, width);
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // EXPORT PDF
+  // ════════════════════════════════════════════════════════════════════════════
   const pdfBytes = await pdfDoc.save();
   return new NextResponse(Buffer.from(pdfBytes), {
     headers: {

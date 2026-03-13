@@ -84,10 +84,10 @@ export default async function DashboardPage() {
     .reduce((sum, inv) => sum + inv.total, 0);
 
   const stats = [
-    { label: "CA du mois", value: formatCurrency(caThisMonth), icon: Euro, color: "text-green-600", bg: "bg-green-50" },
     { label: "Clients", value: clientCount.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "RDV ce mois", value: appointmentsThisMonth.toString(), icon: Calendar, color: "text-purple-600", bg: "bg-purple-50" },
     { label: "En attente", value: formatCurrency(pendingAmount), icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "CA du mois", value: formatCurrency(caThisMonth), icon: Euro, color: "text-green-600", bg: "bg-green-50" },
   ];
 
   const formatTime = (date: Date) =>
@@ -160,9 +160,12 @@ export default async function DashboardPage() {
       {/* MA JOURNÉE */}
       <Card className="mb-6">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Clock className="h-4.5 w-4.5 text-blue-600" />
             <h2 className="font-semibold text-gray-900">Ma journée</h2>
+            <span className="text-sm text-gray-400">
+              {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(now)}
+            </span>
             <Badge variant="info">{todayAppointments.length} RDV</Badge>
           </div>
           <Link href="/calendar" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
@@ -201,7 +204,7 @@ export default async function DashboardPage() {
                           {apt.title}
                           {isCompleted && <CheckCircle2 className="inline h-3.5 w-3.5 text-green-600 ml-1.5" />}
                         </p>
-                        <div className="flex items-center gap-3 mt-0.5">
+                        <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                           <p className="text-sm text-gray-500">
                             {apt.client.firstName} {apt.client.lastName}
                           </p>
@@ -211,6 +214,9 @@ export default async function DashboardPage() {
                               {apt.client.city || apt.client.address}
                             </span>
                           )}
+                          <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
+                            {session?.name?.split(" ")[0]}
+                          </span>
                         </div>
                       </div>
                     </div>
