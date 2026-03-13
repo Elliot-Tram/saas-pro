@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { updateProfile } from "@/app/actions/settings";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -16,10 +16,30 @@ interface User {
   address: string | null;
   city: string | null;
   postalCode: string | null;
+  logo: string | null;
+  insuranceNumber: string | null;
+  insurerName: string | null;
+  qualification: string | null;
 }
 
 export function SettingsForm({ user }: { user: User }) {
   const [state, formAction, pending] = useActionState(updateProfile, null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(user.logo);
+  const [logoBase64, setLogoBase64] = useState<string | null>(user.logo);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setLogoPreview(result);
+      setLogoBase64(result);
+    };
+    reader.readAsDataURL(file);
+  }
 
   return (
     <form action={formAction}>
@@ -47,6 +67,65 @@ export function SettingsForm({ user }: { user: User }) {
               <Input id="email" name="email" type="email" label="Email" defaultValue={user.email} required />
             </div>
             <Input id="phone" name="phone" label="Téléphone" defaultValue={user.phone || ""} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h2 className="font-semibold text-gray-900">Informations professionnelles</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+              <div className="flex items-center gap-4">
+                {logoPreview && (
+                  <img
+                    src={logoPreview}
+                    alt="Logo"
+                    className="h-16 w-16 rounded-lg border border-gray-200 object-contain"
+                  />
+                )}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                  >
+                    {logoPreview ? "Changer le logo" : "Ajouter un logo"}
+                  </button>
+                  <p className="mt-1 text-xs text-gray-500">PNG ou JPG, max 500 Ko</p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  className="hidden"
+                  onChange={handleLogoChange}
+                />
+              </div>
+              <input type="hidden" name="logo" value={logoBase64 || ""} />
+            </div>
+            <Input
+              id="qualification"
+              name="qualification"
+              label="Qualification"
+              placeholder="Qualibat RGE, CTM Ramoneur..."
+              defaultValue={user.qualification || ""}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                id="insuranceNumber"
+                name="insuranceNumber"
+                label="N° assurance RC Pro"
+                defaultValue={user.insuranceNumber || ""}
+              />
+              <Input
+                id="insurerName"
+                name="insurerName"
+                label="Nom de l'assureur"
+                defaultValue={user.insurerName || ""}
+              />
+            </div>
           </CardContent>
         </Card>
 

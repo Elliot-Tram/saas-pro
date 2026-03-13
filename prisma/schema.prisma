@@ -18,6 +18,13 @@ model User {
   address   String?
   city      String?
   postalCode String?
+
+  // Professional info for certificates
+  logo            String?  // base64 encoded logo image
+  insuranceNumber String?  // N° police RC Pro
+  insurerName     String?  // Nom de l'assureur
+  qualification   String?  // Qualibat, CTM, etc.
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -146,13 +153,37 @@ model Certificate {
   id              String   @id @default(cuid())
   number          String   @unique
   date            DateTime @default(now())
-  chimneyType     String
-  chimneyLocation String?
-  fuelType        String?
+
+  // Client context
+  clientQuality   String   @default("proprietaire") // proprietaire, locataire, syndic
+
+  // Chimney details
+  chimneyType     String   // insert, foyer_ouvert, poele_bois, poele_granules, chaudiere
+  chimneyLocation String?  // ex: Salon RDC, Chambre 1er étage
+  fuelType        String?  // bois, granules, fioul, gaz
+  applianceBrand  String?  // Marque de l'appareil
+  applianceModel  String?  // Modèle
+
+  // Intervention
+  method          String   @default("mecanique_haut") // mecanique_haut, mecanique_bas, chimique, mixte
+  conduitType     String?  // maçonné, tubé inox, tubé flexible
+  conduitDiameter String?  // ex: 150mm, 180mm
+  conduitLength   String?  // ex: 8m
+
+  // Assessment
   condition       String   // bon_etat, a_surveiller, dangereux
   vacuumTest      Boolean  @default(true)
+  anomalies       Json?    // JSON checklist of anomalies found
   observations    String?
+  recommendations String?
+
+  // Periodicity & follow-up
+  periodicity     String   @default("annuel") // annuel, semestriel
   nextVisit       DateTime?
+
+  // Signatures (base64 PNG)
+  proSignature    String?  // Professional's signature
+  clientSignature String?  // Client's signature
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)

@@ -16,6 +16,10 @@ export async function updateProfile(_prevState: unknown, formData: FormData) {
     address: (formData.get("address") as string) || null,
     city: (formData.get("city") as string) || null,
     postalCode: (formData.get("postalCode") as string) || null,
+    logo: (formData.get("logo") as string) || null,
+    insuranceNumber: (formData.get("insuranceNumber") as string) || null,
+    insurerName: (formData.get("insurerName") as string) || null,
+    qualification: (formData.get("qualification") as string) || null,
   };
 
   if (!data.name || !data.email) {

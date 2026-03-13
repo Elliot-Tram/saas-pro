@@ -14,8 +14,17 @@ export default async function NewCertificatePage() {
       id: true,
       firstName: true,
       lastName: true,
+      chimneyType: true,
+      fuelType: true,
     },
   });
 
-  return <NewCertificateForm clients={clients} />;
+  const clientsData = clients.map((c) => ({
+    id: c.id,
+    name: `${c.lastName} ${c.firstName}`,
+    chimneyType: c.chimneyType,
+    fuelType: c.fuelType,
+  }));
+
+  return <NewCertificateForm clients={clientsData} />;
 }
