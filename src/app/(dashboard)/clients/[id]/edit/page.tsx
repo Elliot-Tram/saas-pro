@@ -13,11 +13,19 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
 
   const { id } = await params;
 
-  const client = await prisma.client.findFirst({
-    where: { id, userId: session.userId },
-  });
+  const [client, sectorClients] = await Promise.all([
+    prisma.client.findFirst({ where: { id, userId: session.userId } }),
+    prisma.client.findMany({
+      where: { userId: session.userId, sector: { not: null } },
+      select: { sector: true },
+      distinct: ["sector"],
+      orderBy: { sector: "asc" },
+    }),
+  ]);
 
   if (!client) notFound();
 
-  return <EditClientForm client={client} />;
+  const sectors = sectorClients.map((c) => c.sector).filter(Boolean) as string[];
+
+  return <EditClientForm client={client} sectors={sectors} />;
 }

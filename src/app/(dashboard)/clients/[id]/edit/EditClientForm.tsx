@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { SectorSelect } from "@/components/ui/SectorSelect";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -40,9 +41,10 @@ interface EditClientFormProps {
     fuelType: string | null;
     notes: string | null;
   };
+  sectors: string[];
 }
 
-export function EditClientForm({ client }: EditClientFormProps) {
+export function EditClientForm({ client, sectors }: EditClientFormProps) {
   const [state, formAction, pending] = useActionState(updateClient, null);
 
   return (
@@ -141,13 +143,7 @@ export function EditClientForm({ client }: EditClientFormProps) {
               />
             </div>
 
-            <Input
-              id="sector"
-              name="sector"
-              label="Secteur"
-              placeholder="ex: Annecy Nord, Secteur Thônes..."
-              defaultValue={client.sector || ""}
-            />
+            <SectorSelect sectors={sectors} defaultValue={client.sector || ""} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
