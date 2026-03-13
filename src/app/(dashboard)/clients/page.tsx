@@ -7,17 +7,33 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate } from "@/lib/utils";
-import { Users, Plus, Eye, Phone, MapPin } from "lucide-react";
+import { Users, Plus, Eye, Phone, MapPin, Filter } from "lucide-react";
 import Link from "next/link";
 
-export default async function ClientsPage() {
+interface ClientsPageProps {
+  searchParams: Promise<{ sector?: string }>;
+}
+
+export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const clients = await prisma.client.findMany({
+  const { sector: sectorFilter } = await searchParams;
+
+  const allClients = await prisma.client.findMany({
     where: { userId: session.userId },
     orderBy: { lastName: "asc" },
   });
+
+  // Collect unique sectors for the filter dropdown
+  const sectors = Array.from(
+    new Set(allClients.map((c) => c.sector).filter(Boolean))
+  ).sort() as string[];
+
+  // Apply sector filter if set
+  const clients = sectorFilter
+    ? allClients.filter((c) => c.sector === sectorFilter)
+    : allClients;
 
   return (
     <>
@@ -29,6 +45,34 @@ export default async function ClientsPage() {
           </Button>
         </Link>
       </Header>
+
+      {sectors.length > 0 && (
+        <div className="mb-4 flex items-center gap-2">
+          <Filter className="h-4 w-4 text-gray-400" />
+          <form className="flex items-center gap-2">
+            <select
+              name="sector"
+              defaultValue={sectorFilter || ""}
+              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Tous les secteurs</option>
+              {sectors.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <Button type="submit" variant="secondary" size="sm">
+              Filtrer
+            </Button>
+            {sectorFilter && (
+              <Link href="/clients" className="text-xs text-gray-500 hover:text-gray-700">
+                Réinitialiser
+              </Link>
+            )}
+          </form>
+        </div>
+      )}
 
       {clients.length === 0 ? (
         <Card>
@@ -51,6 +95,9 @@ export default async function ClientsPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Adresse
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Secteur
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Téléphone
@@ -101,6 +148,13 @@ export default async function ClientsPage() {
                           {client.city && `, ${client.city}`}
                         </span>
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.sector ? (
+                        <Badge variant="success">{client.sector}</Badge>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {client.phone ? (

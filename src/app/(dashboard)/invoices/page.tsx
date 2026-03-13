@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { FileText, Plus, Eye } from "lucide-react";
+import { FileText, Plus, Eye, Download } from "lucide-react";
 import Link from "next/link";
 
 type FilterStatus = "all" | "overdue" | "sent" | "paid";
@@ -73,6 +73,12 @@ export default async function InvoicesPage({
   return (
     <>
       <Header title="Factures" description="Gérez vos factures clients">
+        <a href={`/api/export/invoices?year=${now.getFullYear()}`}>
+          <Button variant="secondary" size="sm">
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+        </a>
         <Link href="/invoices/new">
           <Button>
             <Plus className="h-4 w-4" />

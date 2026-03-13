@@ -115,6 +115,13 @@ export default function NewClientPage() {
               />
             </div>
 
+            <Input
+              id="sector"
+              name="sector"
+              label="Secteur"
+              placeholder="ex: Annecy Nord, Secteur Thônes..."
+            />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 id="chimneyType"

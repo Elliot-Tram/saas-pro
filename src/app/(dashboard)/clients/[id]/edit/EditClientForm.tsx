@@ -35,6 +35,7 @@ interface EditClientFormProps {
     address: string;
     city: string | null;
     postalCode: string | null;
+    sector: string | null;
     chimneyType: string | null;
     fuelType: string | null;
     notes: string | null;
@@ -139,6 +140,14 @@ export function EditClientForm({ client }: EditClientFormProps) {
                 defaultValue={client.postalCode || ""}
               />
             </div>
+
+            <Input
+              id="sector"
+              name="sector"
+              label="Secteur"
+              placeholder="ex: Annecy Nord, Secteur Thônes..."
+              defaultValue={client.sector || ""}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select

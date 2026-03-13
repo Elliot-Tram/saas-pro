@@ -16,12 +16,14 @@ import {
   Flame,
   Menu,
   X,
+  MapPin,
 } from "lucide-react";
 
 const navigation = [
   { name: "Tableau de bord", href: "/", icon: LayoutDashboard },
   { name: "Clients", href: "/clients", icon: Users },
   { name: "Planning", href: "/calendar", icon: Calendar },
+  { name: "Secteurs", href: "/sectors", icon: MapPin },
   { name: "Factures", href: "/invoices", icon: FileText },
   { name: "Devis", href: "/quotes", icon: FileText },
   { name: "Certificats", href: "/certificates", icon: ClipboardCheck },

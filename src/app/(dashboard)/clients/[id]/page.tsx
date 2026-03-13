@@ -315,6 +315,18 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                 </div>
               </div>
 
+              {client.sector && (
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-gray-50 p-2">
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Secteur</p>
+                    <Badge variant="success">{client.sector}</Badge>
+                  </div>
+                </div>
+              )}
+
               {(client.chimneyType || client.fuelType) && (
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg bg-gray-50 p-2">

@@ -47,6 +47,9 @@ model Client {
   postalCode String?
   notes      String?
 
+  // Sector for route planning
+  sector      String?  // ex: "Annecy Nord", "Thônes", "Chamonix"
+
   // Chimney sweep specific fields
   chimneyType String?  // insert, foyer ouvert, poêle à bois, etc.
   fuelType    String?  // bois, granulés, fioul, gaz
