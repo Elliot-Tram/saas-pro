@@ -3,9 +3,17 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { NewCertificateForm } from "./NewCertificateForm";
 
-export default async function NewCertificatePage() {
+interface NewCertificatePageProps {
+  searchParams: Promise<{ clientId?: string; fromWorkflow?: string }>;
+}
+
+export default async function NewCertificatePage({
+  searchParams,
+}: NewCertificatePageProps) {
   const session = await getSession();
   if (!session) redirect("/login");
+
+  const { clientId, fromWorkflow } = await searchParams;
 
   const clients = await prisma.client.findMany({
     where: { userId: session.userId },
@@ -26,5 +34,11 @@ export default async function NewCertificatePage() {
     fuelType: c.fuelType,
   }));
 
-  return <NewCertificateForm clients={clientsData} />;
+  return (
+    <NewCertificateForm
+      clients={clientsData}
+      defaultClientId={clientId}
+      fromWorkflow={fromWorkflow === "true"}
+    />
+  );
 }

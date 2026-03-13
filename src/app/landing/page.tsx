@@ -2,15 +2,17 @@ import {
   ClipboardCheck,
   Calendar,
   FileText,
-  Users,
-  Shield,
+  Star,
+  Globe,
   Smartphone,
   ArrowRight,
   Check,
   Flame,
   ChevronRight,
-  Star,
+  Shield,
   Zap,
+  Camera,
+  MessageSquare,
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -40,7 +42,7 @@ function Navbar() {
             Fonctionnalites
           </a>
           <a
-            href="#comment-ca-marche"
+            href="#workflow"
             className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
           >
             Comment ca marche
@@ -104,17 +106,17 @@ function HeroSection() {
         </div>
 
         {/* Headline */}
-        <h1 className="mx-auto max-w-4xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl lg:text-7xl lg:leading-[1.1]">
-          Le logiciel n°1 des{" "}
+        <h1 className="mx-auto max-w-5xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+          Votre logiciel actuel vous aide a gerer vos clients.{" "}
           <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-            ramoneurs professionnels
+            Bistry vous aide a en avoir plus.
           </span>
         </h1>
 
         {/* Subheadline */}
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 sm:text-xl">
-          Certificats, factures, planning, clients — tout votre metier dans un
-          seul outil. Gagnez du temps et restez conforme.
+        <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-300 sm:text-xl">
+          Certificats, factures, avis Google, site vitrine — tout ce
+          qu&apos;il faut pour developper votre activite de ramonage.
         </p>
 
         {/* CTAs */}
@@ -127,7 +129,7 @@ function HeroSection() {
             <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
           </a>
           <a
-            href="#comment-ca-marche"
+            href="#workflow"
             className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/10"
           >
             Voir la demo
@@ -249,33 +251,28 @@ function SocialProofBar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
               <Shield className="h-4 w-4 text-green-600" />
             </div>
-            Conforme au decret 2023-641
+            Decret 2023-641
           </div>
           <div className="hidden h-5 w-px bg-slate-300 sm:block" />
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
               <ClipboardCheck className="h-4 w-4 text-blue-600" />
             </div>
-            Certificats officiels
-          </div>
-          <div className="hidden h-5 w-px bg-slate-300 sm:block" />
-          <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-              <FileText className="h-4 w-4 text-purple-600" />
-            </div>
             Signature electronique
           </div>
           <div className="hidden h-5 w-px bg-slate-300 sm:block" />
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
-            <div className="flex items-center gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-4 w-4 fill-amber-400 text-amber-400"
-                />
-              ))}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+              <Star className="h-4 w-4 text-amber-600" />
             </div>
-            4.9/5 satisfaction
+            Avis Google automatiques
+          </div>
+          <div className="hidden h-5 w-px bg-slate-300 sm:block" />
+          <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
+              <Globe className="h-4 w-4 text-purple-600" />
+            </div>
+            Site vitrine inclus
           </div>
         </div>
       </div>
@@ -288,42 +285,42 @@ const features = [
     icon: ClipboardCheck,
     title: "Certificats de ramonage",
     description:
-      "Certificats conformes au decret 2023-641, personnalisables avec votre logo et signature electronique.",
+      "Conformes au decret 2023-641, personnalisables avec votre logo. Generes automatiquement apres chaque intervention.",
     color: "blue" as const,
   },
   {
     icon: Calendar,
     title: "Planning & Secteurs",
     description:
-      "Organisez vos tournees par zone geographique. Vue \"Ma journee\" pour ne rien oublier.",
+      "Organisez vos tournees par zone. Vue 'Ma journee' pour voir vos RDV du jour d'un coup d'oeil.",
     color: "purple" as const,
   },
   {
     icon: FileText,
     title: "Facturation",
     description:
-      "Devis, factures, relances automatiques. Export comptable en un clic.",
+      "Devis, factures, relances automatiques. Export comptable CSV en un clic.",
     color: "green" as const,
   },
   {
-    icon: Users,
-    title: "Gestion clients",
+    icon: Star,
+    title: "Avis Google automatiques",
     description:
-      "Fiches clients completes avec historique, type de cheminee, rappels annuels.",
+      "Apres chaque intervention, une demande d'avis est envoyee automatiquement a votre client. Boostez votre reputation.",
     color: "amber" as const,
   },
   {
-    icon: Shield,
-    title: "Contrats d'entretien",
+    icon: Globe,
+    title: "Site vitrine inclus",
     description:
-      "Gerez vos contrats annuels, suivez les visites realisees et les echeances.",
+      "Un site professionnel connecte a votre app. Vos clients demandent un devis en ligne, la fiche se cree toute seule.",
     color: "rose" as const,
   },
   {
     icon: Smartphone,
-    title: "Mobile & Tablette",
+    title: "Mobile-first",
     description:
-      "Interface adaptee mobile et tablette. Utilisable directement chez le client.",
+      "Concu pour le terrain. Gros boutons, interface simple, utilisable avec des gants.",
     color: "cyan" as const,
   },
 ];
@@ -422,34 +419,44 @@ function FeaturesSection() {
   );
 }
 
-const steps = [
+const workflowSteps = [
   {
     number: "1",
-    title: "Creez votre compte",
-    description:
-      "30 secondes, aucune carte bancaire requise. Commencez immediatement.",
-    icon: Zap,
+    title: "Intervention terminee",
+    description: "Cliquez 'Termine' sur votre planning",
+    icon: Check,
+    color: "from-blue-500 to-blue-600",
   },
   {
     number: "2",
-    title: "Ajoutez vos clients",
+    title: "Certificat genere",
     description:
-      "Importez votre fichier existant ou creez vos fiches clients une a une.",
-    icon: Users,
+      "Le PDF est cree automatiquement avec toutes les infos",
+    icon: FileText,
+    color: "from-green-500 to-green-600",
   },
   {
     number: "3",
-    title: "Travaillez sereinement",
+    title: "Avis Google demande",
     description:
-      "Certificats, factures, planning — tout est automatise et conforme.",
-    icon: Check,
+      "Votre client recoit un email/SMS pour laisser un avis",
+    icon: MessageSquare,
+    color: "from-amber-500 to-amber-600",
+  },
+  {
+    number: "4",
+    title: "Photo publiee",
+    description:
+      "La photo du chantier est publiee sur Google My Business",
+    icon: Camera,
+    color: "from-purple-500 to-purple-600",
   },
 ];
 
-function HowItWorksSection() {
+function WorkflowSection() {
   return (
     <section
-      id="comment-ca-marche"
+      id="workflow"
       className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32"
     >
       <div className="mx-auto max-w-7xl px-6">
@@ -457,40 +464,44 @@ function HowItWorksSection() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ArrowRight className="h-4 w-4" />
-            Simple comme bonjour
+            Apres chaque intervention
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            Pret en{" "}
-            <span className="text-blue-600">3 etapes</span>
+            Tout se fait{" "}
+            <span className="text-blue-600">automatiquement</span>
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Pas de formation necessaire. Si vous savez utiliser un smartphone,
-            vous savez utiliser Bistry.
+            Un clic sur &laquo;&nbsp;Termine&nbsp;&raquo; et Bistry
+            s&apos;occupe du reste.
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="relative mx-auto mt-16 max-w-4xl lg:mt-20">
+        {/* Horizontal timeline */}
+        <div className="relative mx-auto mt-16 max-w-5xl lg:mt-20">
           {/* Connector line */}
-          <div className="absolute top-16 right-16 left-16 hidden h-0.5 bg-gradient-to-r from-blue-200 via-blue-300 to-blue-200 lg:block" />
+          <div className="absolute top-14 right-24 left-24 hidden h-0.5 bg-gradient-to-r from-blue-200 via-green-200 via-amber-200 to-purple-200 lg:block" />
 
-          <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
-            {steps.map((step) => (
+          <div className="grid gap-8 lg:grid-cols-4 lg:gap-6">
+            {workflowSteps.map((step) => (
               <div
                 key={step.number}
                 className="relative flex flex-col items-center text-center"
               >
-                {/* Step number */}
+                {/* Step icon */}
                 <div className="relative mb-6">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-2xl font-bold text-white shadow-xl shadow-blue-600/25">
+                  <div
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-white shadow-xl shadow-black/10`}
+                  >
+                    <step.icon className="h-6 w-6" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-gray-700 shadow-md ring-2 ring-gray-100">
                     {step.number}
                   </div>
-                  <div className="absolute -inset-2 rounded-3xl bg-blue-100/50" style={{ zIndex: -1 }} />
                 </div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">
                   {step.title}
                 </h3>
-                <p className="text-[15px] leading-relaxed text-gray-500">
+                <p className="text-sm leading-relaxed text-gray-500">
                   {step.description}
                 </p>
               </div>
@@ -502,16 +513,29 @@ function HowItWorksSection() {
   );
 }
 
-const planFeatures = [
-  "Clients illimites",
-  "Certificats illimites",
+const essentialFeatures = [
+  "1 utilisateur inclus",
+  "Fiches clients completes",
+  "Planning / calendrier",
+  "Certificats de ramonage PDF",
   "Facturation & devis",
-  "Planning & secteurs",
-  "Rappels automatiques",
-  "Export comptable",
-  "Contrats d'entretien",
-  "Support email prioritaire",
-  "Mises a jour incluses",
+  "Rappels annuels automatiques",
+  "Dashboard & statistiques",
+];
+
+const proFeatures = [
+  "Tout Essentiel, plus :",
+  "Site vitrine personnalise",
+  "Demande d'avis Google automatique",
+  "Statistiques avancees",
+  "Formulaire devis → fiche client",
+];
+
+const boostFeatures = [
+  "Tout Pro, plus :",
+  "Publication photos sur Google My Business",
+  "Setup Google My Business inclus",
+  "Support prioritaire",
 ];
 
 function PricingSection() {
@@ -522,50 +546,42 @@ function PricingSection() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-700">
             <Star className="h-4 w-4" />
-            Tarif simple
+            Tarifs
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            Un seul tarif,{" "}
-            <span className="text-blue-600">tout inclus</span>
+            Choisissez votre{" "}
+            <span className="text-blue-600">formule</span>
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Pas de surprise, pas de frais caches. Tout est inclus dans votre
-            abonnement.
+            Pas de surprise, pas de frais caches. Evoluez a votre rythme.
           </p>
         </div>
 
-        {/* Pricing card */}
-        <div className="mx-auto mt-16 max-w-lg lg:mt-20">
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50">
-            {/* Top accent */}
-            <div className="h-1.5 bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500" />
-
-            <div className="p-10 sm:p-12">
-              {/* Plan name */}
+        {/* Pricing cards */}
+        <div className="mx-auto mt-16 grid max-w-6xl gap-8 lg:mt-20 lg:grid-cols-3">
+          {/* Essentiel */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
+            <div className="h-1.5 bg-gradient-to-r from-slate-400 to-slate-500" />
+            <div className="p-8 sm:p-10">
               <div className="mb-8 text-center">
-                <div className="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase">
-                  Professionnel
+                <div className="mb-2 text-sm font-semibold tracking-wide text-slate-600 uppercase">
+                  Essentiel
                 </div>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-6xl font-extrabold tracking-tight text-gray-900">
+                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
                     29
                   </span>
-                  <span className="text-2xl font-semibold text-gray-400">
+                  <span className="text-xl font-semibold text-gray-400">
                     &euro;
                   </span>
                   <span className="ml-1 text-lg text-gray-400">/mois</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  par utilisateur, sans engagement
-                </p>
               </div>
 
-              {/* Divider */}
               <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-              {/* Features list */}
               <ul className="mt-8 space-y-4">
-                {planFeatures.map((feat) => (
+                {essentialFeatures.map((feat) => (
                   <li key={feat} className="flex items-center gap-3">
                     <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
                       <Check className="h-3.5 w-3.5 text-green-600" />
@@ -575,22 +591,133 @@ function PricingSection() {
                 ))}
               </ul>
 
-              {/* CTA */}
+              <a
+                href="/register"
+                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
+              >
+                Commencer
+                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Pro — Populaire */}
+          <div className="relative overflow-hidden rounded-3xl border-2 border-blue-500 bg-white shadow-xl shadow-blue-200/40">
+            {/* Badge */}
+            <div className="absolute top-0 right-0 rounded-bl-2xl bg-blue-600 px-4 py-1.5 text-xs font-bold tracking-wide text-white uppercase">
+              Populaire
+            </div>
+            <div className="h-1.5 bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500" />
+            <div className="p-8 sm:p-10">
+              <div className="mb-8 text-center">
+                <div className="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase">
+                  Pro
+                </div>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
+                    49
+                  </span>
+                  <span className="text-xl font-semibold text-gray-400">
+                    &euro;
+                  </span>
+                  <span className="ml-1 text-lg text-gray-400">/mois</span>
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
+
+              <ul className="mt-8 space-y-4">
+                {proFeatures.map((feat, i) => (
+                  <li key={feat} className="flex items-center gap-3">
+                    {i === 0 ? (
+                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                        <Check className="h-3.5 w-3.5 text-blue-600" />
+                      </div>
+                    ) : (
+                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <Check className="h-3.5 w-3.5 text-green-600" />
+                      </div>
+                    )}
+                    <span
+                      className={`text-[15px] ${i === 0 ? "font-medium text-blue-700" : "text-gray-700"}`}
+                    >
+                      {feat}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
               <a
                 href="/register"
                 className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:from-blue-500 hover:to-blue-600 hover:shadow-blue-500/30 hover:-translate-y-0.5"
               >
-                Commencer maintenant
+                Commencer
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
               </a>
+            </div>
+          </div>
 
-              <p className="mt-4 text-center text-sm text-gray-400">
-                30 jours d&apos;essai gratuit &middot; Aucune carte bancaire
-                requise
-              </p>
+          {/* Boost */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
+            <div className="h-1.5 bg-gradient-to-r from-purple-500 to-purple-600" />
+            <div className="p-8 sm:p-10">
+              <div className="mb-8 text-center">
+                <div className="mb-2 text-sm font-semibold tracking-wide text-purple-600 uppercase">
+                  Boost
+                </div>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
+                    79
+                  </span>
+                  <span className="text-xl font-semibold text-gray-400">
+                    &euro;
+                  </span>
+                  <span className="ml-1 text-lg text-gray-400">/mois</span>
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+              <ul className="mt-8 space-y-4">
+                {boostFeatures.map((feat, i) => (
+                  <li key={feat} className="flex items-center gap-3">
+                    {i === 0 ? (
+                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-purple-100">
+                        <Check className="h-3.5 w-3.5 text-purple-600" />
+                      </div>
+                    ) : (
+                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <Check className="h-3.5 w-3.5 text-green-600" />
+                      </div>
+                    )}
+                    <span
+                      className={`text-[15px] ${i === 0 ? "font-medium text-purple-700" : "text-gray-700"}`}
+                    >
+                      {feat}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href="/register"
+                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
+              >
+                Commencer
+                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+              </a>
             </div>
           </div>
         </div>
+
+        {/* Extra seat note */}
+        <p className="mt-10 text-center text-sm text-gray-500">
+          Siege supplementaire : +19&euro;/mois par utilisateur
+        </p>
+
+        <p className="mt-3 text-center text-sm text-gray-400">
+          30 jours d&apos;essai gratuit &middot; Aucune carte bancaire requise
+        </p>
       </div>
     </section>
   );
@@ -721,7 +848,7 @@ export default function LandingPage() {
       <HeroSection />
       <SocialProofBar />
       <FeaturesSection />
-      <HowItWorksSection />
+      <WorkflowSection />
       <PricingSection />
       <CtaSection />
       <Footer />

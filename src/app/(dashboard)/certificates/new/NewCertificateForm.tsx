@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { SignaturePad } from "@/components/ui/SignaturePad";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 const chimneyTypeOptions = [
@@ -71,11 +71,19 @@ interface ClientData {
 
 interface NewCertificateFormProps {
   clients: ClientData[];
+  defaultClientId?: string;
+  fromWorkflow?: boolean;
 }
 
-export function NewCertificateForm({ clients }: NewCertificateFormProps) {
+export function NewCertificateForm({
+  clients,
+  defaultClientId,
+  fromWorkflow,
+}: NewCertificateFormProps) {
   const [state, formAction, pending] = useActionState(createCertificate, null);
-  const [selectedClientId, setSelectedClientId] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState(
+    defaultClientId || ""
+  );
   const [chimneyType, setChimneyType] = useState("");
   const [fuelType, setFuelType] = useState("");
 
@@ -113,6 +121,13 @@ export function NewCertificateForm({ clients }: NewCertificateFormProps) {
           Créez un nouveau certificat de ramonage
         </p>
       </div>
+
+      {fromWorkflow && (
+        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 max-w-4xl flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+          Intervention terminée ! Créez maintenant le certificat de ramonage pour le client.
+        </div>
+      )}
 
       {state?.error && (
         <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 max-w-4xl">

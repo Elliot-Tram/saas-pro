@@ -20,6 +20,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
+import { CompleteAndCertifyButton } from "@/components/workflow/CompleteAndCertifyButton";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -223,12 +224,10 @@ export default async function DashboardPage() {
                     {/* Quick actions */}
                     {!isCompleted && !isCancelled && (
                       <div className="flex items-center gap-2">
-                        <Link href={`/certificates/new?clientId=${apt.clientId}`}>
-                          <Button size="sm" variant="secondary">
-                            <ClipboardCheck className="h-3.5 w-3.5" />
-                            Certificat
-                          </Button>
-                        </Link>
+                        <CompleteAndCertifyButton
+                          appointmentId={apt.id}
+                          clientId={apt.clientId}
+                        />
                         <Link href={`/clients/${apt.clientId}`}>
                           <Button size="sm" variant="ghost">Fiche</Button>
                         </Link>

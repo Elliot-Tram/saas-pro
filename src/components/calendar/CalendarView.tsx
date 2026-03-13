@@ -15,12 +15,13 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, Clock, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Clock, Trash2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { NewAppointmentModal } from "./NewAppointmentModal";
 import { updateAppointmentStatus, deleteAppointment } from "@/app/actions/appointments";
+import { completeIntervention } from "@/app/actions/workflow";
 
 interface SerializedAppointment {
   id: string;
@@ -273,10 +274,13 @@ export function CalendarView({ appointments, clients }: CalendarViewProps) {
                           {apt.status === "scheduled" && (
                             <>
                               <button
-                                onClick={() => handleStatusChange(apt.id, "completed")}
-                                className="text-xs text-green-600 hover:text-green-700 font-medium transition-colors"
+                                onClick={async () => {
+                                  await completeIntervention(apt.id);
+                                }}
+                                className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-medium transition-colors"
                               >
-                                Terminer
+                                <CheckCircle className="h-3 w-3" />
+                                Terminé + Certificat
                               </button>
                               <span className="text-gray-200">|</span>
                               <button
