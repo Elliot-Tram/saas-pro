@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  company   String?
+  phone     String?
+  siret     String?
+  address   String?
+  city      String?
+  postalCode String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients      Client[]
+  appointments Appointment[]
+  invoices     Invoice[]
+  quotes       Quote[]
+  certificates Certificate[]
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  address    String
+  city       String?
+  postalCode String?
+  notes      String?
+
+  // Chimney sweep specific fields
+  chimneyType String?  // insert, foyer ouvert, poêle à bois, etc.
+  fuelType    String?  // bois, granulés, fioul, gaz
+  lastVisit   DateTime?
+  nextReminder DateTime?
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  appointments Appointment[]
+  invoices     Invoice[]
+  quotes       Quote[]
+  certificates Certificate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  endDate     DateTime
+  status      String   @default("scheduled") // scheduled, completed, cancelled
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invoice {
+  id      String @id @default(cuid())
+  number  String @unique
+  status  String @default("draft") // draft, sent, paid
+  date    DateTime @default(now())
+  dueDate DateTime?
+
+  subtotal Float
+  taxRate  Float  @default(20)
+  tax      Float
+  total    Float
+
+  items InvoiceItem[]
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InvoiceItem {
+  id          String @id @default(cuid())
+  description String
+  quantity    Float  @default(1)
+  unitPrice   Float
+  total       Float
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Quote {
+  id        String @id @default(cuid())
+  number    String @unique
+  status    String @default("draft") // draft, sent, accepted, rejected
+  date      DateTime @default(now())
+  validUntil DateTime?
+
+  subtotal Float
+  taxRate  Float  @default(20)
+  tax      Float
+  total    Float
+
+  items QuoteItem[]
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuoteItem {
+  id          String @id @default(cuid())
+  description String
+  quantity    Float  @default(1)
+  unitPrice   Float
+  total       Float
+
+  quoteId String
+  quote   Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Certificate {
+  id              String   @id @default(cuid())
+  number          String   @unique
+  date            DateTime @default(now())
+  chimneyType     String
+  chimneyLocation String?
+  fuelType        String?
+  condition       String   // bon_etat, a_surveiller, dangereux
+  vacuumTest      Boolean  @default(true)
+  observations    String?
+  nextVisit       DateTime?
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

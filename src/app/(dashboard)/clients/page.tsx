@@ -1,0 +1,148 @@
+import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { Header } from "@/components/layout/Header";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatDate } from "@/lib/utils";
+import { Users, Plus, Eye, Phone, MapPin } from "lucide-react";
+import Link from "next/link";
+
+export default async function ClientsPage() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const clients = await prisma.client.findMany({
+    where: { userId: session.userId },
+    orderBy: { lastName: "asc" },
+  });
+
+  return (
+    <>
+      <Header title="Clients" description="Gérez votre fichier client">
+        <Link href="/clients/new">
+          <Button>
+            <Plus className="h-4 w-4" />
+            Nouveau client
+          </Button>
+        </Link>
+      </Header>
+
+      {clients.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={Users}
+            title="Aucun client"
+            description="Commencez par ajouter votre premier client pour gérer vos interventions."
+            actionLabel="Ajouter un client"
+            actionHref="/clients/new"
+          />
+        </Card>
+      ) : (
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nom
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Adresse
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Téléphone
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type cheminée
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Dernier passage
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {clients.map((client) => (
+                  <tr
+                    key={client.id}
+                    className="hover:bg-gray-50/50 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/clients/${client.id}`}
+                        className="flex items-center gap-3 group"
+                      >
+                        <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-xs font-medium text-blue-600">
+                          {client.firstName[0]}
+                          {client.lastName[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {client.lastName} {client.firstName}
+                          </p>
+                          {client.email && (
+                            <p className="text-xs text-gray-500">
+                              {client.email}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                        <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                        <span>
+                          {client.address}
+                          {client.city && `, ${client.city}`}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.phone ? (
+                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                          <Phone className="h-3.5 w-3.5 text-gray-400" />
+                          {client.phone}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.chimneyType ? (
+                        <Badge variant="info">{client.chimneyType}</Badge>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.lastVisit ? (
+                        <span className="text-sm text-gray-600">
+                          {formatDate(client.lastVisit)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">Jamais</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link href={`/clients/${client.id}`}>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                          Voir
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </>
+  );
+}
