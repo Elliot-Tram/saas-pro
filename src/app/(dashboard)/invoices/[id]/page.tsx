@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { ArrowLeft, Send, CheckCircle, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, Send, CheckCircle, Download, Trash2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoices";
 import { SendEmailButton } from "@/components/ui/SendEmailButton";
 import { sendInvoiceByEmail } from "@/app/actions/email";
+import { PaymentReminderButton } from "@/components/invoices/PaymentReminderButton";
 
-const statusConfig: Record<string, { label: string; variant: "default" | "warning" | "success" }> = {
+const statusConfig: Record<string, { label: string; variant: "default" | "warning" | "success" | "danger" }> = {
   draft: { label: "Brouillon", variant: "default" },
   sent: { label: "Envoyée", variant: "warning" },
   paid: { label: "Payée", variant: "success" },
@@ -33,7 +34,12 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
 
   if (!invoice) notFound();
 
-  const config = statusConfig[invoice.status] || statusConfig.draft;
+  const now = new Date();
+  const isOverdue = invoice.status === "sent" && invoice.dueDate != null && new Date(invoice.dueDate) < now;
+
+  const config = isOverdue
+    ? { label: "En retard", variant: "danger" as const }
+    : statusConfig[invoice.status] || statusConfig.draft;
 
   const markAsSent = updateInvoiceStatus.bind(null, invoice.id, "sent");
   const markAsPaid = updateInvoiceStatus.bind(null, invoice.id, "paid");
@@ -41,6 +47,16 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
+      {/* Overdue alert banner */}
+      {isOverdue && invoice.dueDate && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+          <p className="text-sm font-medium text-red-800">
+            Cette facture est en retard de paiement depuis le {formatDate(invoice.dueDate)}
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <Link href="/invoices">
@@ -69,12 +85,18 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             </form>
           )}
           {invoice.status === "sent" && (
-            <form action={markAsPaid}>
-              <Button variant="primary" type="submit">
-                <CheckCircle className="h-4 w-4" />
-                Marquer payée
-              </Button>
-            </form>
+            <>
+              <form action={markAsPaid}>
+                <Button variant="primary" type="submit">
+                  <CheckCircle className="h-4 w-4" />
+                  Marquer payée
+                </Button>
+              </form>
+              <PaymentReminderButton
+                invoiceId={invoice.id}
+                clientEmail={invoice.client.email}
+              />
+            </>
           )}
           <a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
             <Button variant="secondary">
@@ -131,7 +153,9 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                   {invoice.dueDate && (
                     <div>
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Date d&apos;échéance</p>
-                      <p className="text-sm text-gray-900">{formatDate(invoice.dueDate)}</p>
+                      <p className={`text-sm ${isOverdue ? "text-red-600 font-semibold" : "text-gray-900"}`}>
+                        {formatDate(invoice.dueDate)}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -192,6 +216,13 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               <div className="border-t border-gray-100 pt-3 flex justify-between">
                 <span className="text-base font-semibold text-gray-900">Total TTC</span>
                 <span className="text-lg font-bold text-gray-900">{formatCurrency(invoice.total)}</span>
+              </div>
+              {/* Payment status */}
+              <div className="border-t border-gray-100 pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Statut</span>
+                  <Badge variant={config.variant}>{config.label}</Badge>
+                </div>
               </div>
             </CardContent>
           </Card>

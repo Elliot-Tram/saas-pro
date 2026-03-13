@@ -18,6 +18,9 @@ import {
   Calendar,
   FileText,
   Award,
+  FileSignature,
+  TrendingUp,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -36,15 +39,17 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
     include: {
       appointments: {
         orderBy: { date: "desc" },
-        take: 10,
       },
       invoices: {
         orderBy: { date: "desc" },
-        take: 10,
+        include: { items: true },
       },
       certificates: {
         orderBy: { date: "desc" },
-        take: 10,
+      },
+      contracts: {
+        where: { status: "active" },
+        orderBy: { createdAt: "desc" },
       },
     },
   });
@@ -53,22 +58,106 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
   const deleteWithId = deleteClient.bind(null, client.id);
 
-  const statusLabels: Record<string, string> = {
-    scheduled: "Planifié",
-    completed: "Terminé",
-    cancelled: "Annulé",
-    draft: "Brouillon",
-    sent: "Envoyée",
-    paid: "Payée",
+  // --- Computed stats ---
+  const interventionCount = client.appointments.length;
+  const certificateCount = client.certificates.length;
+  const caTotal = client.invoices
+    .filter((inv) => inv.status === "paid")
+    .reduce((sum, inv) => sum + inv.total, 0);
+  const activeContract = client.contracts.length > 0 ? client.contracts[0] : null;
+
+  // --- Unified timeline ---
+  type TimelineEntry = {
+    id: string;
+    date: Date;
+    type: "RDV" | "Certificat" | "Facture";
+    description: string;
+    status: string;
+    statusVariant: "default" | "success" | "warning" | "danger" | "info";
+    href?: string;
   };
 
-  const statusVariants: Record<string, "default" | "success" | "warning" | "danger" | "info"> = {
-    scheduled: "info",
-    completed: "success",
-    cancelled: "danger",
-    draft: "default",
-    sent: "warning",
-    paid: "success",
+  const timeline: TimelineEntry[] = [];
+
+  for (const apt of client.appointments) {
+    timeline.push({
+      id: `apt-${apt.id}`,
+      date: apt.date,
+      type: "RDV",
+      description: apt.title + (apt.description ? ` — ${apt.description}` : ""),
+      status:
+        apt.status === "scheduled"
+          ? "Planifié"
+          : apt.status === "completed"
+            ? "Terminé"
+            : apt.status === "cancelled"
+              ? "Annulé"
+              : apt.status,
+      statusVariant:
+        apt.status === "scheduled"
+          ? "info"
+          : apt.status === "completed"
+            ? "success"
+            : apt.status === "cancelled"
+              ? "danger"
+              : "default",
+    });
+  }
+
+  for (const cert of client.certificates) {
+    timeline.push({
+      id: `cert-${cert.id}`,
+      date: cert.date,
+      type: "Certificat",
+      description: `${cert.number} — ${cert.chimneyType}${cert.fuelType ? ` (${cert.fuelType})` : ""}`,
+      status:
+        cert.condition === "bon_etat"
+          ? "Bon état"
+          : cert.condition === "a_surveiller"
+            ? "À surveiller"
+            : "Dangereux",
+      statusVariant:
+        cert.condition === "bon_etat"
+          ? "success"
+          : cert.condition === "a_surveiller"
+            ? "warning"
+            : "danger",
+      href: `/certificates/${cert.id}`,
+    });
+  }
+
+  for (const inv of client.invoices) {
+    timeline.push({
+      id: `inv-${inv.id}`,
+      date: inv.date,
+      type: "Facture",
+      description: `${inv.number} — ${formatCurrency(inv.total)}`,
+      status:
+        inv.status === "draft"
+          ? "Brouillon"
+          : inv.status === "sent"
+            ? "Envoyée"
+            : inv.status === "paid"
+              ? "Payée"
+              : inv.status,
+      statusVariant:
+        inv.status === "draft"
+          ? "default"
+          : inv.status === "sent"
+            ? "warning"
+            : inv.status === "paid"
+              ? "success"
+              : "default",
+      href: `/invoices/${inv.id}`,
+    });
+  }
+
+  timeline.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const typeBadgeVariant: Record<string, "info" | "success" | "warning"> = {
+    RDV: "info",
+    Certificat: "success",
+    Facture: "warning",
   };
 
   return (
@@ -112,6 +201,60 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             </form>
           </div>
         </div>
+      </div>
+
+      {/* Summary stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card>
+          <CardContent className="flex items-center gap-3 py-3">
+            <div className="rounded-lg bg-blue-50 p-2">
+              <Calendar className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Interventions</p>
+              <p className="text-xl font-bold text-gray-900">{interventionCount}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 py-3">
+            <div className="rounded-lg bg-green-50 p-2">
+              <Award className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Certificats</p>
+              <p className="text-xl font-bold text-gray-900">{certificateCount}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 py-3">
+            <div className="rounded-lg bg-amber-50 p-2">
+              <TrendingUp className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">CA total</p>
+              <p className="text-xl font-bold text-gray-900">{formatCurrency(caTotal)}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 py-3">
+            <div className="rounded-lg bg-purple-50 p-2">
+              <FileSignature className="h-5 w-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Contrat</p>
+              <p className="text-xl font-bold text-gray-900">
+                {activeContract ? (
+                  <Badge variant="success">Actif</Badge>
+                ) : (
+                  <span className="text-sm font-medium text-gray-400">Aucun</span>
+                )}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -223,152 +366,117 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
               </CardContent>
             </Card>
           )}
+
+          {/* Active contract */}
+          {activeContract && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileSignature className="h-4 w-4 text-gray-400" />
+                    <h2 className="font-semibold text-gray-900">Contrat actif</h2>
+                  </div>
+                  <Badge variant="success">Actif</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Numéro</span>
+                  <span className="font-medium text-gray-900">{activeContract.number}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Période</span>
+                  <span className="text-gray-900">
+                    {formatDate(activeContract.startDate)} - {formatDate(activeContract.endDate)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Montant</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(activeContract.amount)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Visites effectuées</span>
+                  <span className="text-gray-900">
+                    {activeContract.visitsDone}/{activeContract.visits}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full bg-gray-100 rounded-full h-2 mt-1">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all"
+                    style={{
+                      width: `${Math.min(100, (activeContract.visitsDone / activeContract.visits) * 100)}%`,
+                    }}
+                  />
+                </div>
+                {activeContract.description && (
+                  <p className="text-xs text-gray-500 pt-1">{activeContract.description}</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Right column - Historique & Documents */}
+        {/* Right column - Unified timeline */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Appointments history */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
+                <Clock className="h-4 w-4 text-gray-400" />
                 <h2 className="font-semibold text-gray-900">
-                  Historique des rendez-vous
+                  Historique des interventions
                 </h2>
+                <span className="text-xs text-gray-400 ml-auto">
+                  {timeline.length} entrée{timeline.length !== 1 ? "s" : ""}
+                </span>
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {client.appointments.length === 0 ? (
+              {timeline.length === 0 ? (
                 <div className="px-6 py-8 text-center text-sm text-gray-500">
-                  Aucun rendez-vous enregistré
+                  Aucun historique enregistré
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-50">
-                  {client.appointments.map((apt) => (
+                  {timeline.map((entry) => (
                     <li
-                      key={apt.id}
-                      className="px-6 py-3 flex items-center justify-between"
+                      key={entry.id}
+                      className="px-6 py-3 flex items-start gap-4 hover:bg-gray-50/50 transition-colors"
                     >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {apt.title}
-                        </p>
-                        {apt.description && (
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {apt.description}
+                      {/* Date column */}
+                      <div className="flex-shrink-0 w-20 pt-0.5">
+                        <span className="text-xs text-gray-500">
+                          {formatDate(entry.date)}
+                        </span>
+                      </div>
+                      {/* Type badge */}
+                      <div className="flex-shrink-0 w-24">
+                        <Badge variant={typeBadgeVariant[entry.type] || "default"}>
+                          {entry.type}
+                        </Badge>
+                      </div>
+                      {/* Description */}
+                      <div className="flex-1 min-w-0">
+                        {entry.href ? (
+                          <Link
+                            href={entry.href}
+                            className="text-sm text-blue-600 hover:text-blue-700 hover:underline truncate block"
+                          >
+                            {entry.description}
+                          </Link>
+                        ) : (
+                          <p className="text-sm text-gray-900 truncate">
+                            {entry.description}
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={statusVariants[apt.status] || "default"}
-                        >
-                          {statusLabels[apt.status] || apt.status}
+                      {/* Status */}
+                      <div className="flex-shrink-0">
+                        <Badge variant={entry.statusVariant}>
+                          {entry.status}
                         </Badge>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(apt.date)}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Invoices */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-gray-400" />
-                <h2 className="font-semibold text-gray-900">Factures</h2>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {client.invoices.length === 0 ? (
-                <div className="px-6 py-8 text-center text-sm text-gray-500">
-                  Aucune facture enregistrée
-                </div>
-              ) : (
-                <ul className="divide-y divide-gray-50">
-                  {client.invoices.map((inv) => (
-                    <li
-                      key={inv.id}
-                      className="px-6 py-3 flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {inv.number}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatDate(inv.date)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={statusVariants[inv.status] || "default"}
-                        >
-                          {statusLabels[inv.status] || inv.status}
-                        </Badge>
-                        <span className="text-sm font-medium text-gray-900">
-                          {formatCurrency(inv.total)}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Certificates */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 text-gray-400" />
-                <h2 className="font-semibold text-gray-900">Certificats</h2>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {client.certificates.length === 0 ? (
-                <div className="px-6 py-8 text-center text-sm text-gray-500">
-                  Aucun certificat enregistré
-                </div>
-              ) : (
-                <ul className="divide-y divide-gray-50">
-                  {client.certificates.map((cert) => (
-                    <li
-                      key={cert.id}
-                      className="px-6 py-3 flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {cert.number}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {cert.chimneyType}
-                          {cert.fuelType && ` - ${cert.fuelType}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={
-                            cert.condition === "bon_etat"
-                              ? "success"
-                              : cert.condition === "a_surveiller"
-                                ? "warning"
-                                : "danger"
-                          }
-                        >
-                          {cert.condition === "bon_etat"
-                            ? "Bon état"
-                            : cert.condition === "a_surveiller"
-                              ? "À surveiller"
-                              : "Dangereux"}
-                        </Badge>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(cert.date)}
-                        </span>
                       </div>
                     </li>
                   ))}

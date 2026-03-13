@@ -11,6 +11,7 @@ import {
   FileText,
   ClipboardCheck,
   FileSignature,
+  Bell,
   Settings,
   LogOut,
   Flame,
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Devis", href: "/quotes", icon: FileText },
   { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
   { name: "Contrats", href: "/contracts", icon: FileSignature },
+  { name: "Rappels", href: "/reminders", icon: Bell },
   { name: "Paramètres", href: "/settings", icon: Settings },
 ];
 
