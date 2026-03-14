@@ -21,39 +21,21 @@ import {
   UsersRound,
 } from "lucide-react";
 
-const navigationGroups = [
-  {
-    label: null,
-    items: [
-      { name: "Tableau de bord", href: "/", icon: LayoutDashboard },
-      { name: "Clients", href: "/clients", icon: Users },
-      { name: "Planning", href: "/calendar", icon: Calendar },
-    ],
-  },
-  {
-    label: "Activité",
-    items: [
-      { name: "Factures", href: "/invoices", icon: FileText },
-      { name: "Devis", href: "/quotes", icon: FileText },
-      { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
-      { name: "Contrats", href: "/contracts", icon: FileSignature },
-    ],
-  },
-  {
-    label: "Outils",
-    items: [
-      { name: "Secteurs", href: "/sectors", icon: MapPin },
-      { name: "Rappels", href: "/reminders", icon: Bell },
-      { name: "Statistiques", href: "/stats", icon: BarChart3 },
-    ],
-  },
-  {
-    label: "Paramètres",
-    items: [
-      { name: "Équipe", href: "/team", icon: UsersRound },
-      { name: "Paramètres", href: "/settings", icon: Settings },
-    ],
-  },
+const mainNavItems = [
+  { name: "Accueil", href: "/", icon: LayoutDashboard },
+  { name: "Mes clients", href: "/clients", icon: Users },
+  { name: "Planning", href: "/calendar", icon: Calendar },
+  { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
+  { name: "Facturation", href: "/invoices", icon: FileText },
+  { name: "Mes zones", href: "/sectors", icon: MapPin },
+];
+
+const secondaryNavItems = [
+  { name: "Rappels", href: "/reminders", icon: Bell },
+  { name: "Contrats", href: "/contracts", icon: FileSignature },
+  { name: "Mon chiffre", href: "/stats", icon: BarChart3 },
+  { name: "Équipe", href: "/team", icon: UsersRound },
+  { name: "Mon entreprise", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -98,41 +80,61 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navigationGroups.map((group, groupIndex) => (
-          <div key={groupIndex}>
-            {group.label && (
-              <>
-                <div className="mx-3 my-2 h-px bg-gray-100" />
-                <p className="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  {group.label}
-                </p>
-              </>
-            )}
-            {group.items.map((item) => {
-              const isActive =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(item.href);
+      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+        {/* Main items */}
+        <div className="space-y-1">
+          {mainNavItems.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  )}
-                >
-                  <item.icon className="h-4.5 w-4.5 shrink-0" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                )}
+              >
+                <item.icon className="h-4.5 w-4.5 shrink-0" />
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Separator */}
+        <div className="mx-3 my-3 h-px bg-gray-200" />
+
+        {/* Secondary items */}
+        <div className="space-y-0.5">
+          {secondaryNavItems.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                  isActive
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+                )}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
       </nav>
 
       {/* Bottom spacer */}

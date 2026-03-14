@@ -813,18 +813,6 @@ function Footer() {
             >
               Inscription
             </a>
-            <a
-              href="/cgv"
-              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
-            >
-              CGV
-            </a>
-            <a
-              href="/privacy"
-              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
-            >
-              Confidentialite
-            </a>
           </div>
         </div>
 

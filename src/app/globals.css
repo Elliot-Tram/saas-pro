@@ -6,6 +6,7 @@
 
 body {
   font-family: var(--font-sans);
+  font-size: 15px;
   background: #f8f9fb;
   color: #111827;
   -webkit-font-smoothing: antialiased;
@@ -33,7 +34,7 @@ body {
 /* Large touch targets for mobile */
 @media (max-width: 1024px) {
   button, a, [role="button"] {
-    min-height: 44px;
+    min-height: 48px;
   }
 
   input, select, textarea {
