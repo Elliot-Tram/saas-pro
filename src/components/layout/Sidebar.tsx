@@ -21,19 +21,39 @@ import {
   UsersRound,
 } from "lucide-react";
 
-const navigation = [
-  { name: "Tableau de bord", href: "/", icon: LayoutDashboard },
-  { name: "Clients", href: "/clients", icon: Users },
-  { name: "Planning", href: "/calendar", icon: Calendar },
-  { name: "Secteurs", href: "/sectors", icon: MapPin },
-  { name: "Factures", href: "/invoices", icon: FileText },
-  { name: "Devis", href: "/quotes", icon: FileText },
-  { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
-  { name: "Contrats", href: "/contracts", icon: FileSignature },
-  { name: "Rappels", href: "/reminders", icon: Bell },
-  { name: "Statistiques", href: "/stats", icon: BarChart3 },
-  { name: "Équipe", href: "/team", icon: UsersRound },
-  { name: "Paramètres", href: "/settings", icon: Settings },
+const navigationGroups = [
+  {
+    label: null,
+    items: [
+      { name: "Tableau de bord", href: "/", icon: LayoutDashboard },
+      { name: "Clients", href: "/clients", icon: Users },
+      { name: "Planning", href: "/calendar", icon: Calendar },
+    ],
+  },
+  {
+    label: "Activité",
+    items: [
+      { name: "Factures", href: "/invoices", icon: FileText },
+      { name: "Devis", href: "/quotes", icon: FileText },
+      { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
+      { name: "Contrats", href: "/contracts", icon: FileSignature },
+    ],
+  },
+  {
+    label: "Outils",
+    items: [
+      { name: "Secteurs", href: "/sectors", icon: MapPin },
+      { name: "Rappels", href: "/reminders", icon: Bell },
+      { name: "Statistiques", href: "/stats", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Paramètres",
+    items: [
+      { name: "Équipe", href: "/team", icon: UsersRound },
+      { name: "Paramètres", href: "/settings", icon: Settings },
+    ],
+  },
 ];
 
 export function Sidebar() {
@@ -65,7 +85,7 @@ export function Sidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
             <Flame className="h-4.5 w-4.5 text-white" />
           </div>
-          <span className="text-lg font-bold text-gray-900">SaaS-Pro</span>
+          <span className="text-lg font-bold text-gray-900">Bistry</span>
         </div>
         {/* Close button on mobile */}
         <button
@@ -78,34 +98,46 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navigation.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {navigationGroups.map((group, groupIndex) => (
+          <div key={groupIndex}>
+            {group.label && (
+              <>
+                <div className="mx-3 my-2 h-px bg-gray-100" />
+                <p className="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  {group.label}
+                </p>
+              </>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.href);
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              )}
-            >
-              <item.icon className="h-4.5 w-4.5 shrink-0" />
-              {item.name}
-            </Link>
-          );
-        })}
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
+                >
+                  <item.icon className="h-4.5 w-4.5 shrink-0" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Bottom spacer */}
       <div className="border-t border-gray-100 px-4 py-3">
-        <p className="text-xs text-gray-400">SaaS-Pro v1.0</p>
+        <p className="text-xs text-gray-400">Bistry v1.0</p>
       </div>
     </>
   );
@@ -125,7 +157,7 @@ export function Sidebar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600">
             <Flame className="h-4 w-4 text-white" />
           </div>
-          <span className="text-base font-bold text-gray-900">SaaS-Pro</span>
+          <span className="text-base font-bold text-gray-900">Bistry</span>
         </div>
       </div>
 

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SaaS-Pro — Gestion pour artisans",
-  description: "Logiciel de gestion pour artisans et professions de niche",
+  title: "Bistry — Logiciel de gestion pour ramoneurs",
+  description: "Certificats, factures, planning, clients — tout votre métier de ramoneur dans un seul outil.",
 };
 
 export default function RootLayout({

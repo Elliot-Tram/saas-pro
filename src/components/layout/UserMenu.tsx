@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { logout } from "@/app/actions/auth";
 import Link from "next/link";
 
@@ -52,14 +52,6 @@ export function UserMenu({ name, email }: UserMenuProps) {
             >
               <Settings className="h-4 w-4 text-gray-400" />
               Paramètres
-            </Link>
-            <Link
-              href={`/clients`}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <User className="h-4 w-4 text-gray-400" />
-              Mon profil
             </Link>
           </div>
 

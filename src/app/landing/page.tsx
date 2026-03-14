@@ -813,6 +813,18 @@ function Footer() {
             >
               Inscription
             </a>
+            <a
+              href="/cgv"
+              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+            >
+              CGV
+            </a>
+            <a
+              href="/privacy"
+              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+            >
+              Confidentialite
+            </a>
           </div>
         </div>
 
@@ -823,16 +835,22 @@ function Footer() {
           </p>
           <div className="flex gap-6">
             <a
-              href="#"
+              href="/legal"
               className="text-sm text-gray-400 transition-colors hover:text-gray-600"
             >
               Mentions legales
             </a>
             <a
-              href="#"
+              href="/privacy"
               className="text-sm text-gray-400 transition-colors hover:text-gray-600"
             >
               Confidentialite
+            </a>
+            <a
+              href="/cgv"
+              className="text-sm text-gray-400 transition-colors hover:text-gray-600"
+            >
+              CGV
             </a>
           </div>
         </div>

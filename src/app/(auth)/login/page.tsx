@@ -58,6 +58,12 @@ export default function LoginPage() {
           Créer un compte
         </Link>
       </p>
+
+      <p className="mt-3 text-center">
+        <Link href="/landing" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+          Découvrir Bistry
+        </Link>
+      </p>
     </div>
   );
 }
