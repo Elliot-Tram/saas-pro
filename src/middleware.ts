@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     publicPaths.includes(pathname) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/import") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
@@ -21,6 +22,22 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get("token")?.value;
 
+  // Root path: show landing if not logged in, dashboard if logged in
+  if (pathname === "/") {
+    if (!token) {
+      return NextResponse.rewrite(new URL("/landing", request.url));
+    }
+    try {
+      await jwtVerify(token, secret);
+      return NextResponse.next(); // logged in → dashboard
+    } catch {
+      const response = NextResponse.rewrite(new URL("/landing", request.url));
+      response.cookies.delete("token");
+      return response;
+    }
+  }
+
+  // All other paths: require auth
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
