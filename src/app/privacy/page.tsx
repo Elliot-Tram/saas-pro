@@ -49,7 +49,7 @@ export default function PrivacyPage() {
               Le responsable du traitement des donnees personnelles est Bistry.
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Adresse : [a completer]
+              Lille, France
               <br />
               Email : contact@bistry.fr
             </p>

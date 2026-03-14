@@ -50,9 +50,8 @@ export default function LegalPage() {
             </p>
             <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-5">
               <p className="font-semibold text-gray-900">Bistry</p>
-              <p className="mt-1">Adresse : [a completer]</p>
+              <p className="mt-1">Lille, France</p>
               <p>Email : contact@bistry.fr</p>
-              <p>SIRET : [a completer]</p>
             </div>
           </section>
 
@@ -61,7 +60,7 @@ export default function LegalPage() {
             <h2 className="mb-3 text-xl font-semibold text-gray-900">
               Directeur de la publication
             </h2>
-            <p>[A completer]</p>
+            <p>Elliot Tristram — contact@bistry.fr</p>
           </section>
 
           {/* Hebergeur */}
