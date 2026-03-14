@@ -88,10 +88,10 @@ export default async function CertificateDetailPage({
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <a href={`/api/certificates/${certificate.id}/pdf`} target="_blank" rel="noopener noreferrer">
+            <a href={`/certificates/${certificate.id}/preview`} target="_blank" rel="noopener noreferrer">
               <Button variant="secondary">
                 <Download className="h-4 w-4" />
-                Télécharger PDF
+                Aperçu / PDF
               </Button>
             </a>
             <SendEmailButton
