@@ -210,6 +210,19 @@ export function CreateProspectForm() {
             placeholder="123 456 789 00012"
           />
 
+          <div className="flex items-center gap-3 pt-2">
+            <input
+              id="seedDemo"
+              name="seedDemo"
+              type="checkbox"
+              defaultChecked
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="seedDemo" className="text-sm text-gray-700">
+              Pr&eacute;-remplir avec des donn&eacute;es de d&eacute;mo (3 clients, 1 certificat, 1 facture, 2 RDV)
+            </label>
+          </div>
+
           <div className="pt-2">
             <Button type="submit" loading={isPending} className="w-full">
               Creer le compte prospect
