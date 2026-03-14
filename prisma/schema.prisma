@@ -25,6 +25,7 @@ model Team {
   insurerName     String?
   qualification   String?
   googleReviewLink String?
+  source           String   @default("organic") // organic, prospect
 
   members      User[]
   clients      Client[]

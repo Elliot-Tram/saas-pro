@@ -39,6 +39,7 @@ export async function createProspectAccount(
         phone: phone || null,
         city: city || null,
         siret: siret || null,
+        source: "prospect",
       },
     });
 
