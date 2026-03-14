@@ -73,8 +73,16 @@ export default async function CertificatePreviewPage({
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          body { margin: 0; padding: 0; }
+          body { margin: 0; padding: 0; background: white !important; }
           .certificate { box-shadow: none !important; margin: 0 !important; }
+          /* Hide dashboard layout */
+          aside, nav, [class*="Sidebar"], [class*="sidebar"],
+          [class*="QuickActions"], [class*="quick-action"],
+          header:not(.certificate *) {
+            display: none !important;
+          }
+          main { padding-left: 0 !important; margin: 0 !important; }
+          main > div { padding: 0 !important; margin: 0 !important; max-width: none !important; }
         }
 
         @page {
@@ -89,8 +97,8 @@ export default async function CertificatePreviewPage({
           background: #fff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #111827;
-          font-size: 10px;
-          line-height: 1.35;
+          font-size: 10.5px;
+          line-height: 1.4;
           position: relative;
           box-shadow: 0 4px 24px rgba(0,0,0,0.08);
           overflow: hidden;
@@ -105,7 +113,7 @@ export default async function CertificatePreviewPage({
         }
 
         .content {
-          padding: 16px 32px 8px;
+          padding: 18px 34px 10px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -209,7 +217,7 @@ export default async function CertificatePreviewPage({
         /* Fields */
         .field { margin-bottom: 3px; }
         .field-label {
-          font-size: 6.5px;
+          font-size: 7px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -217,12 +225,12 @@ export default async function CertificatePreviewPage({
           margin-bottom: 0;
         }
         .field-value {
-          font-size: 10px;
+          font-size: 10.5px;
           color: #111827;
           font-weight: 500;
         }
         .field-value-bold {
-          font-size: 10px;
+          font-size: 10.5px;
           color: #111827;
           font-weight: 700;
         }
@@ -343,9 +351,9 @@ export default async function CertificatePreviewPage({
         .sig-label { font-size: 7px; font-weight: 700; color: #374151; margin-bottom: 1px; }
         .sig-sub { font-size: 6px; font-style: italic; color: #9ca3af; margin-bottom: 3px; }
         .sig-box {
-          border: 1px dashed #d1d5db;
-          border-radius: 4px;
-          height: 40px;
+          border: 1.5px dashed #d1d5db;
+          border-radius: 5px;
+          height: 45px;
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 2px;
           background: #fafbfc;
@@ -362,8 +370,8 @@ export default async function CertificatePreviewPage({
           margin-top: auto;
           flex-shrink: 0;
         }
-        .footer-text { font-size: 6.5px; color: #9ca3af; line-height: 1.6; }
-        .footer-brand { font-size: 6px; color: #d1d5db; margin-top: 1px; }
+        .footer-text { font-size: 7px; color: #9ca3af; line-height: 1.6; }
+        .footer-brand { font-size: 6.5px; color: #d1d5db; margin-top: 2px; }
 
         /* Print button bar */
         .print-bar {
