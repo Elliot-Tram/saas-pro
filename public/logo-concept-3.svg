@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Concept 3: Hérisson épuré moderne - étoile/soleil avec manche -->
+  <!-- Fond rond -->
+  <circle cx="60" cy="60" r="56" fill="#0f2b46"/>
+
+  <!-- Hérisson très stylisé - étoile de poils -->
+  <!-- Poils principaux (8 directions) -->
+  <line x1="60" y1="46" x2="60" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="82" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="90" y2="46" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="82" y2="68" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="38" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="30" y2="46" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="38" y2="68" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Poils secondaires (entre) -->
+  <line x1="60" y1="46" x2="72" y2="20" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="88" y2="34" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="88" y2="58" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="48" y2="20" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="32" y2="34" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="32" y2="58" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Centre -->
+  <circle cx="60" cy="46" r="5" fill="white"/>
+
+  <!-- Manche -->
+  <line x1="60" y1="51" x2="60" y2="100" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Petite poignée -->
+  <line x1="54" y1="96" x2="66" y2="96" stroke="white" stroke-width="3" stroke-linecap="round"/>
+</svg>

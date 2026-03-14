@@ -13,9 +13,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 mb-4">
-          <Flame className="h-6 w-6 text-white" />
-        </div>
+        <img src="/logo-concept-2.svg" alt="Bistry" className="h-14 w-14 rounded-xl mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-white">Connexion</h1>
         <p className="mt-1 text-sm text-slate-400">Connectez-vous à Bistry</p>
       </div>

@@ -5,7 +5,6 @@ import {
   Smartphone,
   ArrowRight,
   Check,
-  Flame,
   ChevronRight,
   ChevronDown,
   Shield,
@@ -28,9 +27,7 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a href="/landing" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/25">
-            <Flame className="h-5 w-5 text-white" />
-          </div>
+          <img src="/logo-concept-2.svg" alt="Bistry" className="h-9 w-9 rounded-xl shadow-lg shadow-blue-500/25" />
           <span className="text-xl font-bold tracking-tight text-white">
             Bistry
           </span>
@@ -176,9 +173,7 @@ function CertificateShowcase() {
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
-                    <Flame className="h-5 w-5 text-white" />
-                  </div>
+                  <img src="/logo-concept-2.svg" alt="Logo" className="h-10 w-10 rounded-lg opacity-80" />
                   <div>
                     <div className="text-sm font-bold text-white/90">VOTRE ENTREPRISE</div>
                     <div className="text-xs text-blue-200">SIRET : XXX XXX XXX XXXXX</div>
@@ -782,7 +777,6 @@ function CtaSection() {
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
-          <Flame className="h-4 w-4" />
           Rejoignez Bistry
         </div>
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -826,9 +820,7 @@ function Footer() {
           {/* Brand */}
           <div>
             <a href="/landing" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700">
-                <Flame className="h-5 w-5 text-white" />
-              </div>
+              <img src="/logo-concept-2.svg" alt="Bistry" className="h-9 w-9 rounded-xl" />
               <span className="text-xl font-bold tracking-tight text-gray-900">
                 Bistry
               </span>
