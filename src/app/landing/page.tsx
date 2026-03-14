@@ -18,9 +18,9 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Bistry — Le logiciel n°1 des ramoneurs professionnels",
+  title: "Bistry — Le seul outil dont votre entreprise de ramonage a besoin",
   description:
-    "Certificats de ramonage en 30 secondes, factures automatiques, rappels clients. Conforme au decret 2023-641. Essai gratuit 14 jours.",
+    "Certificats en 30 secondes, factures automatiques, planning par secteur, rappels annuels. Essai gratuit 14 jours, sans carte bancaire.",
 };
 
 function Navbar() {
