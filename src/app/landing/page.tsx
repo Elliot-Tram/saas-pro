@@ -1,25 +1,26 @@
 import {
   ClipboardCheck,
-  Calendar,
   FileText,
   Star,
-  Globe,
   Smartphone,
   ArrowRight,
   Check,
   Flame,
   ChevronRight,
+  ChevronDown,
   Shield,
   Zap,
-  Camera,
-  MessageSquare,
+  Bell,
+  X,
+  Phone,
+  Mail,
 } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Bistry — Le logiciel n°1 des ramoneurs professionnels",
   description:
-    "Certificats, factures, planning, clients — tout votre métier de ramoneur dans un seul outil. Conforme au décret 2023-641.",
+    "Certificats de ramonage en 30 secondes, factures automatiques, rappels clients. Conforme au decret 2023-641. Essai gratuit 14 jours.",
 };
 
 function Navbar() {
@@ -42,16 +43,16 @@ function Navbar() {
             Fonctionnalites
           </a>
           <a
-            href="#workflow"
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
-          >
-            Comment ca marche
-          </a>
-          <a
             href="#tarifs"
             className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
           >
             Tarifs
+          </a>
+          <a
+            href="#faq"
+            className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+          >
+            FAQ
           </a>
           <a
             href="/login"
@@ -63,7 +64,7 @@ function Navbar() {
             href="/register"
             className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:shadow-blue-500/30"
           >
-            Essayer gratuitement
+            Essai gratuit 14 jours
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
@@ -71,7 +72,7 @@ function Navbar() {
           href="/register"
           className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white md:hidden"
         >
-          Essayer
+          Essai gratuit
         </a>
       </div>
     </nav>
@@ -107,16 +108,16 @@ function HeroSection() {
 
         {/* Headline */}
         <h1 className="mx-auto max-w-5xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.1]">
-          Votre logiciel actuel vous aide a gerer vos clients.{" "}
+          Creez vos certificats de ramonage{" "}
           <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-            Bistry vous aide a en avoir plus.
+            en 30 secondes
           </span>
         </h1>
 
         {/* Subheadline */}
         <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-300 sm:text-xl">
-          Certificats, factures, avis Google, site vitrine — tout ce
-          qu&apos;il faut pour developper votre activite de ramonage.
+          Fini le carnet papier. Bistry genere vos certificats, factures et
+          rappels automatiquement. Conforme au decret 2023-641.
         </p>
 
         {/* CTAs */}
@@ -125,117 +126,156 @@ function HeroSection() {
             href="/register"
             className="group inline-flex items-center gap-2.5 rounded-full bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-2xl shadow-blue-600/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/40 hover:-translate-y-0.5"
           >
-            Essayer gratuitement
+            Essai gratuit 14 jours
             <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
           </a>
           <a
-            href="#workflow"
+            href="#certificate"
             className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/10"
           >
-            Voir la demo
-            <ChevronRight className="h-4.5 w-4.5" />
+            Voir un exemple de certificat
+            <ChevronDown className="h-4.5 w-4.5" />
           </a>
         </div>
 
-        {/* Hero visual — mockup placeholder */}
-        <div className="relative mx-auto mt-16 max-w-5xl lg:mt-20">
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-slate-800 to-slate-900 shadow-2xl shadow-black/50">
-            <div className="flex items-center gap-2 border-b border-white/5 bg-slate-800/80 px-5 py-3.5">
-              <div className="h-3 w-3 rounded-full bg-red-400/60" />
-              <div className="h-3 w-3 rounded-full bg-yellow-400/60" />
-              <div className="h-3 w-3 rounded-full bg-green-400/60" />
-              <div className="ml-4 h-5 w-64 rounded bg-white/5" />
-            </div>
-            <div className="grid grid-cols-12 gap-0">
-              {/* Sidebar mock */}
-              <div className="col-span-3 hidden border-r border-white/5 p-5 md:block">
-                <div className="mb-6 flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-blue-600/30" />
-                  <div className="h-3 w-16 rounded bg-white/10" />
-                </div>
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`mb-2 flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${
-                      i === 0 ? "bg-blue-600/15" : ""
-                    }`}
-                  >
-                    <div
-                      className={`h-4 w-4 rounded ${i === 0 ? "bg-blue-400/40" : "bg-white/8"}`}
-                    />
-                    <div
-                      className={`h-2.5 rounded ${i === 0 ? "w-20 bg-blue-400/30" : "bg-white/8"} ${
-                        i === 1
-                          ? "w-24"
-                          : i === 2
-                            ? "w-16"
-                            : i === 3
-                              ? "w-20"
-                              : i === 4
-                                ? "w-28"
-                                : "w-18"
-                      }`}
-                    />
+        {/* Sub-CTA text */}
+        <p className="mt-4 text-sm text-slate-400">
+          Pas besoin de carte bancaire
+        </p>
+
+        {/* Phone line */}
+        <p className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
+          <Phone className="h-4 w-4" />
+          Une question ? Appelez-nous au 04 XX XX XX XX
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function CertificateShowcase() {
+  return (
+    <section id="certificate" className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Section header */}
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
+            <FileText className="h-4 w-4" />
+            Certificat
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+            Un certificat qui{" "}
+            <span className="text-blue-600">fait pro</span>
+          </h2>
+        </div>
+
+        {/* Certificate mockup */}
+        <div className="mx-auto mt-16 max-w-2xl lg:mt-20">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-300/50">
+            {/* Blue top bar */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+                    <Flame className="h-5 w-5 text-white" />
                   </div>
-                ))}
+                  <div>
+                    <div className="text-sm font-bold text-white/90">VOTRE ENTREPRISE</div>
+                    <div className="text-xs text-blue-200">SIRET : XXX XXX XXX XXXXX</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-blue-200">N° 2024-0147</div>
+                  <div className="text-xs text-blue-200">15/03/2026</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Certificate title */}
+            <div className="border-b border-slate-100 px-8 py-6 text-center">
+              <h3 className="text-xl font-bold tracking-wide text-slate-800 uppercase">
+                Certificat de ramonage
+              </h3>
+              <p className="mt-1 text-sm text-slate-400">
+                Article 31-6 du RSDT &mdash; Decret 2023-641
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="px-8 py-6">
+              {/* Client info */}
+              <div className="mb-6 rounded-xl bg-slate-50 p-5">
+                <div className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                  Client
+                </div>
+                <div className="text-sm font-medium text-slate-700">M. Jean Dupont</div>
+                <div className="text-sm text-slate-500">12 rue des Lilas, 69001 Lyon</div>
               </div>
 
-              {/* Main content mock */}
-              <div className="col-span-12 p-6 md:col-span-9 md:p-8">
-                <div className="mb-6 flex items-center justify-between">
-                  <div>
-                    <div className="mb-2 h-5 w-48 rounded bg-white/12" />
-                    <div className="h-3 w-32 rounded bg-white/6" />
+              {/* Intervention details */}
+              <div className="mb-6 grid grid-cols-2 gap-4">
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <div className="mb-1 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                    Type de conduit
                   </div>
-                  <div className="h-9 w-36 rounded-lg bg-blue-600/30" />
+                  <div className="text-sm font-medium text-slate-700">Conduit maconnee</div>
                 </div>
-                {/* Stats cards */}
-                <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                  {[
-                    "bg-blue-500/10",
-                    "bg-green-500/10",
-                    "bg-purple-500/10",
-                    "bg-amber-500/10",
-                  ].map((bg, i) => (
-                    <div
-                      key={i}
-                      className={`rounded-xl ${bg} border border-white/5 p-4`}
-                    >
-                      <div className="mb-2 h-3 w-12 rounded bg-white/8" />
-                      <div className="h-6 w-16 rounded bg-white/15" />
-                    </div>
-                  ))}
-                </div>
-                {/* Table mock */}
-                <div className="rounded-xl border border-white/5 bg-white/[0.02]">
-                  <div className="flex items-center gap-4 border-b border-white/5 px-5 py-3">
-                    {["w-32", "w-24", "w-20", "w-28", "w-16"].map((w, i) => (
-                      <div
-                        key={i}
-                        className={`h-2.5 ${w} rounded bg-white/8`}
-                      />
-                    ))}
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <div className="mb-1 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                    Combustible
                   </div>
-                  {[...Array(4)].map((_, row) => (
-                    <div
-                      key={row}
-                      className="flex items-center gap-4 border-b border-white/[0.03] px-5 py-3.5 last:border-0"
-                    >
-                      {["w-32", "w-24", "w-20", "w-28", "w-16"].map((w, i) => (
-                        <div
-                          key={i}
-                          className={`h-2.5 ${w} rounded bg-white/5`}
-                        />
-                      ))}
-                    </div>
-                  ))}
+                  <div className="text-sm font-medium text-slate-700">Bois</div>
                 </div>
               </div>
+
+              {/* Status badges */}
+              <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+                <div className="flex-1 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-center">
+                  <div className="mb-1 text-xs font-semibold tracking-wide text-green-600 uppercase">
+                    Vacuite
+                  </div>
+                  <div className="text-lg font-bold text-green-700">CONFORME</div>
+                </div>
+                <div className="flex-1 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-center">
+                  <div className="mb-1 text-xs font-semibold tracking-wide text-green-600 uppercase">
+                    Etat general
+                  </div>
+                  <div className="text-lg font-bold text-green-700">BON ETAT</div>
+                </div>
+              </div>
+
+              {/* Signatures */}
+              <div className="grid grid-cols-2 gap-6 border-t border-slate-100 pt-6">
+                <div className="text-center">
+                  <div className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                    Signature du technicien
+                  </div>
+                  <div className="mx-auto h-16 w-32 rounded-lg border-2 border-dashed border-slate-200 bg-slate-50" />
+                </div>
+                <div className="text-center">
+                  <div className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                    Signature du client
+                  </div>
+                  <div className="mx-auto h-16 w-32 rounded-lg border-2 border-dashed border-slate-200 bg-slate-50" />
+                </div>
+              </div>
+            </div>
+
+            {/* Legal footer */}
+            <div className="border-t border-slate-100 bg-slate-50 px-8 py-4">
+              <p className="text-center text-[11px] leading-relaxed text-slate-400">
+                Ce certificat atteste que le ramonage a ete effectue conformement aux
+                dispositions du decret n° 2023-641 du 20 juillet 2023.
+                Document a conserver et a presenter a votre assurance.
+              </p>
             </div>
           </div>
 
-          {/* Glow effect */}
-          <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-gradient-to-b from-blue-600/5 via-transparent to-transparent" />
+          {/* Caption below */}
+          <p className="mt-8 text-center text-base leading-relaxed text-gray-500">
+            Personnalise avec votre logo, votre signature, et les informations de
+            votre entreprise.
+          </p>
         </div>
       </div>
     </section>
@@ -244,35 +284,35 @@ function HeroSection() {
 
 function SocialProofBar() {
   return (
-    <section className="border-y border-slate-200 bg-slate-50">
+    <section className="border-y border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-6 py-6">
         <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-12">
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
               <Shield className="h-4 w-4 text-green-600" />
             </div>
-            Decret 2023-641
+            Conforme decret 2023-641
           </div>
           <div className="hidden h-5 w-px bg-slate-300 sm:block" />
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-              <ClipboardCheck className="h-4 w-4 text-blue-600" />
+              <Smartphone className="h-4 w-4 text-blue-600" />
             </div>
-            Signature electronique
+            Signature sur telephone
           </div>
           <div className="hidden h-5 w-px bg-slate-300 sm:block" />
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-              <Star className="h-4 w-4 text-amber-600" />
+              <Bell className="h-4 w-4 text-amber-600" />
             </div>
-            Avis Google automatiques
+            Rappels automatiques
           </div>
           <div className="hidden h-5 w-px bg-slate-300 sm:block" />
           <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-              <Globe className="h-4 w-4 text-purple-600" />
+              <Zap className="h-4 w-4 text-purple-600" />
             </div>
-            Site vitrine inclus
+            Essai gratuit 14 jours
           </div>
         </div>
       </div>
@@ -283,90 +323,58 @@ function SocialProofBar() {
 const features = [
   {
     icon: ClipboardCheck,
-    title: "Certificats de ramonage",
+    title: "Certificats en un clic",
     description:
-      "Conformes au decret 2023-641, personnalisables avec votre logo. Generes automatiquement apres chaque intervention.",
+      "Apres chaque intervention, un seul bouton : votre certificat est pret, signe, et envoye au client.",
     color: "blue" as const,
   },
   {
-    icon: Calendar,
-    title: "Planning & Secteurs",
-    description:
-      "Organisez vos tournees par zone. Vue 'Ma journee' pour voir vos RDV du jour d'un coup d'oeil.",
-    color: "purple" as const,
-  },
-  {
     icon: FileText,
-    title: "Facturation",
+    title: "Zero paperasse",
     description:
-      "Devis, factures, relances automatiques. Export comptable CSV en un clic.",
+      "Factures, devis, relances — tout se fait automatiquement. Vous ne touchez plus un papier.",
     color: "green" as const,
   },
   {
-    icon: Star,
-    title: "Avis Google automatiques",
+    icon: Bell,
+    title: "Vos clients vous rappellent",
     description:
-      "Apres chaque intervention, une demande d'avis est envoyee automatiquement a votre client. Boostez votre reputation.",
+      "Bistry envoie les rappels annuels a votre place. Vos clients reviennent sans que vous ayez a les relancer.",
     color: "amber" as const,
   },
   {
-    icon: Globe,
-    title: "Site vitrine inclus",
+    icon: Star,
+    title: "Plus d'avis Google",
     description:
-      "Un site professionnel connecte a votre app. Vos clients demandent un devis en ligne, la fiche se cree toute seule.",
-    color: "rose" as const,
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile-first",
-    description:
-      "Concu pour le terrain. Gros boutons, interface simple, utilisable avec des gants.",
-    color: "cyan" as const,
+      "Apres chaque intervention, vos clients recoivent une demande d'avis. Votre reputation grimpe toute seule.",
+    color: "purple" as const,
   },
 ];
 
 const colorMap = {
   blue: {
-    bg: "bg-blue-50",
     iconBg: "bg-blue-100",
     icon: "text-blue-600",
     border: "border-blue-100",
     hoverBorder: "hover:border-blue-200",
   },
-  purple: {
-    bg: "bg-purple-50",
-    iconBg: "bg-purple-100",
-    icon: "text-purple-600",
-    border: "border-purple-100",
-    hoverBorder: "hover:border-purple-200",
-  },
   green: {
-    bg: "bg-green-50",
     iconBg: "bg-green-100",
     icon: "text-green-600",
     border: "border-green-100",
     hoverBorder: "hover:border-green-200",
   },
   amber: {
-    bg: "bg-amber-50",
     iconBg: "bg-amber-100",
     icon: "text-amber-600",
     border: "border-amber-100",
     hoverBorder: "hover:border-amber-200",
   },
-  rose: {
-    bg: "bg-rose-50",
-    iconBg: "bg-rose-100",
-    icon: "text-rose-600",
-    border: "border-rose-100",
-    hoverBorder: "hover:border-rose-200",
-  },
-  cyan: {
-    bg: "bg-cyan-50",
-    iconBg: "bg-cyan-100",
-    icon: "text-cyan-600",
-    border: "border-cyan-100",
-    hoverBorder: "hover:border-cyan-200",
+  purple: {
+    iconBg: "bg-purple-100",
+    icon: "text-purple-600",
+    border: "border-purple-100",
+    hoverBorder: "hover:border-purple-200",
   },
 };
 
@@ -385,29 +393,28 @@ function FeaturesSection() {
             <span className="text-blue-600">rien de superflu</span>
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Chaque fonctionnalite a ete concue avec des ramoneurs, pour des
-            ramoneurs. Simplifiez votre quotidien.
+            Vous faites le ramonage, Bistry fait le reste.
           </p>
         </div>
 
-        {/* Features grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:mt-20">
+        {/* Features grid — 4 cards, 2x2 */}
+        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:mt-20">
           {features.map((feature) => {
             const colors = colorMap[feature.color];
             return (
               <div
                 key={feature.title}
-                className={`group relative rounded-2xl border ${colors.border} ${colors.hoverBorder} bg-white p-8 transition-all duration-200 hover:shadow-lg hover:shadow-gray-200/50 hover:-translate-y-0.5`}
+                className={`group relative rounded-2xl border ${colors.border} ${colors.hoverBorder} bg-white p-10 transition-all duration-200 hover:shadow-lg hover:shadow-gray-200/50 hover:-translate-y-0.5`}
               >
                 <div
-                  className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${colors.iconBg}`}
+                  className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.iconBg}`}
                 >
-                  <feature.icon className={`h-6 w-6 ${colors.icon}`} />
+                  <feature.icon className={`h-7 w-7 ${colors.icon}`} />
                 </div>
-                <h3 className="mb-2.5 text-lg font-semibold text-gray-900">
+                <h3 className="mb-3 text-xl font-semibold text-gray-900">
                   {feature.title}
                 </h3>
-                <p className="text-[15px] leading-relaxed text-gray-500">
+                <p className="text-base leading-relaxed text-gray-500">
                   {feature.description}
                 </p>
               </div>
@@ -419,93 +426,72 @@ function FeaturesSection() {
   );
 }
 
-const workflowSteps = [
-  {
-    number: "1",
-    title: "Intervention terminee",
-    description: "Cliquez 'Termine' sur votre planning",
-    icon: Check,
-    color: "from-blue-500 to-blue-600",
-  },
-  {
-    number: "2",
-    title: "Certificat genere",
-    description:
-      "Le PDF est cree automatiquement avec toutes les infos",
-    icon: FileText,
-    color: "from-green-500 to-green-600",
-  },
-  {
-    number: "3",
-    title: "Avis Google demande",
-    description:
-      "Votre client recoit un email/SMS pour laisser un avis",
-    icon: MessageSquare,
-    color: "from-amber-500 to-amber-600",
-  },
-  {
-    number: "4",
-    title: "Photo publiee",
-    description:
-      "La photo du chantier est publiee sur Google My Business",
-    icon: Camera,
-    color: "from-purple-500 to-purple-600",
-  },
-];
+function BeforeAfterSection() {
+  const beforeItems = [
+    "Carnet papier",
+    "Certificats a la main",
+    "Factures oubliees",
+    "Clients perdus",
+    "Pas d'avis Google",
+  ];
 
-function WorkflowSection() {
+  const afterItems = [
+    "Certificats en 30 secondes",
+    "Factures automatiques",
+    "Rappels par email",
+    "Clients fideles",
+    "Avis Google en un clic",
+  ];
+
   return (
-    <section
-      id="workflow"
-      className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32"
-    >
+    <section className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
-            <ArrowRight className="h-4 w-4" />
-            Apres chaque intervention
-          </div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            Tout se fait{" "}
-            <span className="text-blue-600">automatiquement</span>
+            Avant / Apres
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Un clic sur &laquo;&nbsp;Termine&nbsp;&raquo; et Bistry
-            s&apos;occupe du reste.
+            Ce qui change quand vous passez a Bistry.
           </p>
         </div>
 
-        {/* Horizontal timeline */}
-        <div className="relative mx-auto mt-16 max-w-5xl lg:mt-20">
-          {/* Connector line */}
-          <div className="absolute top-14 right-24 left-24 hidden h-0.5 bg-gradient-to-r from-blue-200 via-green-200 via-amber-200 to-purple-200 lg:block" />
+        {/* Two columns */}
+        <div className="mx-auto mt-16 grid max-w-4xl gap-8 lg:mt-20 lg:grid-cols-2">
+          {/* Before */}
+          <div className="rounded-2xl border border-red-100 bg-gradient-to-b from-red-50/80 to-slate-50 p-8 sm:p-10">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-1.5 text-sm font-semibold text-red-700">
+              <X className="h-4 w-4" />
+              Avant Bistry
+            </div>
+            <ul className="space-y-4">
+              {beforeItems.map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-100">
+                    <X className="h-3.5 w-3.5 text-red-500" />
+                  </div>
+                  <span className="text-base text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          <div className="grid gap-8 lg:grid-cols-4 lg:gap-6">
-            {workflowSteps.map((step) => (
-              <div
-                key={step.number}
-                className="relative flex flex-col items-center text-center"
-              >
-                {/* Step icon */}
-                <div className="relative mb-6">
-                  <div
-                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-white shadow-xl shadow-black/10`}
-                  >
-                    <step.icon className="h-6 w-6" />
+          {/* After */}
+          <div className="rounded-2xl border border-green-100 bg-gradient-to-b from-green-50/80 to-blue-50/50 p-8 sm:p-10">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-1.5 text-sm font-semibold text-green-700">
+              <Check className="h-4 w-4" />
+              Avec Bistry
+            </div>
+            <ul className="space-y-4">
+              {afterItems.map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100">
+                    <Check className="h-3.5 w-3.5 text-green-600" />
                   </div>
-                  <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-gray-700 shadow-md ring-2 ring-gray-100">
-                    {step.number}
-                  </div>
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                  {step.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-gray-500">
-                  {step.description}
-                </p>
-              </div>
-            ))}
+                  <span className="text-base text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -515,25 +501,22 @@ function WorkflowSection() {
 
 const essentialFeatures = [
   "1 utilisateur inclus",
-  "Fiches clients completes",
-  "Planning / calendrier",
+  "Fiches clients",
   "Certificats de ramonage PDF",
   "Facturation & devis",
   "Rappels annuels automatiques",
-  "Dashboard & statistiques",
 ];
 
 const proFeatures = [
   "Tout Essentiel, plus :",
   "Site vitrine personnalise",
-  "Demande d'avis Google automatique",
+  "Avis Google automatiques",
   "Statistiques avancees",
-  "Formulaire devis → fiche client",
 ];
 
 const boostFeatures = [
   "Tout Pro, plus :",
-  "Publication photos sur Google My Business",
+  "Photos Google My Business",
   "Setup Google My Business inclus",
   "Support prioritaire",
 ];
@@ -549,11 +532,11 @@ function PricingSection() {
             Tarifs
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            Choisissez votre{" "}
-            <span className="text-blue-600">formule</span>
+            Simple et{" "}
+            <span className="text-blue-600">sans surprise</span>
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Pas de surprise, pas de frais caches. Evoluez a votre rythme.
+            Pas de frais caches. 14 jours d&apos;essai gratuit, sans carte bancaire.
           </p>
         </div>
 
@@ -595,7 +578,7 @@ function PricingSection() {
                 href="/register"
                 className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
               >
-                Commencer
+                Essai gratuit
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -651,7 +634,7 @@ function PricingSection() {
                 href="/register"
                 className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:from-blue-500 hover:to-blue-600 hover:shadow-blue-500/30 hover:-translate-y-0.5"
               >
-                Commencer
+                Essai gratuit
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -703,7 +686,7 @@ function PricingSection() {
                 href="/register"
                 className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
               >
-                Commencer
+                Essai gratuit
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -716,8 +699,74 @@ function PricingSection() {
         </p>
 
         <p className="mt-3 text-center text-sm text-gray-400">
-          30 jours d&apos;essai gratuit &middot; Aucune carte bancaire requise
+          14 jours d&apos;essai gratuit &middot; Aucune carte bancaire requise
         </p>
+      </div>
+    </section>
+  );
+}
+
+const faqItems = [
+  {
+    question: "Est-ce que c'est complique a utiliser ?",
+    answer:
+      "Non, si vous savez utiliser un telephone, vous savez utiliser Bistry. L'interface est faite pour le terrain.",
+  },
+  {
+    question: "Est-ce que le certificat est valable ?",
+    answer:
+      "Oui, conforme au decret 2023-641. Accepte par toutes les assurances.",
+  },
+  {
+    question: "Je peux essayer sans payer ?",
+    answer:
+      "Oui, 14 jours gratuits, sans carte bancaire.",
+  },
+  {
+    question: "Et si j'ai deja un carnet avec mes clients ?",
+    answer:
+      "On vous aide a tout importer. Envoyez-nous une photo de votre carnet.",
+  },
+  {
+    question: "Je suis seul, c'est pas trop cher ?",
+    answer:
+      "Le plan Essentiel a 29\u20AC/mois, c'est moins qu'un plein de gazole.",
+  },
+];
+
+function FaqSection() {
+  return (
+    <section id="faq" className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Section header */}
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
+            <ChevronRight className="h-4 w-4" />
+            FAQ
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+            Questions{" "}
+            <span className="text-blue-600">frequentes</span>
+          </h2>
+        </div>
+
+        {/* FAQ items */}
+        <div className="mx-auto mt-16 max-w-3xl space-y-4 lg:mt-20">
+          {faqItems.map((item) => (
+            <details
+              key={item.question}
+              className="group rounded-2xl border border-slate-200 bg-white transition-all hover:shadow-md"
+            >
+              <summary className="flex cursor-pointer items-center justify-between px-8 py-6 text-base font-semibold text-gray-900 marker:[font-size:0] [&::-webkit-details-marker]:hidden">
+                {item.question}
+                <ChevronDown className="h-5 w-5 shrink-0 text-gray-400 transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="px-8 pb-6 text-base leading-relaxed text-gray-500">
+                {item.answer}
+              </div>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -737,21 +786,21 @@ function CtaSection() {
           Rejoignez Bistry
         </div>
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-          Simplifiez votre activite de ramoneur{" "}
+          Passez au numerique{" "}
           <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
             des aujourd&apos;hui
           </span>
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">
-          Rejoignez les professionnels qui font confiance a Bistry pour gerer
-          leur activite au quotidien.
+          Vous faites le ramonage, Bistry s&apos;occupe de la paperasse.
+          14 jours gratuits, sans engagement.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
             href="/register"
             className="group inline-flex items-center gap-2.5 rounded-full bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-2xl shadow-blue-600/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/40 hover:-translate-y-0.5"
           >
-            Essayer gratuitement
+            Essai gratuit 14 jours
             <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
           </a>
           <a
@@ -761,6 +810,9 @@ function CtaSection() {
             Se connecter
           </a>
         </div>
+        <p className="mt-4 text-sm text-slate-400">
+          Pas besoin de carte bancaire
+        </p>
       </div>
     </section>
   );
@@ -783,8 +835,24 @@ function Footer() {
             </a>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-500">
               Le logiciel de gestion concu pour les ramoneurs professionnels.
-              Certificats, factures, planning — tout en un.
+              Certificats, factures, rappels — tout en un.
             </p>
+            <div className="mt-4 flex flex-col gap-2">
+              <a
+                href="tel:04XXXXXXXX"
+                className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
+              >
+                <Phone className="h-4 w-4" />
+                04 XX XX XX XX
+              </a>
+              <a
+                href="mailto:contact@bistry.fr"
+                className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
+              >
+                <Mail className="h-4 w-4" />
+                contact@bistry.fr
+              </a>
+            </div>
           </div>
 
           {/* Links */}
@@ -800,6 +868,12 @@ function Footer() {
               className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
             >
               Tarifs
+            </a>
+            <a
+              href="#faq"
+              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+            >
+              FAQ
             </a>
             <a
               href="/login"
@@ -853,9 +927,11 @@ export default function LandingPage() {
       <Navbar />
       <HeroSection />
       <SocialProofBar />
+      <CertificateShowcase />
       <FeaturesSection />
-      <WorkflowSection />
+      <BeforeAfterSection />
       <PricingSection />
+      <FaqSection />
       <CtaSection />
       <Footer />
     </div>
