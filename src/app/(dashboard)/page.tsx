@@ -26,6 +26,13 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
+  // Check if user has completed basic onboarding
+  const currentUser = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { company: true },
+  });
+  const needsOnboarding = !currentUser?.company;
+
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -118,6 +125,21 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </Header>
+
+      {/* Onboarding banner */}
+      {needsOnboarding && (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between">
+          <p className="text-sm font-medium text-amber-800">
+            Completez votre profil pour commencer
+          </p>
+          <Link href="/onboarding">
+            <Button size="sm" variant="secondary">
+              Completer mon profil
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
