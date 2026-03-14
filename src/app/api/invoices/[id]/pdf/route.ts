@@ -1,20 +1,43 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont, PDFImage } from "pdf-lib";
 
-export const maxDuration = 30;
-export const dynamic = "force-dynamic";
+// ── Color palette ────────────────────────────────────────────────────────────
+const NAVY = rgb(0.06, 0.17, 0.27);
+const BLUE = rgb(0.15, 0.39, 0.93);
+const EMERALD = rgb(0.02, 0.59, 0.41);
+const RED = rgb(0.86, 0.15, 0.15);
+const DARK = rgb(0.07, 0.09, 0.11);
+const GRAY = rgb(0.42, 0.45, 0.49);
+const LIGHT_GRAY = rgb(0.9, 0.91, 0.92);
+const BG = rgb(0.98, 0.98, 0.99);
+const WHITE = rgb(1, 1, 1);
 
-// ── Helpers ─────────────────────────────────────────────────────────────────────
+const GREEN_BG = rgb(0.86, 0.99, 0.9);
+const GREEN_BORDER = rgb(0.73, 0.97, 0.83);
+const BLUE_BG_BADGE = rgb(0.86, 0.92, 0.99);
+const BLUE_BORDER_BADGE = rgb(0.75, 0.86, 0.99);
+const RED_BG = rgb(1, 0.95, 0.95);
+const RED_BORDER = rgb(0.99, 0.79, 0.79);
+const GRAY_BG_BADGE = rgb(0.95, 0.96, 0.96);
+const GRAY_BORDER_BADGE = rgb(0.9, 0.91, 0.92);
 
-function safe(val: string | null | undefined, fallback = "\u2014"): string {
+// ── Page dimensions (A4) ─────────────────────────────────────────────────────
+const PAGE_W = 595;
+const PAGE_H = 842;
+const MARGIN_L = 44;
+const MARGIN_R = 44;
+const CONTENT_W = PAGE_W - MARGIN_L - MARGIN_R;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function safe(val: string | null | undefined, fallback = "--"): string {
   return val && val.trim() ? val.trim() : fallback;
 }
 
 function fmtDate(date: Date | null | undefined): string {
-  if (!date) return "\u2014";
+  if (!date) return "--";
   return new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "2-digit",
@@ -23,684 +46,201 @@ function fmtDate(date: Date | null | undefined): string {
 }
 
 function fmtCurrency(amount: number): string {
-  return amount.toFixed(2).replace(".", ",") + " \u20ac";
-}
-
-function escHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return amount.toFixed(2).replace(".", ",") + " EUR";
 }
 
 function statusLabel(status: string): string {
   switch (status) {
     case "paid":
-      return "Pay\u00e9e";
+      return "PAYEE";
     case "sent":
-      return "Envoy\u00e9e";
+      return "ENVOYEE";
     case "overdue":
-      return "En retard";
+      return "EN RETARD";
     default:
-      return "Brouillon";
+      return "BROUILLON";
   }
 }
 
-function statusClass(status: string): string {
-  switch (status) {
-    case "paid":
-      return "badge-green";
-    case "sent":
-      return "badge-blue";
-    case "overdue":
-      return "badge-red";
-    default:
-      return "badge-gray";
+// ── Helper: strip accents for Helvetica (Latin-1 only) ───────────────────────
+function stripAccents(str: string): string {
+  return str
+    .replace(/[\u00e9\u00e8\u00ea\u00eb]/g, "e")
+    .replace(/[\u00c9\u00c8\u00ca\u00cb]/g, "E")
+    .replace(/[\u00e0\u00e2\u00e4]/g, "a")
+    .replace(/[\u00c0\u00c2\u00c4]/g, "A")
+    .replace(/[\u00f9\u00fb\u00fc]/g, "u")
+    .replace(/[\u00d9\u00db\u00dc]/g, "U")
+    .replace(/[\u00ee\u00ef]/g, "i")
+    .replace(/[\u00ce\u00cf]/g, "I")
+    .replace(/[\u00f4\u00f6]/g, "o")
+    .replace(/[\u00d4\u00d6]/g, "O")
+    .replace(/[\u00e7]/g, "c")
+    .replace(/[\u00c7]/g, "C")
+    .replace(/[\u2014\u2013]/g, "--")
+    .replace(/[\u00b0]/g, "deg")
+    .replace(/[\u00d8]/g, "O")
+    .replace(/[\u00f8]/g, "o")
+    .replace(/[\u2019\u2018]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/[\u00ab\u00bb]/g, '"')
+    .replace(/\u00a0/g, " ")
+    .replace(/[\u20ac]/g, "EUR")
+    .replace(/[^\x00-\x7F]/g, "");
+}
+
+// ── Helper: embed image from data URL ────────────────────────────────────────
+async function embedImage(
+  pdfDoc: PDFDocument,
+  dataUrl: string | null | undefined
+): Promise<PDFImage | null> {
+  if (!dataUrl) return null;
+  try {
+    const base64 = dataUrl.split(",")[1];
+    if (!base64) return null;
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    return dataUrl.includes("image/png")
+      ? await pdfDoc.embedPng(bytes)
+      : await pdfDoc.embedJpg(bytes);
+  } catch {
+    return null;
   }
 }
 
-// ── Build the full HTML invoice ─────────────────────────────────────────────────
-
-function buildInvoiceHtml(invoice: {
-  number: string;
-  status: string;
-  date: Date;
-  dueDate: Date | null;
-  subtotal: number;
-  taxRate: number;
-  tax: number;
-  total: number;
-  items: {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    total: number;
-  }[];
-  client: {
-    firstName: string | null;
-    lastName: string | null;
-    address: string | null;
-    city: string | null;
-    postalCode: string | null;
-    phone: string | null;
-    email: string | null;
-  };
-  team: {
-    name: string | null;
-    company: string | null;
-    phone: string | null;
-    address: string | null;
-    city: string | null;
-    postalCode: string | null;
-    siret: string | null;
-    logo: string | null;
-    insuranceNumber: string | null;
-    insurerName: string | null;
-  };
-}): string {
-  const clientName =
-    `${safe(invoice.client.firstName, "")} ${safe(invoice.client.lastName, "")}`.trim() || "\u2014";
-  const clientAddr = [
-    invoice.client.address,
-    [invoice.client.postalCode, invoice.client.city].filter(Boolean).join(" "),
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const companyName = safe(
-    invoice.team.company || invoice.team.name,
-    "Entreprise"
-  );
-  const companyLines = [
-    invoice.team.address,
-    [invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" "),
-    invoice.team.phone ? `T\u00e9l. ${invoice.team.phone}` : null,
-  ].filter(Boolean) as string[];
-
-  const proParts = [
-    invoice.team.siret ? `SIRET : ${invoice.team.siret}` : null,
-    invoice.team.insurerName
-      ? `Assurance RC : ${invoice.team.insurerName}${invoice.team.insuranceNumber ? ` \u2014 Police n\u00b0${invoice.team.insuranceNumber}` : ""}`
-      : null,
-  ].filter(Boolean) as string[];
-
-  const logoHtml = invoice.team.logo
-    ? `<img src="${invoice.team.logo}" class="logo" alt="Logo" />`
-    : "";
-
-  // Build item rows with alternating backgrounds
-  const itemRowsHtml = invoice.items
-    .map(
-      (item, i) => `
-        <tr class="${i % 2 === 1 ? "row-alt" : ""}">
-          <td class="td-desc">${escHtml(item.description)}</td>
-          <td class="td-center">${item.quantity}</td>
-          <td class="td-right">${escHtml(fmtCurrency(item.unitPrice))}</td>
-          <td class="td-right td-bold">${escHtml(fmtCurrency(item.total))}</td>
-        </tr>`
-    )
-    .join("\n");
-
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<style>
-  @page {
-    margin: 0;
-    size: A4;
-  }
-
-  @media print {
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1a1a1a;
-    background: #fff;
-    font-size: 12px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .page {
-    width: 210mm;
-    min-height: 297mm;
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* ── Top accent bar ───────────────────────────────── */
-  .accent-bar {
-    height: 5px;
-    background: linear-gradient(90deg, #1e3a5f, #2a5a8f);
-    width: 100%;
-  }
-
-  /* ── Content area ─────────────────────────────────── */
-  .content {
-    padding: 28px 40px 20px 40px;
-  }
-
-  /* ── Header ───────────────────────────────────────── */
-  .header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 16px;
-    align-items: start;
-    margin-bottom: 20px;
-  }
-
-  .logo {
-    max-height: 70px;
-    max-width: 100px;
-    object-fit: contain;
-  }
-
-  .company-info {
-    padding-top: 2px;
-  }
-
-  .company-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e3a5f;
-    margin-bottom: 4px;
-    letter-spacing: -0.01em;
-  }
-
-  .company-detail {
-    font-size: 9px;
-    color: #6b7280;
-    line-height: 1.6;
-  }
-
-  .title-block {
-    text-align: right;
-    padding-top: 2px;
-  }
-
-  .title-main {
-    font-size: 26px;
-    font-weight: 800;
-    color: #1e3a5f;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 6px;
-  }
-
-  .invoice-number {
-    font-size: 11px;
-    color: #6b7280;
-    font-weight: 500;
-  }
-
-  .invoice-date {
-    font-size: 10px;
-    color: #9ca3af;
-    margin-top: 2px;
-  }
-
-  /* ── Separator ────────────────────────────────────── */
-  .separator {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 0 0 14px 0;
-  }
-
-  .separator-footer {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 20px 0 12px 0;
-  }
-
-  /* ── Pro info bar ─────────────────────────────────── */
-  .pro-bar {
-    background: #f8f9fb;
-    border-radius: 6px;
-    padding: 8px 14px;
-    text-align: center;
-    font-size: 8px;
-    color: #6b7280;
-    margin-bottom: 18px;
-    letter-spacing: 0.02em;
-  }
-
-  .pro-bar span {
-    margin: 0 8px;
-    color: #d1d5db;
-  }
-
-  /* ── Section card ─────────────────────────────────── */
-  .section {
-    margin-bottom: 16px;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-
-  .section-accent {
-    width: 3px;
-    height: 14px;
-    background: #1e3a5f;
-    border-radius: 2px;
-    margin-right: 10px;
-    flex-shrink: 0;
-  }
-
-  .section-title {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1e3a5f;
-  }
-
-  /* ── Card styles ──────────────────────────────────── */
-  .card {
-    border-radius: 8px;
-    padding: 14px 18px;
-  }
-
-  .card-filled {
-    background: #f8f9fb;
-  }
-
-  /* ── Grid layouts ─────────────────────────────────── */
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 32px;
-  }
-
-  /* ── Field (label + value) ────────────────────────── */
-  .field {
-    margin-bottom: 6px;
-  }
-
-  .field-label {
-    font-size: 9px;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-    margin-bottom: 1px;
-  }
-
-  .field-value {
-    font-size: 12px;
-    color: #1a1a1a;
-    font-weight: 500;
-  }
-
-  .field-value-bold {
-    font-size: 12px;
-    color: #1a1a1a;
-    font-weight: 700;
-  }
-
-  /* ── Badges ───────────────────────────────────────── */
-  .badge {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .badge-green {
-    background: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
-  }
-
-  .badge-blue {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 1px solid #bfdbfe;
-  }
-
-  .badge-red {
-    background: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-  }
-
-  .badge-gray {
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 1px solid #e5e7eb;
-  }
-
-  /* ── Items table ───────────────────────────────────── */
-  .items-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 8px;
-    overflow: hidden;
-    font-size: 11px;
-  }
-
-  .items-table thead th {
-    background: #1e3a5f;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 10px 14px;
-    text-align: left;
-    white-space: nowrap;
-  }
-
-  .items-table thead th:nth-child(2),
-  .items-table thead th:nth-child(3),
-  .items-table thead th:nth-child(4) {
-    text-align: right;
-  }
-
-  .items-table tbody td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #f3f4f6;
-    color: #374151;
-    vertical-align: top;
-  }
-
-  .row-alt td {
-    background: #f9fafb;
-  }
-
-  .td-desc {
-    max-width: 260px;
-    line-height: 1.4;
-    color: #1a1a1a;
-    font-weight: 500;
-  }
-
-  .td-center {
-    text-align: right;
-    white-space: nowrap;
-    color: #6b7280;
-  }
-
-  .td-right {
-    text-align: right;
-    white-space: nowrap;
-    color: #6b7280;
-  }
-
-  .td-bold {
-    font-weight: 600;
-    color: #1a1a1a;
-  }
-
-  /* ── Totals section ────────────────────────────────── */
-  .totals-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
-  }
-
-  .totals-block {
-    width: 260px;
-  }
-
-  .totals-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-  }
-
-  .totals-row + .totals-row {
-    border-top: 1px solid #f3f4f6;
-  }
-
-  .totals-label {
-    font-size: 11px;
-    color: #6b7280;
-    font-weight: 500;
-  }
-
-  .totals-value {
-    font-size: 11px;
-    color: #1a1a1a;
-    font-weight: 500;
-  }
-
-  .total-ttc-row {
-    background: linear-gradient(135deg, #1e3a5f, #2a5a8f);
-    border-radius: 8px;
-    padding: 12px 16px !important;
-    margin-top: 8px;
-    border: none !important;
-  }
-
-  .total-ttc-label {
-    font-size: 12px;
-    color: #fff;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .total-ttc-value {
-    font-size: 16px;
-    color: #fff;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-
-  /* ── Payment info ──────────────────────────────────── */
-  .payment-info {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-top: 20px;
-    padding: 14px 18px;
-    background: #f8f9fb;
-    border-radius: 8px;
-    border-left: 3px solid #1e3a5f;
-  }
-
-  .payment-field {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .payment-label {
-    font-size: 9px;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-  }
-
-  .payment-value {
-    font-size: 12px;
-    color: #1a1a1a;
-    font-weight: 600;
-  }
-
-  /* ── Footer ───────────────────────────────────────── */
-  .footer {
-    text-align: center;
-    padding: 0 40px;
-    position: absolute;
-    bottom: 24px;
-    left: 0;
-    right: 0;
-  }
-
-  .footer-text {
-    font-size: 7.5px;
-    color: #9ca3af;
-    line-height: 1.7;
-  }
-
-  .footer-divider {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 0 0 10px 0;
-  }
-</style>
-</head>
-<body>
-<div class="page">
-  <!-- Top accent bar -->
-  <div class="accent-bar"></div>
-
-  <div class="content">
-    <!-- ═══════ HEADER ═══════ -->
-    <div class="header">
-      <div>
-        ${logoHtml}
-      </div>
-      <div class="company-info">
-        <div class="company-name">${escHtml(companyName)}</div>
-        ${companyLines.map((l) => `<div class="company-detail">${escHtml(l)}</div>`).join("\n        ")}
-      </div>
-      <div class="title-block">
-        <div class="title-main">FACTURE</div>
-        <div class="invoice-number">N\u00b0 ${escHtml(safe(invoice.number))}</div>
-        <div class="invoice-date">Date : ${fmtDate(invoice.date)}</div>
-      </div>
-    </div>
-
-    <hr class="separator" />
-
-    <!-- ═══════ PRO INFO BAR ═══════ -->
-    ${
-      proParts.length > 0
-        ? `<div class="pro-bar">${proParts.map((p) => escHtml(p)).join('<span>|</span>')}</div>`
-        : ""
+// ── Helper: word wrap ────────────────────────────────────────────────────────
+function wrapText(
+  text: string,
+  font: PDFFont,
+  size: number,
+  maxWidth: number
+): string[] {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (font.widthOfTextAtSize(stripAccents(test), size) > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
     }
+  }
+  if (current) lines.push(current);
+  return lines.length ? lines : [""];
+}
 
-    <!-- ═══════ CLIENT ═══════ -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <div class="section-title">Factur\u00e9 \u00e0</div>
-      </div>
-      <div class="card card-filled">
-        <div class="grid-2">
-          <div>
-            <div class="field">
-              <div class="field-value-bold">${escHtml(clientName)}</div>
-            </div>
-            <div class="field">
-              <div class="field-label">Adresse</div>
-              <div class="field-value">${escHtml(safe(clientAddr))}</div>
-            </div>
-          </div>
-          <div>
-            ${
-              invoice.client.phone
-                ? `<div class="field">
-              <div class="field-label">T\u00e9l\u00e9phone</div>
-              <div class="field-value">${escHtml(invoice.client.phone)}</div>
-            </div>`
-                : ""
-            }
-            ${
-              invoice.client.email
-                ? `<div class="field">
-              <div class="field-label">Email</div>
-              <div class="field-value">${escHtml(invoice.client.email)}</div>
-            </div>`
-                : ""
-            }
-          </div>
-        </div>
-      </div>
-    </div>
+// ── Helper: draw accent bar ─────────────────────────────────────────────────
+function drawAccentBar(
+  page: PDFPage,
+  x: number,
+  y: number,
+  width: number
+) {
+  page.drawRectangle({
+    x,
+    y,
+    width,
+    height: 6,
+    color: NAVY,
+  });
+}
 
-    <!-- ═══════ LINE ITEMS TABLE ═══════ -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <div class="section-title">D\u00e9tail des prestations</div>
-      </div>
+// ── Helper: draw section header ──────────────────────────────────────────────
+function drawSectionHeader(
+  page: PDFPage,
+  title: string,
+  y: number,
+  fontBold: PDFFont,
+  width: number
+): number {
+  const text = stripAccents(title.toUpperCase());
+  page.drawText(text, {
+    x: MARGIN_L,
+    y,
+    size: 8.5,
+    font: fontBold,
+    color: NAVY,
+  });
+  page.drawLine({
+    start: { x: MARGIN_L, y: y - 8 },
+    end: { x: MARGIN_L + width, y: y - 8 },
+    thickness: 0.75,
+    color: LIGHT_GRAY,
+  });
+  return y - 22;
+}
 
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th style="width: 50%">Description</th>
-            <th style="width: 12%">Qt\u00e9</th>
-            <th style="width: 19%">Prix unitaire</th>
-            <th style="width: 19%">Total HT</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemRowsHtml}
-        </tbody>
-      </table>
+// ── Helper: draw field (label + value) ───────────────────────────────────────
+function drawField(
+  page: PDFPage,
+  label: string,
+  value: string,
+  x: number,
+  y: number,
+  fontR: PDFFont,
+  fontB: PDFFont,
+  bold = false
+): number {
+  const labelText = stripAccents(label.toUpperCase());
+  page.drawText(labelText, {
+    x,
+    y,
+    size: 7.5,
+    font: fontR,
+    color: GRAY,
+  });
+  const valText = stripAccents(value);
+  page.drawText(valText, {
+    x,
+    y: y - 12,
+    size: 9.5,
+    font: bold ? fontB : fontR,
+    color: DARK,
+  });
+  return y - 28;
+}
 
-      <!-- ═══════ TOTALS ═══════ -->
-      <div class="totals-wrapper">
-        <div class="totals-block">
-          <div class="totals-row">
-            <div class="totals-label">Sous-total HT</div>
-            <div class="totals-value">${escHtml(fmtCurrency(invoice.subtotal))}</div>
-          </div>
-          <div class="totals-row">
-            <div class="totals-label">TVA (${invoice.taxRate}%)</div>
-            <div class="totals-value">${escHtml(fmtCurrency(invoice.tax))}</div>
-          </div>
-          <div class="totals-row total-ttc-row">
-            <div class="total-ttc-label">Total TTC</div>
-            <div class="total-ttc-value">${escHtml(fmtCurrency(invoice.total))}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════ PAYMENT INFO ═══════ -->
-    <div class="payment-info">
-      ${
-        invoice.dueDate
-          ? `<div class="payment-field">
-        <div class="payment-label">\u00c9ch\u00e9ance</div>
-        <div class="payment-value">${fmtDate(invoice.dueDate)}</div>
-      </div>`
-          : ""
-      }
-      <div class="payment-field">
-        <div class="payment-label">Statut</div>
-        <div><span class="badge ${statusClass(invoice.status)}">${statusLabel(invoice.status)}</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════ FOOTER ═══════ -->
-  <div class="footer">
-    <hr class="footer-divider" />
-    <div class="footer-text">
-      ${escHtml(companyName)}${invoice.team.siret ? ` \u2014 SIRET : ${escHtml(invoice.team.siret)}` : ""}${invoice.team.address ? ` \u2014 ${escHtml(invoice.team.address)}` : ""}${invoice.team.postalCode || invoice.team.city ? `, ${escHtml([invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" "))}` : ""}
-    </div>
-    <div class="footer-text">
-      ${invoice.team.phone ? `T\u00e9l. ${escHtml(invoice.team.phone)}` : ""}
-    </div>
-  </div>
-</div>
-</body>
-</html>`;
+// ── Helper: draw badge ───────────────────────────────────────────────────────
+function drawBadge(
+  page: PDFPage,
+  text: string,
+  x: number,
+  y: number,
+  font: PDFFont,
+  textColor: ReturnType<typeof rgb>,
+  bgColor: ReturnType<typeof rgb>,
+  borderColor: ReturnType<typeof rgb>
+): number {
+  const displayText = stripAccents(text);
+  const textWidth = font.widthOfTextAtSize(displayText, 9);
+  const padding = 10;
+  const height = 18;
+  const width = textWidth + padding * 2;
+  page.drawRectangle({
+    x,
+    y: y - 4,
+    width,
+    height,
+    color: bgColor,
+  });
+  page.drawRectangle({
+    x,
+    y: y - 4,
+    width,
+    height,
+    borderColor,
+    borderWidth: 1,
+    opacity: 0,
+  });
+  page.drawText(displayText, {
+    x: x + padding,
+    y: y + 1,
+    size: 9,
+    font,
+    color: textColor,
+  });
+  return width;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -713,7 +253,7 @@ export async function GET(
 ) {
   const session = await getSession();
   if (!session)
-    return NextResponse.json({ error: "Non autoris\u00e9" }, { status: 401 });
+    return NextResponse.json({ error: "Non autorise" }, { status: 401 });
 
   const { id } = await params;
   const invoice = await prisma.invoice.findUnique({
@@ -728,79 +268,509 @@ export async function GET(
   if (!invoice)
     return NextResponse.json({ error: "Facture introuvable" }, { status: 404 });
 
-  // Build the HTML invoice
-  const html = buildInvoiceHtml(
-    invoice as Parameters<typeof buildInvoiceHtml>[0]
-  );
-
-  // Launch Puppeteer
-  let browser;
   try {
-    const isDev = process.env.NODE_ENV === "development";
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([PAGE_W, PAGE_H]);
 
-    if (isDev) {
-      // Development: use local Chrome
-      const possiblePaths = [
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        "/usr/bin/google-chrome",
-        "/usr/bin/chromium-browser",
-        "/usr/bin/chromium",
-        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-        "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-      ];
+    const fontR = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      let execPath: string | undefined;
-      const fs = await import("fs");
-      for (const p of possiblePaths) {
-        if (fs.existsSync(p)) {
-          execPath = p;
-          break;
-        }
+    // Embed images
+    const logoImg = await embedImage(pdfDoc, invoice.team.logo);
+
+    // Derived data
+    const clientName =
+      `${safe(invoice.client.firstName, "")} ${safe(invoice.client.lastName, "")}`.trim() || "--";
+    const clientAddr = [
+      invoice.client.address,
+      [invoice.client.postalCode, invoice.client.city].filter(Boolean).join(" "),
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const companyName = safe(
+      invoice.team.company || invoice.team.name,
+      "Entreprise"
+    );
+    const companyLines = [
+      invoice.team.address,
+      [invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" "),
+      invoice.team.phone ? `Tel. ${invoice.team.phone}` : null,
+    ].filter(Boolean) as string[];
+
+    const proParts = [
+      invoice.team.siret ? `SIRET : ${invoice.team.siret}` : null,
+      invoice.team.insurerName
+        ? `Assurance RC : ${invoice.team.insurerName}${invoice.team.insuranceNumber ? ` -- Police n${invoice.team.insuranceNumber}` : ""}`
+        : null,
+    ].filter(Boolean) as string[];
+
+    // ═══════ 1. TOP BAR ═══════
+    drawAccentBar(page, 0, PAGE_H - 6, PAGE_W);
+
+    // ═══════ 2. HEADER ═══════
+    let curY = PAGE_H - 48;
+
+    // Logo + company info on left
+    let logoEndX = MARGIN_L;
+    if (logoImg) {
+      const logoDims = logoImg.scale(1);
+      const maxH = 55;
+      const scale = Math.min(maxH / logoDims.height, 90 / logoDims.width, 1);
+      const lw = logoDims.width * scale;
+      const lh = logoDims.height * scale;
+      page.drawImage(logoImg, {
+        x: MARGIN_L,
+        y: curY - lh + 14,
+        width: lw,
+        height: lh,
+      });
+      logoEndX = MARGIN_L + lw + 14;
+    }
+
+    // Company name
+    page.drawText(stripAccents(companyName), {
+      x: logoEndX,
+      y: curY,
+      size: 14,
+      font: fontB,
+      color: NAVY,
+    });
+
+    // Company address lines
+    let compY = curY - 14;
+    for (const line of companyLines) {
+      page.drawText(stripAccents(line), {
+        x: logoEndX,
+        y: compY,
+        size: 7.5,
+        font: fontR,
+        color: GRAY,
+      });
+      compY -= 11;
+    }
+
+    // Right side: Title
+    const titleText = "FACTURE";
+    const titleWidth = fontB.widthOfTextAtSize(titleText, 22);
+    page.drawText(titleText, {
+      x: PAGE_W - MARGIN_R - titleWidth,
+      y: curY + 2,
+      size: 22,
+      font: fontB,
+      color: NAVY,
+    });
+
+    // Invoice number and date
+    const numText = stripAccents(`N ${safe(invoice.number)}`);
+    const numWidth = fontR.widthOfTextAtSize(numText, 9);
+    page.drawText(numText, {
+      x: PAGE_W - MARGIN_R - numWidth,
+      y: curY - 16,
+      size: 9,
+      font: fontR,
+      color: GRAY,
+    });
+
+    const dateText = stripAccents(`Date : ${fmtDate(invoice.date)}`);
+    const dateWidth = fontR.widthOfTextAtSize(dateText, 9);
+    page.drawText(dateText, {
+      x: PAGE_W - MARGIN_R - dateWidth,
+      y: curY - 28,
+      size: 9,
+      font: fontR,
+      color: GRAY,
+    });
+
+    // ═══════ 3. SEPARATOR ═══════
+    curY = PAGE_H - 110;
+    page.drawLine({
+      start: { x: MARGIN_L, y: curY },
+      end: { x: PAGE_W - MARGIN_R, y: curY },
+      thickness: 0.5,
+      color: LIGHT_GRAY,
+    });
+
+    // ═══════ 4. PRO INFO BAR ═══════
+    if (proParts.length > 0) {
+      curY -= 20;
+      const proText = stripAccents(proParts.join("  |  "));
+      const proWidth = fontR.widthOfTextAtSize(proText, 7);
+      const proBarW = CONTENT_W;
+      page.drawRectangle({
+        x: MARGIN_L,
+        y: curY - 6,
+        width: proBarW,
+        height: 18,
+        color: BG,
+      });
+      page.drawText(proText, {
+        x: MARGIN_L + (proBarW - proWidth) / 2,
+        y: curY,
+        size: 7,
+        font: fontR,
+        color: GRAY,
+      });
+      curY -= 28;
+    } else {
+      curY -= 16;
+    }
+
+    // ═══════ 5. CLIENT SECTION ═══════
+    curY = drawSectionHeader(page, "Facture a", curY, fontB, CONTENT_W);
+
+    const colMid = MARGIN_L + CONTENT_W / 2 + 10;
+
+    // Light gray background card
+    const clientCardH = 52;
+    page.drawRectangle({
+      x: MARGIN_L,
+      y: curY - clientCardH + 14,
+      width: CONTENT_W,
+      height: clientCardH,
+      color: BG,
+    });
+
+    // Client name (bold)
+    page.drawText(stripAccents(clientName), {
+      x: MARGIN_L + 14,
+      y: curY,
+      size: 10,
+      font: fontB,
+      color: DARK,
+    });
+
+    // Address
+    drawField(page, "ADRESSE", safe(clientAddr), MARGIN_L + 14, curY - 16, fontR, fontB);
+
+    // Right column: phone & email
+    let rightFieldY = curY;
+    if (invoice.client.phone) {
+      rightFieldY = drawField(page, "TELEPHONE", invoice.client.phone, colMid, rightFieldY, fontR, fontB);
+    }
+    if (invoice.client.email) {
+      drawField(page, "EMAIL", invoice.client.email, colMid, rightFieldY, fontR, fontB);
+    }
+
+    curY -= clientCardH + 8;
+
+    // ═══════ 6. LINE ITEMS TABLE ═══════
+    curY = drawSectionHeader(page, "Detail des prestations", curY, fontB, CONTENT_W);
+
+    // Table column positions
+    const colDesc = MARGIN_L;
+    const colQty = MARGIN_L + CONTENT_W * 0.55;
+    const colUnit = MARGIN_L + CONTENT_W * 0.70;
+    const colTotal = MARGIN_L + CONTENT_W * 0.87;
+    const tableRight = MARGIN_L + CONTENT_W;
+    const rowH = 26;
+
+    // Table header
+    const headerH = 28;
+    page.drawRectangle({
+      x: MARGIN_L,
+      y: curY - headerH + 12,
+      width: CONTENT_W,
+      height: headerH,
+      color: NAVY,
+    });
+
+    const headerY = curY - 2;
+    page.drawText("DESCRIPTION", {
+      x: colDesc + 12,
+      y: headerY,
+      size: 7.5,
+      font: fontB,
+      color: WHITE,
+    });
+    const qtyText = "QTE";
+    page.drawText(qtyText, {
+      x: colQty + (colUnit - colQty) / 2 - fontB.widthOfTextAtSize(qtyText, 7.5) / 2,
+      y: headerY,
+      size: 7.5,
+      font: fontB,
+      color: WHITE,
+    });
+    const unitText = "PRIX UNIT.";
+    page.drawText(unitText, {
+      x: colTotal - fontB.widthOfTextAtSize(unitText, 7.5) - 4,
+      y: headerY,
+      size: 7.5,
+      font: fontB,
+      color: WHITE,
+    });
+    const totalHText = "TOTAL HT";
+    page.drawText(totalHText, {
+      x: tableRight - fontB.widthOfTextAtSize(totalHText, 7.5) - 8,
+      y: headerY,
+      size: 7.5,
+      font: fontB,
+      color: WHITE,
+    });
+
+    curY -= headerH;
+
+    // Table rows
+    for (let i = 0; i < invoice.items.length; i++) {
+      const item = invoice.items[i];
+      const isAlt = i % 2 === 1;
+
+      // Row background
+      if (isAlt) {
+        page.drawRectangle({
+          x: MARGIN_L,
+          y: curY - rowH + 12,
+          width: CONTENT_W,
+          height: rowH,
+          color: BG,
+        });
       }
 
-      browser = await puppeteer.launch({
-        headless: true,
-        executablePath: execPath,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // Bottom border
+      page.drawLine({
+        start: { x: MARGIN_L, y: curY - rowH + 12 },
+        end: { x: tableRight, y: curY - rowH + 12 },
+        thickness: 0.5,
+        color: rgb(0.95, 0.96, 0.96),
       });
-    } else {
-      // Production (Vercel): use @sparticuz/chromium
-      browser = await puppeteer.launch({
-        args: [...chromium.args, "--disable-gpu", "--single-process"],
-        defaultViewport: { width: 800, height: 600 },
-        executablePath: await chromium.executablePath(),
-        headless: true,
+
+      const textY = curY - 4;
+
+      // Description (wrap if needed)
+      const descLines = wrapText(item.description, fontR, 9, colQty - colDesc - 20);
+      page.drawText(stripAccents(descLines[0]), {
+        x: colDesc + 12,
+        y: textY,
+        size: 9,
+        font: fontR,
+        color: DARK,
+      });
+
+      // Quantity
+      const qtyStr = String(item.quantity);
+      page.drawText(qtyStr, {
+        x: colQty + (colUnit - colQty) / 2 - fontR.widthOfTextAtSize(qtyStr, 9) / 2,
+        y: textY,
+        size: 9,
+        font: fontR,
+        color: GRAY,
+      });
+
+      // Unit price
+      const unitStr = fmtCurrency(item.unitPrice);
+      page.drawText(stripAccents(unitStr), {
+        x: colTotal - fontR.widthOfTextAtSize(stripAccents(unitStr), 9) - 4,
+        y: textY,
+        size: 9,
+        font: fontR,
+        color: GRAY,
+      });
+
+      // Total
+      const totalStr = fmtCurrency(item.total);
+      page.drawText(stripAccents(totalStr), {
+        x: tableRight - fontB.widthOfTextAtSize(stripAccents(totalStr), 9) - 8,
+        y: textY,
+        size: 9,
+        font: fontB,
+        color: DARK,
+      });
+
+      curY -= rowH;
+    }
+
+    curY -= 8;
+
+    // ═══════ 7. TOTALS ═══════
+    const totalsW = 220;
+    const totalsX = tableRight - totalsW;
+    const totRowH = 22;
+
+    // Sous-total row
+    page.drawText("Sous-total HT", {
+      x: totalsX,
+      y: curY,
+      size: 9,
+      font: fontR,
+      color: GRAY,
+    });
+    const subtotalStr = stripAccents(fmtCurrency(invoice.subtotal));
+    page.drawText(subtotalStr, {
+      x: tableRight - fontR.widthOfTextAtSize(subtotalStr, 9) - 8,
+      y: curY,
+      size: 9,
+      font: fontR,
+      color: DARK,
+    });
+
+    // Separator
+    curY -= totRowH;
+    page.drawLine({
+      start: { x: totalsX, y: curY + 8 },
+      end: { x: tableRight, y: curY + 8 },
+      thickness: 0.5,
+      color: rgb(0.95, 0.96, 0.96),
+    });
+
+    // TVA row
+    const tvaLabel = `TVA (${invoice.taxRate}%)`;
+    page.drawText(stripAccents(tvaLabel), {
+      x: totalsX,
+      y: curY,
+      size: 9,
+      font: fontR,
+      color: GRAY,
+    });
+    const taxStr = stripAccents(fmtCurrency(invoice.tax));
+    page.drawText(taxStr, {
+      x: tableRight - fontR.widthOfTextAtSize(taxStr, 9) - 8,
+      y: curY,
+      size: 9,
+      font: fontR,
+      color: DARK,
+    });
+
+    curY -= totRowH + 6;
+
+    // Total TTC in navy rectangle
+    const ttcBoxH = 32;
+    page.drawRectangle({
+      x: totalsX,
+      y: curY - 4,
+      width: totalsW,
+      height: ttcBoxH,
+      color: NAVY,
+    });
+
+    page.drawText("TOTAL TTC", {
+      x: totalsX + 14,
+      y: curY + 6,
+      size: 10,
+      font: fontB,
+      color: WHITE,
+    });
+
+    const totalTtcStr = stripAccents(fmtCurrency(invoice.total));
+    page.drawText(totalTtcStr, {
+      x: tableRight - fontB.widthOfTextAtSize(totalTtcStr, 13) - 14,
+      y: curY + 4,
+      size: 13,
+      font: fontB,
+      color: WHITE,
+    });
+
+    curY -= ttcBoxH + 16;
+
+    // ═══════ 8. PAYMENT INFO ═══════
+    const paymentH = 34;
+    page.drawRectangle({
+      x: MARGIN_L,
+      y: curY - paymentH + 18,
+      width: CONTENT_W,
+      height: paymentH,
+      color: BG,
+    });
+    // Left border accent
+    page.drawRectangle({
+      x: MARGIN_L,
+      y: curY - paymentH + 18,
+      width: 3,
+      height: paymentH,
+      color: NAVY,
+    });
+
+    let payX = MARGIN_L + 14;
+    if (invoice.dueDate) {
+      drawField(page, "ECHEANCE", fmtDate(invoice.dueDate), payX, curY, fontR, fontB);
+      payX += 130;
+    }
+
+    // Status badge
+    page.drawText("STATUT", {
+      x: payX,
+      y: curY,
+      size: 7.5,
+      font: fontR,
+      color: GRAY,
+    });
+
+    const sLabel = statusLabel(invoice.status);
+    let sColor: ReturnType<typeof rgb>;
+    let sBg: ReturnType<typeof rgb>;
+    let sBorder: ReturnType<typeof rgb>;
+    switch (invoice.status) {
+      case "paid":
+        sColor = EMERALD;
+        sBg = GREEN_BG;
+        sBorder = GREEN_BORDER;
+        break;
+      case "sent":
+        sColor = BLUE;
+        sBg = BLUE_BG_BADGE;
+        sBorder = BLUE_BORDER_BADGE;
+        break;
+      case "overdue":
+        sColor = RED;
+        sBg = RED_BG;
+        sBorder = RED_BORDER;
+        break;
+      default:
+        sColor = GRAY;
+        sBg = GRAY_BG_BADGE;
+        sBorder = GRAY_BORDER_BADGE;
+    }
+    drawBadge(page, sLabel, payX, curY - 14, fontB, sColor, sBg, sBorder);
+
+    // ═══════ 9. FOOTER ═══════
+    const footerY = 44;
+    page.drawLine({
+      start: { x: MARGIN_L, y: footerY + 14 },
+      end: { x: PAGE_W - MARGIN_R, y: footerY + 14 },
+      thickness: 0.5,
+      color: LIGHT_GRAY,
+    });
+
+    // Company info line
+    const footerParts = [companyName];
+    if (invoice.team.siret) footerParts.push(`SIRET : ${invoice.team.siret}`);
+    if (invoice.team.address) footerParts.push(invoice.team.address);
+    const cpCity = [invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" ");
+    if (cpCity) footerParts.push(cpCity);
+    const footerLine1 = stripAccents(footerParts.join(" -- "));
+    const footerLine1W = fontR.widthOfTextAtSize(footerLine1, 7);
+    page.drawText(footerLine1, {
+      x: PAGE_W / 2 - footerLine1W / 2,
+      y: footerY,
+      size: 7,
+      font: fontR,
+      color: GRAY,
+    });
+
+    if (invoice.team.phone) {
+      const phoneLine = stripAccents(`Tel. ${invoice.team.phone}`);
+      const phoneW = fontR.widthOfTextAtSize(phoneLine, 7);
+      page.drawText(phoneLine, {
+        x: PAGE_W / 2 - phoneW / 2,
+        y: footerY - 12,
+        size: 7,
+        font: fontR,
+        color: GRAY,
       });
     }
 
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
+    // Serialize
+    const pdfBytes = await pdfDoc.save();
 
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: { top: "0", bottom: "0", left: "0", right: "0" },
-    });
-
-    await browser.close();
-
-    return new NextResponse(Buffer.from(pdfBuffer), {
+    return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `inline; filename="facture-${invoice.number}.pdf"`,
       },
     });
   } catch (error) {
-    if (browser) {
-      try {
-        await browser.close();
-      } catch {
-        /* ignore close errors */
-      }
-    }
     console.error("PDF generation error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la g\u00e9n\u00e9ration du PDF" },
+      { error: "Erreur lors de la generation du PDF" },
       { status: 500 }
     );
   }
