@@ -764,7 +764,7 @@ export async function GET(
     return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="facture-${invoice.number}.pdf"`,
+        "Content-Disposition": `inline; filename="Facture-${stripAccents(safe(invoice.client.lastName, ""))}-${stripAccents(safe(invoice.client.firstName, ""))}-${fmtDate(invoice.date).replace(/\//g, "-")}.pdf"`,
       },
     });
   } catch (error) {

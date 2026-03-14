@@ -897,7 +897,7 @@ export async function GET(
     return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="certificat-${cert.number || cert.id}.pdf"`,
+        "Content-Disposition": `inline; filename="Certificat-Ramonage-${stripAccents(safe(cert.client.lastName, ""))}-${stripAccents(safe(cert.client.firstName, ""))}-${fmtDate(cert.date).replace(/\//g, "-")}.pdf"`,
       },
     });
   } catch (error) {
