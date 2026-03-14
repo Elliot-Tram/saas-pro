@@ -84,114 +84,115 @@ export default async function CertificatePreviewPage({
 
         .certificate {
           width: 210mm;
-          min-height: 297mm;
+          max-height: 297mm;
           margin: 0 auto;
           background: #fff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #111827;
-          font-size: 12px;
-          line-height: 1.5;
+          font-size: 11px;
+          line-height: 1.4;
           position: relative;
           box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+          overflow: hidden;
         }
 
         .accent-bar {
-          height: 8px;
+          height: 6px;
           background: linear-gradient(90deg, #0f2b46, #1e40af);
         }
 
         .content {
-          padding: 28px 40px 20px;
+          padding: 20px 36px 12px;
         }
 
         /* Header */
         .header {
           display: grid;
           grid-template-columns: auto 1fr auto;
-          gap: 16px;
+          gap: 12px;
           align-items: start;
-          margin-bottom: 22px;
+          margin-bottom: 14px;
         }
 
         .logo {
-          max-height: 65px;
-          max-width: 100px;
+          max-height: 50px;
+          max-width: 80px;
           object-fit: contain;
         }
 
         .company-name {
-          font-size: 17px;
+          font-size: 14px;
           font-weight: 800;
           color: #0f2b46;
           letter-spacing: -0.02em;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
         }
 
         .company-detail {
-          font-size: 9px;
+          font-size: 8px;
           color: #6b7280;
-          line-height: 1.7;
+          line-height: 1.6;
         }
 
         .title-block { text-align: right; }
 
         .title-main {
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 24px;
-          font-weight: 700;
+          font-size: 18px;
+          font-weight: 800;
           color: #0f2b46;
           line-height: 1.15;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
         }
 
         .title-accent {
-          width: 40px;
-          height: 3px;
+          width: 32px;
+          height: 2px;
           background: #2563eb;
           margin-left: auto;
-          margin-top: 6px;
-          margin-bottom: 8px;
+          margin-top: 4px;
+          margin-bottom: 5px;
         }
 
         .cert-meta {
-          font-size: 10px;
+          font-size: 9px;
           color: #6b7280;
-          line-height: 1.6;
+          line-height: 1.5;
         }
 
         /* Separator */
-        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 16px; }
+        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 10px; }
 
         /* Pro bar */
         .pro-bar {
           background: #f9fafb;
-          border-radius: 6px;
-          padding: 8px 16px;
+          border-radius: 4px;
+          padding: 5px 12px;
           text-align: center;
-          font-size: 8.5px;
+          font-size: 7.5px;
           color: #6b7280;
-          margin-bottom: 20px;
+          margin-bottom: 12px;
         }
-        .pro-bar .divider { margin: 0 10px; color: #d1d5db; }
+        .pro-bar .divider { margin: 0 8px; color: #d1d5db; }
 
         /* Section */
-        .section { margin-bottom: 18px; }
+        .section { margin-bottom: 10px; }
         .section-title {
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: #0f2b46;
-          padding-bottom: 6px;
-          border-bottom: 1.5px solid #e5e7eb;
-          margin-bottom: 12px;
+          padding-bottom: 4px;
+          border-bottom: 1px solid #e5e7eb;
+          margin-bottom: 8px;
         }
 
         /* Cards */
         .card {
           border-left: 3px solid #e5e7eb;
-          padding: 12px 16px;
-          margin-bottom: 4px;
+          padding: 8px 12px;
+          margin-bottom: 2px;
         }
         .card-filled {
           background: #f9fafb;
@@ -199,25 +200,25 @@ export default async function CertificatePreviewPage({
         }
 
         /* Grid */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 32px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; }
 
         /* Fields */
-        .field { margin-bottom: 8px; }
+        .field { margin-bottom: 5px; }
         .field-label {
-          font-size: 8px;
+          font-size: 7px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: #9ca3af;
-          margin-bottom: 1px;
+          margin-bottom: 0;
         }
         .field-value {
-          font-size: 12px;
+          font-size: 11px;
           color: #111827;
           font-weight: 500;
         }
         .field-value-bold {
-          font-size: 13px;
+          font-size: 11px;
           color: #111827;
           font-weight: 700;
         }
@@ -225,9 +226,9 @@ export default async function CertificatePreviewPage({
         /* Badges */
         .badge {
           display: inline-block;
-          padding: 6px 20px;
-          border-radius: 6px;
-          font-size: 12px;
+          padding: 4px 14px;
+          border-radius: 4px;
+          font-size: 10px;
           font-weight: 800;
           letter-spacing: 0.04em;
           text-transform: uppercase;
@@ -253,11 +254,11 @@ export default async function CertificatePreviewPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 16px;
+          padding: 6px 12px;
         }
         .result-row + .result-row { border-top: 1px solid #f3f4f6; }
         .result-label {
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.06em;
@@ -267,8 +268,8 @@ export default async function CertificatePreviewPage({
         /* Method line */
         .method-line {
           display: flex;
-          gap: 40px;
-          padding: 10px 16px 12px;
+          gap: 32px;
+          padding: 6px 12px 8px;
           border-bottom: 1px solid #f3f4f6;
         }
 
@@ -276,88 +277,88 @@ export default async function CertificatePreviewPage({
         .anomaly-ok {
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding: 10px 16px;
+          gap: 8px;
+          padding: 6px 12px;
         }
         .anomaly-ok-icon {
-          width: 28px; height: 28px;
+          width: 22px; height: 22px;
           border-radius: 50%;
           background: #ecfdf5;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
-        .anomaly-ok-text { font-size: 12px; font-weight: 700; color: #059669; }
+        .anomaly-ok-text { font-size: 11px; font-weight: 700; color: #059669; }
 
         .anomaly-item {
           display: flex;
           align-items: flex-start;
-          gap: 10px;
-          padding: 4px 16px;
+          gap: 8px;
+          padding: 2px 12px;
         }
         .anomaly-icon {
-          width: 20px; height: 20px;
+          width: 16px; height: 16px;
           border-radius: 50%;
           background: #fef2f2;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
-          margin-top: 2px;
+          margin-top: 1px;
         }
-        .anomaly-text { font-size: 11px; font-weight: 600; color: #dc2626; }
+        .anomaly-text { font-size: 10px; font-weight: 600; color: #dc2626; }
 
         /* Observations */
-        .obs-text { font-size: 11px; color: #374151; line-height: 1.7; padding: 0 16px; }
+        .obs-text { font-size: 10px; color: #374151; line-height: 1.5; padding: 0 12px; }
         .obs-rec-label {
-          font-size: 8px; font-weight: 700; color: #6b7280;
+          font-size: 7px; font-weight: 700; color: #6b7280;
           text-transform: uppercase; letter-spacing: 0.06em;
-          margin: 8px 16px 2px;
+          margin: 4px 12px 1px;
         }
-        .obs-rec-text { font-size: 11px; color: #374151; font-style: italic; line-height: 1.7; padding: 0 16px; }
+        .obs-rec-text { font-size: 10px; color: #374151; font-style: italic; line-height: 1.5; padding: 0 12px; }
 
         .next-visit {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          margin: 10px 16px 0;
-          padding: 6px 14px;
+          gap: 4px;
+          margin: 6px 12px 0;
+          padding: 4px 10px;
           background: #eff6ff;
           border: 1px solid #bfdbfe;
-          border-radius: 6px;
-          font-size: 11px;
+          border-radius: 4px;
+          font-size: 9px;
           font-weight: 700;
           color: #1e40af;
         }
 
         /* Signatures */
         .sig-section {
-          margin-top: 20px;
-          padding-top: 16px;
-          border-top: 1.5px solid #e5e7eb;
+          margin-top: 12px;
+          padding-top: 10px;
+          border-top: 1px solid #e5e7eb;
         }
-        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .sig-block { text-align: center; }
-        .sig-label { font-size: 9px; font-weight: 700; color: #374151; margin-bottom: 4px; }
-        .sig-sub { font-size: 7px; font-style: italic; color: #9ca3af; margin-bottom: 6px; }
+        .sig-label { font-size: 8px; font-weight: 700; color: #374151; margin-bottom: 2px; }
+        .sig-sub { font-size: 6.5px; font-style: italic; color: #9ca3af; margin-bottom: 4px; }
         .sig-box {
-          border: 2px dashed #d1d5db;
-          border-radius: 8px;
-          height: 70px;
+          border: 1.5px dashed #d1d5db;
+          border-radius: 6px;
+          height: 50px;
           display: flex; align-items: center; justify-content: center;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
           background: #fafbfc;
         }
-        .sig-img { max-width: 180px; max-height: 55px; object-fit: contain; }
-        .sig-name { font-size: 9px; color: #6b7280; }
-        .sig-date { font-size: 8px; color: #9ca3af; margin-top: 1px; }
+        .sig-img { max-width: 150px; max-height: 40px; object-fit: contain; }
+        .sig-name { font-size: 8px; color: #6b7280; }
+        .sig-date { font-size: 7px; color: #9ca3af; margin-top: 1px; }
 
         /* Footer */
         .footer {
           text-align: center;
-          padding: 14px 40px 12px;
+          padding: 8px 36px 8px;
           border-top: 1px solid #e5e7eb;
-          margin-top: 16px;
+          margin-top: 8px;
         }
-        .footer-text { font-size: 7.5px; color: #9ca3af; line-height: 1.8; }
-        .footer-brand { font-size: 7px; color: #d1d5db; margin-top: 4px; }
+        .footer-text { font-size: 7px; color: #9ca3af; line-height: 1.7; }
+        .footer-brand { font-size: 6.5px; color: #d1d5db; margin-top: 2px; }
 
         /* Print button bar */
         .print-bar {
