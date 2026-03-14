@@ -54,7 +54,7 @@ export default async function CertificateDetailPage({
   const { id } = await params;
 
   const certificate = await prisma.certificate.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     include: { client: true },
   });
 

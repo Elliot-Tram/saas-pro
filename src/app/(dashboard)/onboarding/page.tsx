@@ -7,13 +7,13 @@ export default async function OnboardingPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  // Check if user has already completed onboarding
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
+  // Check if team has already completed onboarding
+  const team = await prisma.team.findUnique({
+    where: { id: session.teamId },
     select: { company: true, siret: true },
   });
 
-  if (user?.company && user?.siret) {
+  if (team?.company && team?.siret) {
     redirect("/");
   }
 

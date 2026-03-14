@@ -7,9 +7,10 @@ export async function updateProfile(_prevState: unknown, formData: FormData) {
   const session = await getSession();
   if (!session) return { error: "Non authentifié" };
 
-  const data = {
-    name: formData.get("name") as string,
-    email: formData.get("email") as string,
+  const userName = formData.get("userName") as string;
+  const userEmail = formData.get("userEmail") as string;
+
+  const teamData = {
     phone: (formData.get("phone") as string) || null,
     company: (formData.get("company") as string) || null,
     siret: (formData.get("siret") as string) || null,
@@ -23,19 +24,26 @@ export async function updateProfile(_prevState: unknown, formData: FormData) {
     googleReviewLink: (formData.get("googleReviewLink") as string) || null,
   };
 
-  if (!data.name || !data.email) {
+  if (!userName || !userEmail) {
     return { error: "Nom et email sont requis" };
   }
 
   // Check email uniqueness
-  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+  const existing = await prisma.user.findUnique({ where: { email: userEmail } });
   if (existing && existing.id !== session.userId) {
     return { error: "Cet email est déjà utilisé" };
   }
 
+  // Update user fields (name, email)
   await prisma.user.update({
     where: { id: session.userId },
-    data,
+    data: { name: userName, email: userEmail },
+  });
+
+  // Update team fields (company info)
+  await prisma.team.update({
+    where: { id: session.teamId },
+    data: teamData,
   });
 
   return { success: true };

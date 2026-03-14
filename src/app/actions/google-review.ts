@@ -13,25 +13,24 @@ export async function sendGoogleReviewRequest(
     return { error: "Non autoris\u00e9" };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
+  const team = await prisma.team.findUnique({
+    where: { id: session.teamId },
     select: {
       googleReviewLink: true,
       company: true,
-      name: true,
     },
   });
 
-  if (!user) {
-    return { error: "Utilisateur introuvable" };
+  if (!team) {
+    return { error: "Équipe introuvable" };
   }
 
-  if (!user.googleReviewLink) {
+  if (!team.googleReviewLink) {
     return { error: "Lien Google avis non configur\u00e9. Ajoutez-le dans Param\u00e8tres." };
   }
 
   const client = await prisma.client.findFirst({
-    where: { id: clientId, userId: session.userId },
+    where: { id: clientId, teamId: session.teamId },
     select: {
       firstName: true,
       lastName: true,
@@ -47,7 +46,7 @@ export async function sendGoogleReviewRequest(
     return { error: "Ce client n\u2019a pas d\u2019adresse email" };
   }
 
-  const companyName = user.company || user.name;
+  const companyName = team.company || session.name;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
@@ -59,7 +58,7 @@ export async function sendGoogleReviewRequest(
         <p>Merci de nous avoir fait confiance pour votre ramonage.</p>
         <p>Votre satisfaction est notre priorit\u00e9. Si vous \u00eates satisfait(e) de notre intervention, nous serions ravis que vous partagiez votre exp\u00e9rience.</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${user.googleReviewLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #3366DE; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">
+          <a href="${team.googleReviewLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #3366DE; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">
             Laisser un avis Google \u2605\u2605\u2605\u2605\u2605
           </a>
         </div>

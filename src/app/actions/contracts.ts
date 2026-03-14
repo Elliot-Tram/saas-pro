@@ -37,7 +37,7 @@ export async function createContract(_prevState: unknown, formData: FormData) {
 
   // Verify client belongs to user
   const client = await prisma.client.findFirst({
-    where: { id: parsed.data.clientId, userId: session.userId },
+    where: { id: parsed.data.clientId, teamId: session.teamId },
   });
   if (!client) {
     return { error: "Client introuvable" };
@@ -45,7 +45,7 @@ export async function createContract(_prevState: unknown, formData: FormData) {
 
   // Generate contract number
   const count = await prisma.contract.count({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
   });
   const number = generateNumber("CTR", count);
 
@@ -60,7 +60,7 @@ export async function createContract(_prevState: unknown, formData: FormData) {
       description: parsed.data.description || null,
       autoRenew: parsed.data.autoRenew,
       clientId: parsed.data.clientId,
-      userId: session.userId,
+      teamId: session.teamId,
     },
   });
 
@@ -72,7 +72,7 @@ export async function updateContractStatus(id: string, status: string) {
   if (!session) redirect("/login");
 
   const existing = await prisma.contract.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!existing) {
     return { error: "Contrat introuvable" };
@@ -91,7 +91,7 @@ export async function deleteContract(id: string) {
   if (!session) redirect("/login");
 
   const existing = await prisma.contract.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!existing) {
     return { error: "Contrat introuvable" };

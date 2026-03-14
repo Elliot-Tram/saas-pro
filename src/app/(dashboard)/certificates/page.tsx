@@ -21,7 +21,7 @@ export default async function CertificatesPage() {
   if (!session) redirect("/login");
 
   const certificates = await prisma.certificate.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     include: { client: true },
     orderBy: { date: "desc" },
   });

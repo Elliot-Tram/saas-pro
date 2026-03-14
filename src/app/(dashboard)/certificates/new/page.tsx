@@ -16,7 +16,7 @@ export default async function NewCertificatePage({
   const { clientId, fromWorkflow } = await searchParams;
 
   const clients = await prisma.client.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     orderBy: { lastName: "asc" },
     select: {
       id: true,

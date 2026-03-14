@@ -25,7 +25,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
 
   const invoice = await prisma.invoice.findUnique({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     include: {
       items: true,
       client: true,

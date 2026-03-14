@@ -21,7 +21,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   const { sector: sectorFilter } = await searchParams;
 
   const allClients = await prisma.client.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     orderBy: { lastName: "asc" },
   });
 

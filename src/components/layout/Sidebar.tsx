@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   MapPin,
+  UsersRound,
 } from "lucide-react";
 
 const navigation = [
@@ -31,6 +32,7 @@ const navigation = [
   { name: "Contrats", href: "/contracts", icon: FileSignature },
   { name: "Rappels", href: "/reminders", icon: Bell },
   { name: "Statistiques", href: "/stats", icon: BarChart3 },
+  { name: "Équipe", href: "/team", icon: UsersRound },
   { name: "Paramètres", href: "/settings", icon: Settings },
 ];
 

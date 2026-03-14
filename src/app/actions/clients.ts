@@ -55,7 +55,7 @@ export async function createClient(_prevState: unknown, formData: FormData) {
       chimneyType: parsed.data.chimneyType || null,
       fuelType: parsed.data.fuelType || null,
       notes: parsed.data.notes || null,
-      userId: session.userId,
+      teamId: session.teamId,
     },
   });
 
@@ -72,7 +72,7 @@ export async function updateClient(_prevState: unknown, formData: FormData) {
   }
 
   const existing = await prisma.client.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!existing) {
     return { error: "Client introuvable" };
@@ -122,7 +122,7 @@ export async function deleteClient(id: string) {
   if (!session) redirect("/login");
 
   const existing = await prisma.client.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!existing) {
     redirect("/clients");

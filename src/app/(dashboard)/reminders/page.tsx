@@ -21,7 +21,7 @@ export default async function RemindersPage() {
 
   const clients = await prisma.client.findMany({
     where: {
-      userId: session.userId,
+      teamId: session.teamId,
       OR: [
         { lastVisit: null },
         { lastVisit: { lt: elevenMonthsAgo } },

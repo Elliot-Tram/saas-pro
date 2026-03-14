@@ -8,32 +8,39 @@ export default async function SettingsPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      company: true,
-      siret: true,
-      address: true,
-      city: true,
-      postalCode: true,
-      logo: true,
-      insuranceNumber: true,
-      insurerName: true,
-      qualification: true,
-      googleReviewLink: true,
-    },
-  });
+  const [team, user] = await Promise.all([
+    prisma.team.findUnique({
+      where: { id: session.teamId },
+      select: {
+        id: true,
+        company: true,
+        phone: true,
+        siret: true,
+        address: true,
+        city: true,
+        postalCode: true,
+        logo: true,
+        insuranceNumber: true,
+        insurerName: true,
+        qualification: true,
+        googleReviewLink: true,
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.userId },
+      select: {
+        name: true,
+        email: true,
+      },
+    }),
+  ]);
 
-  if (!user) redirect("/login");
+  if (!team || !user) redirect("/login");
 
   return (
     <>
       <Header title="Paramètres" description="Gérez les informations de votre entreprise" />
-      <SettingsForm user={user} />
+      <SettingsForm team={team} user={user} />
     </>
   );
 }

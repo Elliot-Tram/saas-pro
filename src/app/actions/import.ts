@@ -130,7 +130,7 @@ export async function importClients(
       chimneyType: string | null;
       fuelType: string | null;
       notes: string | null;
-      userId: string;
+      teamId: string;
     }[] = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -161,7 +161,7 @@ export async function importClients(
         chimneyType: getValue("chimneyType") || null,
         fuelType: getValue("fuelType") || null,
         notes: getValue("notes") || null,
-        userId: session.userId,
+        teamId: session.teamId,
       });
     }
 

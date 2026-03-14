@@ -21,7 +21,7 @@ export default async function ContractsPage() {
   if (!session) redirect("/login");
 
   const contracts = await prisma.contract.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     include: { client: true },
     orderBy: { createdAt: "desc" },
   });

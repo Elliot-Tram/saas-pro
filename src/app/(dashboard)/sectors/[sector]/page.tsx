@@ -23,7 +23,7 @@ export default async function SectorDetailPage({ params }: SectorDetailPageProps
 
   const clients = await prisma.client.findMany({
     where: {
-      userId: session.userId,
+      teamId: session.teamId,
       sector: sectorName,
     },
     orderBy: { lastName: "asc" },

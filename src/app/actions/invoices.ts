@@ -46,7 +46,7 @@ export async function createInvoice(_prevState: unknown, formData: FormData) {
   const total = subtotal + tax;
 
   // Generate invoice number
-  const count = await prisma.invoice.count({ where: { userId: session.userId } });
+  const count = await prisma.invoice.count({ where: { teamId: session.teamId } });
   const number = generateNumber("FAC", count);
 
   await prisma.invoice.create({
@@ -60,7 +60,7 @@ export async function createInvoice(_prevState: unknown, formData: FormData) {
       tax,
       total,
       clientId,
-      userId: session.userId,
+      teamId: session.teamId,
       items: {
         create: items.map((item) => ({
           description: item.description,
@@ -80,7 +80,7 @@ export async function updateInvoiceStatus(id: string, status: string) {
   if (!session) redirect("/login");
 
   await prisma.invoice.update({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     data: { status },
   });
 }
@@ -90,7 +90,7 @@ export async function deleteInvoice(id: string) {
   if (!session) redirect("/login");
 
   await prisma.invoice.delete({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
 
   redirect("/invoices");

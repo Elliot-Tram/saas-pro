@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   const clients = await prisma.client.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     select: { id: true, firstName: true, lastName: true },
     orderBy: { lastName: "asc" },
   });

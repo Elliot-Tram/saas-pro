@@ -14,7 +14,7 @@ export async function sendPaymentReminder(
   }
 
   const invoice = await prisma.invoice.findFirst({
-    where: { id: invoiceId, userId: session.userId },
+    where: { id: invoiceId, teamId: session.teamId },
     include: { client: true },
   });
 

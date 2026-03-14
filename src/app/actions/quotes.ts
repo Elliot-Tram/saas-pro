@@ -46,7 +46,7 @@ export async function createQuote(_prevState: unknown, formData: FormData) {
   const total = subtotal + tax;
 
   // Generate quote number
-  const count = await prisma.quote.count({ where: { userId: session.userId } });
+  const count = await prisma.quote.count({ where: { teamId: session.teamId } });
   const number = generateNumber("DEV", count);
 
   await prisma.quote.create({
@@ -60,7 +60,7 @@ export async function createQuote(_prevState: unknown, formData: FormData) {
       tax,
       total,
       clientId,
-      userId: session.userId,
+      teamId: session.teamId,
       items: {
         create: items.map((item) => ({
           description: item.description,
@@ -80,7 +80,7 @@ export async function updateQuoteStatus(id: string, status: string) {
   if (!session) redirect("/login");
 
   await prisma.quote.update({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     data: { status },
   });
 }
@@ -90,7 +90,7 @@ export async function deleteQuote(id: string) {
   if (!session) redirect("/login");
 
   await prisma.quote.delete({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
 
   redirect("/quotes");

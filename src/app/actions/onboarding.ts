@@ -27,8 +27,8 @@ export async function completeOnboarding(_prevState: unknown, formData: FormData
     googleReviewLink: (formData.get("googleReviewLink") as string) || null,
   };
 
-  await prisma.user.update({
-    where: { id: session.userId },
+  await prisma.team.update({
+    where: { id: session.teamId },
     data,
   });
 

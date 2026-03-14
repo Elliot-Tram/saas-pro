@@ -14,7 +14,7 @@ export default async function SectorsPage() {
   if (!session) redirect("/login");
 
   const clients = await prisma.client.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     orderBy: { lastName: "asc" },
   });
 

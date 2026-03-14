@@ -8,7 +8,7 @@ export default async function NewContractPage() {
   if (!session) redirect("/login");
 
   const clients = await prisma.client.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     orderBy: { lastName: "asc" },
     select: {
       id: true,

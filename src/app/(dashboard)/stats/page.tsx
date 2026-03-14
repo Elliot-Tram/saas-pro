@@ -129,7 +129,7 @@ export default async function StatsPage({
     // Revenue for the period (paid invoices)
     prisma.invoice.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "paid",
         date: { gte: periodStart, lte: periodEnd },
       },
@@ -137,7 +137,7 @@ export default async function StatsPage({
     // Revenue last 6 months (paid invoices)
     prisma.invoice.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "paid",
         date: { gte: sixMonthsStart },
       },
@@ -145,7 +145,7 @@ export default async function StatsPage({
     // Completed appointments for the period
     prisma.appointment.count({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "completed",
         date: { gte: periodStart, lte: periodEnd },
       },
@@ -153,7 +153,7 @@ export default async function StatsPage({
     // All appointments for the period (for day-of-week analysis)
     prisma.appointment.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "completed",
         date: { gte: periodStart, lte: periodEnd },
       },
@@ -161,19 +161,19 @@ export default async function StatsPage({
     }),
     // Total clients
     prisma.client.count({
-      where: { userId: session.userId },
+      where: { teamId: session.teamId },
     }),
     // New clients this period
     prisma.client.count({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         createdAt: { gte: periodStart, lte: periodEnd },
       },
     }),
     // Clients with active contracts
     prisma.contract.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "active",
       },
       select: { clientId: true },
@@ -181,7 +181,7 @@ export default async function StatsPage({
     }),
     // Clients with sectors + their invoices and appointments for sector performance
     prisma.client.findMany({
-      where: { userId: session.userId },
+      where: { teamId: session.teamId },
       select: {
         id: true,
         firstName: true,
@@ -200,14 +200,14 @@ export default async function StatsPage({
     // Certificates for the period
     prisma.certificate.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         date: { gte: periodStart, lte: periodEnd },
       },
       select: { condition: true, anomalies: true },
     }),
     // Top clients by total invoiced
     prisma.client.findMany({
-      where: { userId: session.userId },
+      where: { teamId: session.teamId },
       select: {
         id: true,
         firstName: true,

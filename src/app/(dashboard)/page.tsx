@@ -26,12 +26,12 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  // Check if user has completed basic onboarding
-  const currentUser = await prisma.user.findUnique({
-    where: { id: session.userId },
+  // Check if team has completed basic onboarding
+  const currentTeam = await prisma.team.findUnique({
+    where: { id: session.teamId },
     select: { company: true },
   });
-  const needsOnboarding = !currentUser?.company;
+  const needsOnboarding = !currentTeam?.company;
 
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -48,27 +48,27 @@ export default async function DashboardPage() {
     overdueInvoices,
     recentClients,
   ] = await Promise.all([
-    prisma.client.count({ where: { userId: session.userId } }),
+    prisma.client.count({ where: { teamId: session.teamId } }),
     prisma.appointment.count({
-      where: { userId: session.userId, date: { gte: startOfMonth, lte: endOfMonth } },
+      where: { teamId: session.teamId, date: { gte: startOfMonth, lte: endOfMonth } },
     }),
     prisma.appointment.findMany({
-      where: { userId: session.userId, date: { gte: startOfDay, lte: endOfDay } },
+      where: { teamId: session.teamId, date: { gte: startOfDay, lte: endOfDay } },
       include: { client: true },
       orderBy: { date: "asc" },
     }),
     prisma.appointment.findMany({
-      where: { userId: session.userId, date: { gt: endOfDay }, status: "scheduled" },
+      where: { teamId: session.teamId, date: { gt: endOfDay }, status: "scheduled" },
       include: { client: true },
       orderBy: { date: "asc" },
       take: 5,
     }),
     prisma.invoice.findMany({
-      where: { userId: session.userId, date: { gte: startOfMonth, lte: endOfMonth } },
+      where: { teamId: session.teamId, date: { gte: startOfMonth, lte: endOfMonth } },
     }),
     prisma.invoice.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         status: "sent",
         dueDate: { lt: now },
       },
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
       take: 5,
     }),
     prisma.client.findMany({
-      where: { userId: session.userId },
+      where: { teamId: session.teamId },
       orderBy: { createdAt: "desc" },
       take: 5,
     }),

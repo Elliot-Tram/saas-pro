@@ -15,14 +15,14 @@ export default async function CalendarPage() {
   const [appointments, clients] = await Promise.all([
     prisma.appointment.findMany({
       where: {
-        userId: session.userId,
+        teamId: session.teamId,
         date: { gte: startOfMonth, lte: endOfMonth },
       },
       include: { client: true },
       orderBy: { date: "asc" },
     }),
     prisma.client.findMany({
-      where: { userId: session.userId },
+      where: { teamId: session.teamId },
       orderBy: { lastName: "asc" },
     }),
   ]);

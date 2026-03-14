@@ -14,14 +14,12 @@ async function main() {
   await prisma.contract.deleteMany();
   await prisma.client.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.team.deleteMany();
 
-  // Create user
-  const password = await bcrypt.hash("demo1234", 12);
-  const user = await prisma.user.create({
+  // Create team with company info
+  const team = await prisma.team.create({
     data: {
-      name: "Jean-Pierre Martin",
-      email: "jp.martin@ramonage-martin.fr",
-      password,
+      name: "Ramonage Martin",
       company: "Ramonage Martin SARL",
       phone: "06 12 34 56 78",
       siret: "823 456 789 00012",
@@ -31,6 +29,29 @@ async function main() {
       qualification: "Qualibat RGE — CTM Ramoneur",
       insurerName: "MAAF Pro",
       insuranceNumber: "RC-2024-887456",
+    },
+  });
+
+  // Create admin user
+  const password = await bcrypt.hash("demo1234", 12);
+  const user = await prisma.user.create({
+    data: {
+      name: "Jean-Pierre Martin",
+      email: "jp.martin@ramonage-martin.fr",
+      password,
+      role: "admin",
+      teamId: team.id,
+    },
+  });
+
+  // Create second team member
+  const lucas = await prisma.user.create({
+    data: {
+      name: "Lucas Martin",
+      email: "lucas@ramonage-martin.fr",
+      password: await bcrypt.hash("demo1234", 12),
+      role: "member",
+      teamId: team.id,
     },
   });
 
@@ -45,7 +66,7 @@ async function main() {
         chimneyType: "Insert", fuelType: "Bois",
         lastVisit: new Date("2025-11-15"), nextReminder: new Date("2026-11-15"),
         notes: "Chien dans le jardin, sonner 2 fois. Accès par le côté gauche.",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -57,7 +78,7 @@ async function main() {
         chimneyType: "Poêle à bois", fuelType: "Bois",
         lastVisit: new Date("2025-03-20"), nextReminder: new Date("2026-03-20"),
         notes: "2 conduits à ramoner. Préfère les RDV le matin.",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -69,7 +90,7 @@ async function main() {
         chimneyType: "Foyer ouvert", fuelType: "Bois",
         lastVisit: new Date("2025-01-10"),
         notes: "Maison ancienne, conduit maçonné. Attention aux tuiles fragiles.",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -80,7 +101,7 @@ async function main() {
         sector: "Annecy",
         chimneyType: "Poêle à granulés", fuelType: "Granulés",
         lastVisit: new Date("2026-01-08"), nextReminder: new Date("2027-01-08"),
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -91,7 +112,7 @@ async function main() {
         sector: "Cran-Gevrier / Seynod",
         chimneyType: "Chaudière", fuelType: "Fioul",
         lastVisit: new Date("2025-09-22"), nextReminder: new Date("2026-09-22"),
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -103,7 +124,7 @@ async function main() {
         chimneyType: "Insert", fuelType: "Bois",
         lastVisit: new Date("2024-12-05"),
         notes: "Chalet en altitude, accès difficile en hiver.",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -114,7 +135,7 @@ async function main() {
         sector: "Cran-Gevrier / Seynod",
         chimneyType: "Poêle à bois", fuelType: "Bois",
         lastVisit: new Date("2026-02-20"), nextReminder: new Date("2027-02-20"),
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -124,7 +145,7 @@ async function main() {
         address: "2 chemin des Érables", city: "Seynod", postalCode: "74600",
         sector: "Seynod",
         chimneyType: "Foyer ouvert", fuelType: "Bois",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -135,7 +156,7 @@ async function main() {
         sector: "Rumilly",
         chimneyType: "Chaudière", fuelType: "Gaz",
         lastVisit: new Date("2025-06-15"), nextReminder: new Date("2026-06-15"),
-        userId: user.id,
+        teamId: team.id,
       },
     }),
     prisma.client.create({
@@ -147,7 +168,7 @@ async function main() {
         chimneyType: "Poêle à bois", fuelType: "Bois",
         lastVisit: new Date("2025-02-28"),
         notes: "Personne âgée, prévoir plus de temps.",
-        userId: user.id,
+        teamId: team.id,
       },
     }),
   ]);
@@ -159,7 +180,7 @@ async function main() {
   const todayStr = today.toISOString().split("T")[0];
 
   await Promise.all([
-    // Today's appointments
+    // Today's appointments (assigned to admin)
     prisma.appointment.create({
       data: {
         title: "Ramonage annuel",
@@ -167,7 +188,7 @@ async function main() {
         date: new Date(`${todayStr}T08:30:00`),
         endDate: new Date(`${todayStr}T09:30:00`),
         status: "scheduled",
-        clientId: sophie.id, userId: user.id,
+        clientId: sophie.id, assignedToId: user.id, teamId: team.id,
       },
     }),
     prisma.appointment.create({
@@ -177,16 +198,17 @@ async function main() {
         date: new Date(`${todayStr}T10:00:00`),
         endDate: new Date(`${todayStr}T11:30:00`),
         status: "scheduled",
-        clientId: marc.id, userId: user.id,
+        clientId: marc.id, assignedToId: user.id, teamId: team.id,
       },
     }),
+    // Today's appointments (assigned to Lucas)
     prisma.appointment.create({
       data: {
         title: "Ramonage chaudière fioul",
         date: new Date(`${todayStr}T14:00:00`),
         endDate: new Date(`${todayStr}T15:00:00`),
         status: "scheduled",
-        clientId: isabelle.id, userId: user.id,
+        clientId: isabelle.id, assignedToId: lucas.id, teamId: team.id,
       },
     }),
     prisma.appointment.create({
@@ -196,17 +218,17 @@ async function main() {
         date: new Date(`${todayStr}T16:00:00`),
         endDate: new Date(`${todayStr}T16:45:00`),
         status: "scheduled",
-        clientId: antoine.id, userId: user.id,
+        clientId: antoine.id, assignedToId: lucas.id, teamId: team.id,
       },
     }),
-    // Upcoming
+    // Upcoming (mix of admin and Lucas)
     prisma.appointment.create({
       data: {
         title: "Ramonage poêle à granulés",
         date: addDays(today, 2, 9, 0),
         endDate: addDays(today, 2, 10, 0),
         status: "scheduled",
-        clientId: pierre.id, userId: user.id,
+        clientId: pierre.id, assignedToId: lucas.id, teamId: team.id,
       },
     }),
     prisma.appointment.create({
@@ -215,7 +237,7 @@ async function main() {
         date: addDays(today, 3, 8, 30),
         endDate: addDays(today, 3, 9, 30),
         status: "scheduled",
-        clientId: nathalie.id, userId: user.id,
+        clientId: nathalie.id, assignedToId: user.id, teamId: team.id,
       },
     }),
     prisma.appointment.create({
@@ -225,7 +247,7 @@ async function main() {
         date: addDays(today, 5, 10, 0),
         endDate: addDays(today, 5, 12, 0),
         status: "scheduled",
-        clientId: francois.id, userId: user.id,
+        clientId: francois.id, assignedToId: user.id, teamId: team.id,
       },
     }),
     // Past completed
@@ -235,7 +257,7 @@ async function main() {
         date: addDays(today, -5, 9, 0),
         endDate: addDays(today, -5, 10, 0),
         status: "completed",
-        clientId: marie.id, userId: user.id,
+        clientId: marie.id, assignedToId: lucas.id, teamId: team.id,
       },
     }),
     prisma.appointment.create({
@@ -244,7 +266,7 @@ async function main() {
         date: addDays(today, -12, 14, 0),
         endDate: addDays(today, -12, 15, 30),
         status: "completed",
-        clientId: pierre.id, userId: user.id,
+        clientId: pierre.id, assignedToId: user.id, teamId: team.id,
       },
     }),
   ]);
@@ -257,7 +279,7 @@ async function main() {
       date: new Date("2026-01-15"),
       dueDate: new Date("2026-02-15"),
       subtotal: 85, taxRate: 20, tax: 17, total: 102,
-      clientId: pierre.id, userId: user.id,
+      clientId: pierre.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage poêle à granulés", quantity: 1, unitPrice: 85, total: 85 },
@@ -273,7 +295,7 @@ async function main() {
       date: new Date("2026-02-05"),
       dueDate: new Date("2026-03-05"),
       subtotal: 150, taxRate: 20, tax: 30, total: 180,
-      clientId: marc.id, userId: user.id,
+      clientId: marc.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage conduit n°1", quantity: 1, unitPrice: 75, total: 75 },
@@ -290,7 +312,7 @@ async function main() {
       date: new Date("2026-02-20"),
       dueDate: new Date("2026-03-20"),
       subtotal: 95, taxRate: 20, tax: 19, total: 114,
-      clientId: marie.id, userId: user.id,
+      clientId: marie.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage poêle à bois", quantity: 1, unitPrice: 75, total: 75 },
@@ -308,7 +330,7 @@ async function main() {
       date: new Date("2026-01-20"),
       dueDate: new Date("2026-02-20"),
       subtotal: 120, taxRate: 20, tax: 24, total: 144,
-      clientId: catherine.id, userId: user.id,
+      clientId: catherine.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage foyer ouvert", quantity: 1, unitPrice: 90, total: 90 },
@@ -326,7 +348,7 @@ async function main() {
       date: new Date("2026-03-10"),
       dueDate: new Date("2026-04-10"),
       subtotal: 75, taxRate: 20, tax: 15, total: 90,
-      clientId: sophie.id, userId: user.id,
+      clientId: sophie.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage insert bois", quantity: 1, unitPrice: 75, total: 75 },
@@ -342,7 +364,7 @@ async function main() {
       status: "draft",
       date: new Date("2026-03-12"),
       subtotal: 160, taxRate: 20, tax: 32, total: 192,
-      clientId: francois.id, userId: user.id,
+      clientId: francois.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage insert", quantity: 1, unitPrice: 90, total: 90 },
@@ -360,7 +382,7 @@ async function main() {
       date: new Date("2026-02-01"),
       validUntil: new Date("2026-03-01"),
       subtotal: 350, taxRate: 20, tax: 70, total: 420,
-      clientId: francois.id, userId: user.id,
+      clientId: francois.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage complet chalet (2 conduits)", quantity: 1, unitPrice: 180, total: 180 },
@@ -378,7 +400,7 @@ async function main() {
       date: new Date("2026-03-08"),
       validUntil: new Date("2026-04-08"),
       subtotal: 95, taxRate: 20, tax: 19, total: 114,
-      clientId: antoine.id, userId: user.id,
+      clientId: antoine.id, teamId: team.id,
       items: {
         create: [
           { description: "Ramonage foyer ouvert + certificat", quantity: 1, unitPrice: 95, total: 95 },
@@ -409,7 +431,7 @@ async function main() {
       recommendations: "Maintenir la fréquence de ramonage annuelle.",
       periodicity: "annuel",
       nextVisit: new Date("2027-01-08"),
-      clientId: pierre.id, userId: user.id,
+      clientId: pierre.id, teamId: team.id,
     },
   });
 
@@ -432,7 +454,7 @@ async function main() {
       observations: "RAS. Conduit propre après intervention.",
       periodicity: "annuel",
       nextVisit: new Date("2027-02-20"),
-      clientId: marie.id, userId: user.id,
+      clientId: marie.id, teamId: team.id,
     },
   });
 
@@ -455,7 +477,7 @@ async function main() {
       recommendations: "Prévoir un débistrage complet dans les 6 prochains mois. Surveiller l'étanchéité au prochain passage.",
       periodicity: "semestriel",
       nextVisit: new Date("2026-08-05"),
-      clientId: marc.id, userId: user.id,
+      clientId: marc.id, teamId: team.id,
     },
   });
 
@@ -471,7 +493,7 @@ async function main() {
       autoRenew: true,
       visits: 2,
       visitsDone: 1,
-      clientId: sophie.id, userId: user.id,
+      clientId: sophie.id, teamId: team.id,
     },
   });
 
@@ -486,7 +508,7 @@ async function main() {
       autoRenew: true,
       visits: 1,
       visitsDone: 0,
-      clientId: marc.id, userId: user.id,
+      clientId: marc.id, teamId: team.id,
     },
   });
 
@@ -501,18 +523,19 @@ async function main() {
       autoRenew: false,
       visits: 1,
       visitsDone: 1,
-      clientId: nathalie.id, userId: user.id,
+      clientId: nathalie.id, teamId: team.id,
     },
   });
 
-  console.log("✅ Seed complete!");
-  console.log(`   👤 1 utilisateur: jp.martin@ramonage-martin.fr / demo1234`);
-  console.log(`   👥 ${clients.length} clients`);
-  console.log(`   📅 9 rendez-vous (4 aujourd'hui)`);
-  console.log(`   🧾 6 factures (3 payées, 1 en retard, 1 en attente, 1 brouillon)`);
-  console.log(`   📋 2 devis`);
-  console.log(`   📜 3 certificats`);
-  console.log(`   📝 3 contrats`);
+  console.log("Seed complete!");
+  console.log(`   1 team: ${team.name}`);
+  console.log(`   2 users: jp.martin@ramonage-martin.fr / demo1234 (admin), lucas@ramonage-martin.fr / demo1234 (member)`);
+  console.log(`   ${clients.length} clients`);
+  console.log(`   9 appointments (4 today)`);
+  console.log(`   6 invoices (3 paid, 1 overdue, 1 pending, 1 draft)`);
+  console.log(`   2 quotes`);
+  console.log(`   3 certificates`);
+  console.log(`   3 contracts`);
 }
 
 function addDays(base: Date, days: number, hour: number, min: number): Date {

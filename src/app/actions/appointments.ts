@@ -46,7 +46,7 @@ export async function createAppointment(_prevState: unknown, formData: FormData)
 
   // Verify the client belongs to this user
   const client = await prisma.client.findFirst({
-    where: { id: clientId, userId: session.userId },
+    where: { id: clientId, teamId: session.teamId },
   });
   if (!client) {
     return { error: "Client introuvable" };
@@ -60,7 +60,8 @@ export async function createAppointment(_prevState: unknown, formData: FormData)
       endDate,
       status: "scheduled",
       clientId,
-      userId: session.userId,
+      teamId: session.teamId,
+      assignedToId: session.userId,
     },
   });
 
@@ -78,7 +79,7 @@ export async function updateAppointmentStatus(id: string, status: string) {
   }
 
   const appointment = await prisma.appointment.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!appointment) {
     return { error: "Rendez-vous introuvable" };
@@ -98,7 +99,7 @@ export async function deleteAppointment(id: string) {
   if (!session) redirect("/login");
 
   const appointment = await prisma.appointment.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!appointment) {
     return { error: "Rendez-vous introuvable" };

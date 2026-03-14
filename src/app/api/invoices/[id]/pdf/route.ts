@@ -83,11 +83,10 @@ function buildInvoiceHtml(invoice: {
     phone: string | null;
     email: string | null;
   };
-  user: {
+  team: {
     name: string | null;
     company: string | null;
     phone: string | null;
-    email: string | null;
     address: string | null;
     city: string | null;
     postalCode: string | null;
@@ -107,25 +106,24 @@ function buildInvoiceHtml(invoice: {
     .join(", ");
 
   const companyName = safe(
-    invoice.user.company || invoice.user.name,
+    invoice.team.company || invoice.team.name,
     "Entreprise"
   );
   const companyLines = [
-    invoice.user.address,
-    [invoice.user.postalCode, invoice.user.city].filter(Boolean).join(" "),
-    invoice.user.phone ? `T\u00e9l. ${invoice.user.phone}` : null,
-    invoice.user.email,
+    invoice.team.address,
+    [invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" "),
+    invoice.team.phone ? `T\u00e9l. ${invoice.team.phone}` : null,
   ].filter(Boolean) as string[];
 
   const proParts = [
-    invoice.user.siret ? `SIRET : ${invoice.user.siret}` : null,
-    invoice.user.insurerName
-      ? `Assurance RC : ${invoice.user.insurerName}${invoice.user.insuranceNumber ? ` \u2014 Police n\u00b0${invoice.user.insuranceNumber}` : ""}`
+    invoice.team.siret ? `SIRET : ${invoice.team.siret}` : null,
+    invoice.team.insurerName
+      ? `Assurance RC : ${invoice.team.insurerName}${invoice.team.insuranceNumber ? ` \u2014 Police n\u00b0${invoice.team.insuranceNumber}` : ""}`
       : null,
   ].filter(Boolean) as string[];
 
-  const logoHtml = invoice.user.logo
-    ? `<img src="${invoice.user.logo}" class="logo" alt="Logo" />`
+  const logoHtml = invoice.team.logo
+    ? `<img src="${invoice.team.logo}" class="logo" alt="Logo" />`
     : "";
 
   // Build item rows with alternating backgrounds
@@ -691,10 +689,10 @@ function buildInvoiceHtml(invoice: {
   <div class="footer">
     <hr class="footer-divider" />
     <div class="footer-text">
-      ${escHtml(companyName)}${invoice.user.siret ? ` \u2014 SIRET : ${escHtml(invoice.user.siret)}` : ""}${invoice.user.address ? ` \u2014 ${escHtml(invoice.user.address)}` : ""}${invoice.user.postalCode || invoice.user.city ? `, ${escHtml([invoice.user.postalCode, invoice.user.city].filter(Boolean).join(" "))}` : ""}
+      ${escHtml(companyName)}${invoice.team.siret ? ` \u2014 SIRET : ${escHtml(invoice.team.siret)}` : ""}${invoice.team.address ? ` \u2014 ${escHtml(invoice.team.address)}` : ""}${invoice.team.postalCode || invoice.team.city ? `, ${escHtml([invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" "))}` : ""}
     </div>
     <div class="footer-text">
-      ${invoice.user.phone ? `T\u00e9l. ${escHtml(invoice.user.phone)}` : ""}${invoice.user.phone && invoice.user.email ? " \u2014 " : ""}${invoice.user.email ? escHtml(invoice.user.email) : ""}
+      ${invoice.team.phone ? `T\u00e9l. ${escHtml(invoice.team.phone)}` : ""}
     </div>
   </div>
 </div>
@@ -716,11 +714,11 @@ export async function GET(
 
   const { id } = await params;
   const invoice = await prisma.invoice.findUnique({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     include: {
       items: true,
       client: true,
-      user: true,
+      team: true,
     },
   });
 

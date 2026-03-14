@@ -11,7 +11,7 @@ export async function completeIntervention(appointmentId: string) {
 
   // Verify the appointment exists and belongs to this user
   const appointment = await prisma.appointment.findFirst({
-    where: { id: appointmentId, userId: session.userId },
+    where: { id: appointmentId, teamId: session.teamId },
   });
   if (!appointment) {
     return { error: "Rendez-vous introuvable" };

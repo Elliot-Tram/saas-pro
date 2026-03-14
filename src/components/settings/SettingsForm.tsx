@@ -6,10 +6,8 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
-interface User {
+interface TeamSettings {
   id: string;
-  name: string;
-  email: string;
   company: string | null;
   phone: string | null;
   siret: string | null;
@@ -23,10 +21,15 @@ interface User {
   googleReviewLink: string | null;
 }
 
-export function SettingsForm({ user }: { user: User }) {
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
+export function SettingsForm({ team, user }: { team: TeamSettings; user: UserInfo }) {
   const [state, formAction, pending] = useActionState(updateProfile, null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(user.logo);
-  const [logoBase64, setLogoBase64] = useState<string | null>(user.logo);
+  const [logoPreview, setLogoPreview] = useState<string | null>(team.logo);
+  const [logoBase64, setLogoBase64] = useState<string | null>(team.logo);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -44,12 +47,12 @@ export function SettingsForm({ user }: { user: User }) {
 
   return (
     <form action={formAction}>
-      <input type="hidden" name="id" value={user.id} />
+      <input type="hidden" name="id" value={team.id} />
 
       <div className="space-y-6 max-w-2xl">
         {state?.success && (
           <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
-            Profil mis à jour avec succès
+            Paramètres mis à jour avec succès
           </div>
         )}
         {state?.error && (
@@ -60,14 +63,31 @@ export function SettingsForm({ user }: { user: User }) {
 
         <Card>
           <CardHeader>
-            <h2 className="font-semibold text-gray-900">Informations personnelles</h2>
+            <h2 className="font-semibold text-gray-900">Mon profil</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Input id="name" name="name" label="Nom complet" defaultValue={user.name} required />
-              <Input id="email" name="email" type="email" label="Email" defaultValue={user.email} required />
+              <Input id="userName" name="userName" label="Nom complet" defaultValue={user.name} required />
+              <Input id="userEmail" name="userEmail" type="email" label="Email" defaultValue={user.email} required />
             </div>
-            <Input id="phone" name="phone" label="Téléphone" defaultValue={user.phone || ""} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h2 className="font-semibold text-gray-900">Entreprise</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Input id="company" name="company" label="Raison sociale" defaultValue={team.company || ""} />
+              <Input id="siret" name="siret" label="SIRET" defaultValue={team.siret || ""} />
+            </div>
+            <Input id="phone" name="phone" label="Téléphone" defaultValue={team.phone || ""} />
+            <Input id="address" name="address" label="Adresse" defaultValue={team.address || ""} />
+            <div className="grid grid-cols-2 gap-4">
+              <Input id="city" name="city" label="Ville" defaultValue={team.city || ""} />
+              <Input id="postalCode" name="postalCode" label="Code postal" defaultValue={team.postalCode || ""} />
+            </div>
           </CardContent>
         </Card>
 
@@ -111,20 +131,20 @@ export function SettingsForm({ user }: { user: User }) {
               name="qualification"
               label="Qualification"
               placeholder="Qualibat RGE, CTM Ramoneur..."
-              defaultValue={user.qualification || ""}
+              defaultValue={team.qualification || ""}
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
                 id="insuranceNumber"
                 name="insuranceNumber"
                 label="N° assurance RC Pro"
-                defaultValue={user.insuranceNumber || ""}
+                defaultValue={team.insuranceNumber || ""}
               />
               <Input
                 id="insurerName"
                 name="insurerName"
                 label="Nom de l'assureur"
-                defaultValue={user.insurerName || ""}
+                defaultValue={team.insurerName || ""}
               />
             </div>
             <div>
@@ -133,28 +153,11 @@ export function SettingsForm({ user }: { user: User }) {
                 name="googleReviewLink"
                 label="Lien avis Google"
                 placeholder="https://g.page/r/votre-lien/review"
-                defaultValue={user.googleReviewLink || ""}
+                defaultValue={team.googleReviewLink || ""}
               />
               <p className="mt-1 text-xs text-gray-500">
                 Trouvez votre lien dans Google My Business &rarr; Accueil &rarr; Demander des avis
               </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <h2 className="font-semibold text-gray-900">Entreprise</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Input id="company" name="company" label="Raison sociale" defaultValue={user.company || ""} />
-              <Input id="siret" name="siret" label="SIRET" defaultValue={user.siret || ""} />
-            </div>
-            <Input id="address" name="address" label="Adresse" defaultValue={user.address || ""} />
-            <div className="grid grid-cols-2 gap-4">
-              <Input id="city" name="city" label="Ville" defaultValue={user.city || ""} />
-              <Input id="postalCode" name="postalCode" label="Code postal" defaultValue={user.postalCode || ""} />
             </div>
           </CardContent>
         </Card>

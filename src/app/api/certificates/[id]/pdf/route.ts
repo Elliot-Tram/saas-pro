@@ -89,11 +89,10 @@ function buildCertificateHtml(cert: {
     phone: string | null;
     email: string | null;
   };
-  user: {
+  team: {
     name: string | null;
     company: string | null;
     phone: string | null;
-    email: string | null;
     address: string | null;
     city: string | null;
     postalCode: string | null;
@@ -114,23 +113,22 @@ function buildCertificateHtml(cert: {
     .join(", ");
 
   const companyName = safe(
-    cert.user.company || cert.user.name,
+    cert.team.company || cert.team.name,
     "Entreprise"
   );
   const companyLines = [
-    cert.user.address,
-    [cert.user.postalCode, cert.user.city].filter(Boolean).join(" "),
-    cert.user.phone ? `Tél. ${cert.user.phone}` : null,
-    cert.user.email,
+    cert.team.address,
+    [cert.team.postalCode, cert.team.city].filter(Boolean).join(" "),
+    cert.team.phone ? `Tél. ${cert.team.phone}` : null,
   ].filter(Boolean) as string[];
 
   const proParts = [
-    cert.user.siret ? `SIRET : ${cert.user.siret}` : null,
-    cert.user.insurerName
-      ? `Assurance RC : ${cert.user.insurerName}${cert.user.insuranceNumber ? ` \u2014 Police n\u00b0${cert.user.insuranceNumber}` : ""}`
+    cert.team.siret ? `SIRET : ${cert.team.siret}` : null,
+    cert.team.insurerName
+      ? `Assurance RC : ${cert.team.insurerName}${cert.team.insuranceNumber ? ` \u2014 Police n\u00b0${cert.team.insuranceNumber}` : ""}`
       : null,
-    cert.user.qualification
-      ? `Qualification : ${cert.user.qualification}`
+    cert.team.qualification
+      ? `Qualification : ${cert.team.qualification}`
       : null,
   ].filter(Boolean) as string[];
 
@@ -151,8 +149,8 @@ function buildCertificateHtml(cert: {
     .filter(Boolean)
     .join(" \u2014 ");
 
-  const logoHtml = cert.user.logo
-    ? `<img src="${cert.user.logo}" class="logo" alt="Logo" />`
+  const logoHtml = cert.team.logo
+    ? `<img src="${cert.team.logo}" class="logo" alt="Logo" />`
     : "";
 
   const proSignatureHtml = cert.proSignature
@@ -884,8 +882,8 @@ export async function GET(
 
   const { id } = await params;
   const cert = await prisma.certificate.findFirst({
-    where: { id, userId: session.userId },
-    include: { client: true, user: true },
+    where: { id, teamId: session.teamId },
+    include: { client: true, team: true },
   });
   if (!cert)
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });

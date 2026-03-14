@@ -36,16 +36,36 @@ export async function register(_prevState: unknown, formData: FormData) {
   }
 
   const hashedPassword = await hashPassword(parsed.data.password);
-  const user = await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email: parsed.data.email,
-      password: hashedPassword,
-      company: parsed.data.company || null,
-    },
+
+  // Create team + user in a transaction
+  const { user, team } = await prisma.$transaction(async (tx) => {
+    const team = await tx.team.create({
+      data: {
+        name: parsed.data.company || parsed.data.name,
+        company: parsed.data.company || null,
+      },
+    });
+
+    const user = await tx.user.create({
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        password: hashedPassword,
+        role: "admin",
+        teamId: team.id,
+      },
+    });
+
+    return { user, team };
   });
 
-  const token = await createToken({ userId: user.id, email: user.email, name: user.name });
+  const token = await createToken({
+    userId: user.id,
+    teamId: team.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  });
   await setSession(token);
   redirect("/onboarding");
 }
@@ -61,7 +81,10 @@ export async function login(_prevState: unknown, formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+  const user = await prisma.user.findUnique({
+    where: { email: parsed.data.email },
+    include: { team: true },
+  });
   if (!user) {
     return { error: "Email ou mot de passe incorrect" };
   }
@@ -71,7 +94,13 @@ export async function login(_prevState: unknown, formData: FormData) {
     return { error: "Email ou mot de passe incorrect" };
   }
 
-  const token = await createToken({ userId: user.id, email: user.email, name: user.name });
+  const token = await createToken({
+    userId: user.id,
+    teamId: user.teamId,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  });
   await setSession(token);
   redirect("/");
 }

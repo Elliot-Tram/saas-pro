@@ -22,7 +22,7 @@ export default async function QuotesPage() {
   if (!session) redirect("/login");
 
   const quotes = await prisma.quote.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     include: { client: true },
     orderBy: { createdAt: "desc" },
   });

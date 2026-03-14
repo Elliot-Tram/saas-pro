@@ -9,7 +9,7 @@ export default async function NewClientPage() {
 
   // Get distinct sectors for the dropdown
   const clients = await prisma.client.findMany({
-    where: { userId: session.userId, sector: { not: null } },
+    where: { teamId: session.teamId, sector: { not: null } },
     select: { sector: true },
     distinct: ["sector"],
     orderBy: { sector: "asc" },

@@ -7,34 +7,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Team {
   id        String   @id @default(cuid())
   name      String
-  email     String   @unique
-  password  String
-  company   String?
-  phone     String?
-  siret     String?
-  address   String?
-  city      String?
-  postalCode String?
-
-  // Professional info for certificates
-  logo            String?  // base64 encoded logo image
-  insuranceNumber String?  // N° police RC Pro
-  insurerName     String?  // Nom de l'assureur
-  qualification   String?  // Qualibat, CTM, etc.
-  googleReviewLink String?  // ex: https://g.page/r/xxx/review
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Company info (shared across team)
+  company         String?
+  phone           String?
+  siret           String?
+  address         String?
+  city            String?
+  postalCode      String?
+  logo            String?
+  insuranceNumber String?
+  insurerName     String?
+  qualification   String?
+  googleReviewLink String?
+
+  members      User[]
   clients      Client[]
   appointments Appointment[]
   invoices     Invoice[]
   quotes       Quote[]
   certificates Certificate[]
   contracts    Contract[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin") // admin, member
+
+  teamId    String
+  team      Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Appointments assigned to this user
+  appointments Appointment[]
 }
 
 model Client {
@@ -48,17 +63,14 @@ model Client {
   postalCode String?
   notes      String?
 
-  // Sector for route planning
-  sector      String?  // ex: "Annecy Nord", "Thônes", "Chamonix"
-
-  // Chimney sweep specific fields
-  chimneyType String?  // insert, foyer ouvert, poêle à bois, etc.
-  fuelType    String?  // bois, granulés, fioul, gaz
+  sector      String?
+  chimneyType String?
+  fuelType    String?
   lastVisit   DateTime?
   nextReminder DateTime?
 
-  userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId    String
+  team      Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
   invoices     Invoice[]
@@ -76,12 +88,17 @@ model Appointment {
   description String?
   date        DateTime
   endDate     DateTime
-  status      String   @default("scheduled") // scheduled, completed, cancelled
+  status      String   @default("scheduled")
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Assigned to specific team member
+  assignedToId String
+  assignedTo   User   @relation(fields: [assignedToId], references: [id], onDelete: Cascade)
+
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,7 +107,7 @@ model Appointment {
 model Invoice {
   id      String @id @default(cuid())
   number  String @unique
-  status  String @default("draft") // draft, sent, paid
+  status  String @default("draft")
   date    DateTime @default(now())
   dueDate DateTime?
 
@@ -103,8 +120,8 @@ model Invoice {
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId   String
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -124,7 +141,7 @@ model InvoiceItem {
 model Quote {
   id        String @id @default(cuid())
   number    String @unique
-  status    String @default("draft") // draft, sent, accepted, rejected
+  status    String @default("draft")
   date      DateTime @default(now())
   validUntil DateTime?
 
@@ -137,8 +154,8 @@ model Quote {
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId   String
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -160,41 +177,30 @@ model Certificate {
   number          String   @unique
   date            DateTime @default(now())
 
-  // Client context
-  clientQuality   String   @default("proprietaire") // proprietaire, locataire, syndic
-
-  // Chimney details
-  chimneyType     String   // insert, foyer_ouvert, poele_bois, poele_granules, chaudiere
-  chimneyLocation String?  // ex: Salon RDC, Chambre 1er étage
-  fuelType        String?  // bois, granules, fioul, gaz
-  applianceBrand  String?  // Marque de l'appareil
-  applianceModel  String?  // Modèle
-
-  // Intervention
-  method          String   @default("mecanique_haut") // mecanique_haut, mecanique_bas, chimique, mixte
-  conduitType     String?  // maçonné, tubé inox, tubé flexible
-  conduitDiameter String?  // ex: 150mm, 180mm
-  conduitLength   String?  // ex: 8m
-
-  // Assessment
-  condition       String   // bon_etat, a_surveiller, dangereux
+  clientQuality   String   @default("proprietaire")
+  chimneyType     String
+  chimneyLocation String?
+  fuelType        String?
+  applianceBrand  String?
+  applianceModel  String?
+  method          String   @default("mecanique_haut")
+  conduitType     String?
+  conduitDiameter String?
+  conduitLength   String?
+  condition       String
   vacuumTest      Boolean  @default(true)
-  anomalies       Json?    // JSON checklist of anomalies found
+  anomalies       Json?
   observations    String?
   recommendations String?
-
-  // Periodicity & follow-up
-  periodicity     String   @default("annuel") // annuel, semestriel
+  periodicity     String   @default("annuel")
   nextVisit       DateTime?
-
-  // Signatures (base64 PNG)
-  proSignature    String?  // Professional's signature
-  clientSignature String?  // Client's signature
+  proSignature    String?
+  clientSignature String?
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId   String
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -203,20 +209,19 @@ model Certificate {
 model Contract {
   id          String   @id @default(cuid())
   number      String   @unique
-  status      String   @default("active") // active, expired, cancelled
+  status      String   @default("active")
   startDate   DateTime
   endDate     DateTime
-  amount      Float    // Annual price
+  amount      Float
   description String?
   autoRenew   Boolean  @default(true)
-
-  visits      Int      @default(1) // Number of visits per year included
-  visitsDone  Int      @default(0) // Number completed this period
+  visits      Int      @default(1)
+  visitsDone  Int      @default(0)
 
   clientId    String
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

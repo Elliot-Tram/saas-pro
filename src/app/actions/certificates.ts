@@ -91,7 +91,7 @@ export async function createCertificate(_prevState: unknown, formData: FormData)
 
   // Verify client belongs to user
   const client = await prisma.client.findFirst({
-    where: { id: parsed.data.clientId, userId: session.userId },
+    where: { id: parsed.data.clientId, teamId: session.teamId },
   });
   if (!client) {
     return { error: "Client introuvable" };
@@ -99,7 +99,7 @@ export async function createCertificate(_prevState: unknown, formData: FormData)
 
   // Generate certificate number
   const count = await prisma.certificate.count({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
   });
   const number = generateNumber("CERT", count);
 
@@ -128,7 +128,7 @@ export async function createCertificate(_prevState: unknown, formData: FormData)
       proSignature: parsed.data.proSignature || null,
       clientSignature: parsed.data.clientSignature || null,
       clientId: parsed.data.clientId,
-      userId: session.userId,
+      teamId: session.teamId,
     },
   });
 
@@ -146,7 +146,7 @@ export async function deleteCertificate(id: string) {
   if (!session) redirect("/login");
 
   const existing = await prisma.certificate.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
   });
   if (!existing) {
     return { error: "Certificat introuvable" };

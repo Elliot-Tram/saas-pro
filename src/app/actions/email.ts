@@ -14,7 +14,7 @@ export async function sendCertificateByEmail(
   }
 
   const certificate = await prisma.certificate.findFirst({
-    where: { id: certificateId, userId: session.userId },
+    where: { id: certificateId, teamId: session.teamId },
     include: { client: true },
   });
 
@@ -89,7 +89,7 @@ export async function sendInvoiceByEmail(
   }
 
   const invoice = await prisma.invoice.findFirst({
-    where: { id: invoiceId, userId: session.userId },
+    where: { id: invoiceId, teamId: session.teamId },
     include: { client: true },
   });
 

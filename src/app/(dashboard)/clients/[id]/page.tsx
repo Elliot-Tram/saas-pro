@@ -35,7 +35,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
   const { id } = await params;
 
   const client = await prisma.client.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     include: {
       appointments: {
         orderBy: { date: "desc" },

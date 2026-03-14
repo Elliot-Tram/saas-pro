@@ -14,7 +14,7 @@ export async function sendAnnualReminder(
   }
 
   const client = await prisma.client.findFirst({
-    where: { id: clientId, userId: session.userId },
+    where: { id: clientId, teamId: session.teamId },
   });
 
   if (!client) {
@@ -25,12 +25,12 @@ export async function sendAnnualReminder(
     return { error: "Ce client n'a pas d'adresse email" };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
+  const team = await prisma.team.findUnique({
+    where: { id: session.teamId },
   });
 
-  if (!user) {
-    return { error: "Utilisateur introuvable" };
+  if (!team) {
+    return { error: "Équipe introuvable" };
   }
 
   const clientName = `${client.firstName} ${client.lastName}`;
@@ -42,8 +42,8 @@ export async function sendAnnualReminder(
       }).format(new Date(client.lastVisit))
     : "date inconnue";
 
-  const companyName = user.company || user.name;
-  const phone = user.phone || "notre numéro habituel";
+  const companyName = team.company || session.name;
+  const phone = team.phone || "notre numéro habituel";
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">

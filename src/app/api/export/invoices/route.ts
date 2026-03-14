@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   const invoices = await prisma.invoice.findMany({
     where: {
-      userId: session.userId,
+      teamId: session.teamId,
       date: { gte: startDate, lte: endDate },
     },
     include: { client: true, items: true },

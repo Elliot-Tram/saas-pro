@@ -23,7 +23,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
 
   const quote = await prisma.quote.findUnique({
-    where: { id, userId: session.userId },
+    where: { id, teamId: session.teamId },
     include: {
       items: true,
       client: true,

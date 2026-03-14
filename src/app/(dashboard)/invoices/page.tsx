@@ -39,7 +39,7 @@ export default async function InvoicesPage({
   const now = new Date();
 
   const invoices = await prisma.invoice.findMany({
-    where: { userId: session.userId },
+    where: { teamId: session.teamId },
     include: { client: true },
     orderBy: { createdAt: "desc" },
   });
