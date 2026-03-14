@@ -184,7 +184,7 @@ function buildCertificateHtml(cert: {
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1a1a1a;
+    color: #111827;
     background: #fff;
     font-size: 12px;
     line-height: 1.5;
@@ -201,29 +201,36 @@ function buildCertificateHtml(cert: {
 
   /* ── Top accent bar ───────────────────────────────── */
   .accent-bar {
-    height: 5px;
-    background: linear-gradient(90deg, #1e3a5f, #2a5a8f);
+    height: 8px;
+    background: linear-gradient(90deg, #0f2b46, #1e40af);
     width: 100%;
   }
 
   /* ── Content area ─────────────────────────────────── */
   .content {
-    padding: 28px 40px 20px 40px;
+    padding: 32px 44px 20px 44px;
   }
 
   /* ── Header ───────────────────────────────────────── */
   .header {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     gap: 16px;
     align-items: start;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
   }
 
   .logo {
-    max-height: 70px;
-    max-width: 100px;
+    max-height: 60px;
+    max-width: 90px;
     object-fit: contain;
+    border-radius: 1px;
   }
 
   .company-info {
@@ -231,11 +238,11 @@ function buildCertificateHtml(cert: {
   }
 
   .company-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e3a5f;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f2b46;
     margin-bottom: 4px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
   }
 
   .company-detail {
@@ -246,108 +253,89 @@ function buildCertificateHtml(cert: {
 
   .title-block {
     text-align: right;
-    padding-top: 2px;
+    padding-top: 0;
   }
 
   .title-main {
-    font-size: 22px;
-    font-weight: 800;
-    color: #1a1a1a;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f2b46;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 8px;
   }
 
-  .title-sub {
-    font-size: 22px;
-    font-weight: 800;
-    color: #1e3a5f;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 6px;
+  .title-accent {
+    display: inline-block;
+    width: 40px;
+    height: 2px;
+    background: #2563eb;
+    margin-bottom: 10px;
   }
 
   .cert-number {
     font-size: 11px;
     color: #6b7280;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .cert-date {
     font-size: 10px;
     color: #9ca3af;
     margin-top: 2px;
-  }
-
-  /* ── Separator ────────────────────────────────────── */
-  .separator {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 0 0 14px 0;
-  }
-
-  .separator-footer {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 20px 0 12px 0;
+    font-weight: 400;
   }
 
   /* ── Pro info bar ─────────────────────────────────── */
   .pro-bar {
-    background: #f8f9fb;
-    border-radius: 6px;
-    padding: 8px 14px;
+    padding: 8px 0;
     text-align: center;
     font-size: 8px;
     color: #6b7280;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
     letter-spacing: 0.02em;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
   }
 
   .pro-bar span {
-    margin: 0 8px;
+    margin: 0 10px;
     color: #d1d5db;
   }
 
-  /* ── Section card ─────────────────────────────────── */
+  /* ── Section ──────────────────────────────────────── */
   .section {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
   }
 
   .section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-
-  .section-accent {
-    width: 3px;
-    height: 14px;
-    background: #1e3a5f;
-    border-radius: 2px;
-    margin-right: 10px;
-    flex-shrink: 0;
+    margin-top: 20px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
   }
 
   .section-title {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1e3a5f;
+    letter-spacing: 0.12em;
+    color: #0f2b46;
   }
 
   /* ── Card styles ──────────────────────────────────── */
   .card {
-    border-radius: 8px;
-    padding: 14px 18px;
+    padding: 14px 18px 14px 20px;
   }
 
   .card-filled {
-    background: #f8f9fb;
+    background: #fafbfc;
+    border-left: 3px solid #e5e7eb;
   }
 
   .card-bordered {
-    border: 1px solid #e5e7eb;
+    border-left: 3px solid #e5e7eb;
     background: #fff;
   }
 
@@ -355,84 +343,65 @@ function buildCertificateHtml(cert: {
   .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px 32px;
-  }
-
-  .grid-2-wide {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 40px;
+    gap: 6px 36px;
   }
 
   /* ── Field (label + value) ────────────────────────── */
   .field {
-    margin-bottom: 6px;
+    margin-bottom: 7px;
   }
 
   .field-label {
     font-size: 9px;
     color: #9ca3af;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
+    letter-spacing: 0.08em;
+    font-weight: 600;
     margin-bottom: 1px;
   }
 
   .field-value {
-    font-size: 12px;
-    color: #1a1a1a;
+    font-size: 13px;
+    color: #111827;
     font-weight: 500;
   }
 
   .field-value-bold {
-    font-size: 12px;
-    color: #1a1a1a;
+    font-size: 13px;
+    color: #111827;
     font-weight: 700;
-  }
-
-  .field-inline {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-
-  .field-inline .field-label {
-    min-width: 40px;
-    margin-bottom: 0;
-  }
-
-  .field-inline .field-value {
-    margin-bottom: 0;
   }
 
   /* ── Badges ───────────────────────────────────────── */
   .badge {
     display: inline-block;
-    padding: 5px 16px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
+    padding: 8px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
   .badge-green {
-    background: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
+    background: #ecfdf5;
+    color: #059669;
+    border: 2px solid #a7f3d0;
+    box-shadow: inset 0 1px 2px rgba(5, 150, 105, 0.08);
   }
 
   .badge-red {
     background: #fef2f2;
     color: #dc2626;
-    border: 1px solid #fecaca;
+    border: 2px solid #fecaca;
+    box-shadow: inset 0 1px 2px rgba(220, 38, 38, 0.08);
   }
 
   .badge-orange {
-    background: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #fed7aa;
+    background: #fffbeb;
+    color: #d97706;
+    border: 2px solid #fde68a;
+    box-shadow: inset 0 1px 2px rgba(217, 119, 6, 0.08);
   }
 
   /* ── Result row ───────────────────────────────────── */
@@ -440,11 +409,11 @@ function buildCertificateHtml(cert: {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 12px 0;
   }
 
   .result-row + .result-row {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid #e5e7eb;
   }
 
   .result-label {
@@ -458,25 +427,26 @@ function buildCertificateHtml(cert: {
   /* ── Method + Periodicity line ─────────────────────── */
   .method-line {
     display: flex;
-    gap: 40px;
+    gap: 48px;
     margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
   }
 
   /* ── Anomalies ────────────────────────────────────── */
   .anomaly-ok {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
+    gap: 14px;
+    padding: 10px 0;
   }
 
   .anomaly-ok-icon {
-    width: 22px;
-    height: 22px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: #dcfce7;
+    background: #ecfdf5;
+    border: 2px solid #a7f3d0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -484,53 +454,54 @@ function buildCertificateHtml(cert: {
   }
 
   .anomaly-ok-icon svg {
-    width: 13px;
-    height: 13px;
+    width: 18px;
+    height: 18px;
   }
 
   .anomaly-ok-text {
-    font-size: 12px;
-    font-weight: 600;
-    color: #15803d;
+    font-size: 14px;
+    font-weight: 700;
+    color: #059669;
   }
 
   .anomaly-item {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 5px 0;
+    gap: 12px;
+    padding: 6px 0;
   }
 
   .anomaly-icon {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background: #fef2f2;
+    background: #dc2626;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 1px;
+    margin-top: 0;
   }
 
   .anomaly-icon svg {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
 
   .anomaly-text {
-    font-size: 11px;
+    font-size: 12px;
     color: #dc2626;
-    font-weight: 500;
-    line-height: 1.5;
+    font-weight: 600;
+    line-height: 1.6;
+    padding-top: 3px;
   }
 
   /* ── Observations ─────────────────────────────────── */
   .obs-text {
-    font-size: 11px;
+    font-size: 12px;
     color: #374151;
     line-height: 1.6;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .obs-rec-label {
@@ -538,13 +509,13 @@ function buildCertificateHtml(cert: {
     font-weight: 700;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 3px;
-    margin-top: 8px;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+    margin-top: 10px;
   }
 
   .obs-rec-text {
-    font-size: 11px;
+    font-size: 12px;
     color: #374151;
     font-style: italic;
     line-height: 1.6;
@@ -553,14 +524,15 @@ function buildCertificateHtml(cert: {
   .next-visit {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    padding: 6px 14px;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 16px;
     background: #eff6ff;
+    border: 1px solid #bfdbfe;
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
-    color: #1e3a5f;
+    color: #0f2b46;
   }
 
   .next-visit-icon {
@@ -572,7 +544,7 @@ function buildCertificateHtml(cert: {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
-    margin-top: 8px;
+    margin-top: 10px;
   }
 
   .sig-block {
@@ -583,13 +555,20 @@ function buildCertificateHtml(cert: {
     font-size: 10px;
     font-weight: 700;
     color: #374151;
+    margin-bottom: 4px;
+  }
+
+  .sig-approve {
+    font-size: 8px;
+    color: #9ca3af;
+    font-style: italic;
     margin-bottom: 8px;
   }
 
   .sig-box {
-    border: 1.5px dashed #d1d5db;
-    border-radius: 8px;
-    height: 80px;
+    border: 2px dashed #d1d5db;
+    border-radius: 4px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -598,8 +577,8 @@ function buildCertificateHtml(cert: {
   }
 
   .sig-img {
-    max-width: 180px;
-    max-height: 65px;
+    max-width: 200px;
+    max-height: 80px;
     object-fit: contain;
   }
 
@@ -618,13 +597,26 @@ function buildCertificateHtml(cert: {
   /* ── Footer ───────────────────────────────────────── */
   .footer {
     text-align: center;
-    padding: 0 40px;
+    padding: 0 44px;
+  }
+
+  .footer-line {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 20px 0 12px 0;
   }
 
   .footer-text {
-    font-size: 7.5px;
+    font-size: 8.5px;
     color: #9ca3af;
     line-height: 1.7;
+  }
+
+  .footer-brand {
+    font-size: 7.5px;
+    color: #d1d5db;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
   }
 </style>
 </head>
@@ -636,22 +628,20 @@ function buildCertificateHtml(cert: {
   <div class="content">
     <!-- ═══════ HEADER ═══════ -->
     <div class="header">
-      <div>
+      <div class="header-left">
         ${logoHtml}
-      </div>
-      <div class="company-info">
-        <div class="company-name">${escHtml(companyName)}</div>
-        ${companyLines.map((l) => `<div class="company-detail">${escHtml(l)}</div>`).join("\n        ")}
+        <div class="company-info">
+          <div class="company-name">${escHtml(companyName)}</div>
+          ${companyLines.map((l) => `<div class="company-detail">${escHtml(l)}</div>`).join("\n          ")}
+        </div>
       </div>
       <div class="title-block">
-        <div class="title-main">CERTIFICAT</div>
-        <div class="title-sub">DE RAMONAGE</div>
+        <div class="title-main">CERTIFICAT DE RAMONAGE</div>
+        <div><span class="title-accent"></span></div>
         <div class="cert-number">N\u00b0 ${escHtml(safe(cert.number))}</div>
         <div class="cert-date">Date : ${fmtDate(cert.date)}</div>
       </div>
     </div>
-
-    <hr class="separator" />
 
     <!-- ═══════ PRO INFO BAR ═══════ -->
     ${
@@ -663,7 +653,6 @@ function buildCertificateHtml(cert: {
     <!-- ═══════ CLIENT ═══════ -->
     <div class="section">
       <div class="section-header">
-        <div class="section-accent"></div>
         <div class="section-title">Client</div>
       </div>
       <div class="card card-filled">
@@ -706,7 +695,6 @@ function buildCertificateHtml(cert: {
     <!-- ═══════ INSTALLATION ═══════ -->
     <div class="section">
       <div class="section-header">
-        <div class="section-accent"></div>
         <div class="section-title">Installation</div>
       </div>
       <div class="card card-bordered">
@@ -746,7 +734,6 @@ function buildCertificateHtml(cert: {
     <!-- ═══════ RESULTAT DE L'INTERVENTION ═══════ -->
     <div class="section">
       <div class="section-header">
-        <div class="section-accent"></div>
         <div class="section-title">R\u00e9sultat de l\u2019intervention</div>
       </div>
       <div class="card card-filled">
@@ -774,7 +761,6 @@ function buildCertificateHtml(cert: {
     <!-- ═══════ ANOMALIES ═══════ -->
     <div class="section">
       <div class="section-header">
-        <div class="section-accent"></div>
         <div class="section-title">Anomalies constat\u00e9es</div>
       </div>
       <div class="card card-bordered">
@@ -782,7 +768,7 @@ function buildCertificateHtml(cert: {
           anomalies.length === 0
             ? `<div class="anomaly-ok">
           <div class="anomaly-ok-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </div>
           <div class="anomaly-ok-text">Aucune anomalie constat\u00e9e</div>
         </div>`
@@ -790,7 +776,7 @@ function buildCertificateHtml(cert: {
                 .map(
                   (a) => `<div class="anomaly-item">
           <div class="anomaly-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </div>
           <div class="anomaly-text">${escHtml(t(a))}</div>
         </div>`
@@ -805,7 +791,6 @@ function buildCertificateHtml(cert: {
       cert.observations || cert.recommendations || cert.nextVisit
         ? `<div class="section">
       <div class="section-header">
-        <div class="section-accent"></div>
         <div class="section-title">Observations &amp; Recommandations</div>
       </div>
       <div class="card card-filled">
@@ -830,11 +815,10 @@ function buildCertificateHtml(cert: {
     }
 
     <!-- ═══════ SIGNATURES ═══════ -->
-    <hr class="separator-footer" />
-
     <div class="signatures">
       <div class="sig-block">
         <div class="sig-label">Le professionnel</div>
+        <div class="sig-approve">Lu et approuv\u00e9</div>
         <div class="sig-box">
           ${proSignatureHtml}
         </div>
@@ -843,6 +827,7 @@ function buildCertificateHtml(cert: {
       </div>
       <div class="sig-block">
         <div class="sig-label">Le client</div>
+        <div class="sig-approve">Lu et approuv\u00e9</div>
         <div class="sig-box">
           ${clientSignatureHtml}
         </div>
@@ -852,7 +837,7 @@ function buildCertificateHtml(cert: {
     </div>
 
     <!-- ═══════ FOOTER ═══════ -->
-    <hr class="separator-footer" />
+    <hr class="footer-line" />
 
     <div class="footer">
       <div class="footer-text">
@@ -861,6 +846,7 @@ function buildCertificateHtml(cert: {
       <div class="footer-text">
         Ce document doit \u00eatre conserv\u00e9 pendant une dur\u00e9e minimale de 2 ans \u2014 Validit\u00e9 : ${escHtml(t(cert.periodicity).toLowerCase())}
       </div>
+      <div class="footer-brand">Bistry \u2014 Logiciel de gestion pour ramoneurs</div>
     </div>
   </div>
 </div>
