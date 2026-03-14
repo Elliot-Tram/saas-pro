@@ -84,115 +84,119 @@ export default async function CertificatePreviewPage({
 
         .certificate {
           width: 210mm;
-          max-height: 297mm;
+          height: 297mm;
           margin: 0 auto;
           background: #fff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #111827;
-          font-size: 11px;
-          line-height: 1.4;
+          font-size: 10px;
+          line-height: 1.35;
           position: relative;
           box-shadow: 0 4px 24px rgba(0,0,0,0.08);
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
         }
 
         .accent-bar {
-          height: 6px;
+          height: 5px;
           background: linear-gradient(90deg, #0f2b46, #1e40af);
+          flex-shrink: 0;
         }
 
         .content {
-          padding: 20px 36px 12px;
+          padding: 16px 32px 8px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Header */
         .header {
           display: grid;
           grid-template-columns: auto 1fr auto;
-          gap: 12px;
+          gap: 10px;
           align-items: start;
-          margin-bottom: 14px;
+          margin-bottom: 10px;
         }
 
         .logo {
-          max-height: 50px;
-          max-width: 80px;
+          max-height: 40px;
+          max-width: 70px;
           object-fit: contain;
         }
 
         .company-name {
-          font-size: 14px;
-          font-weight: 800;
+          font-size: 13px;
+          font-weight: 700;
           color: #0f2b46;
-          letter-spacing: -0.02em;
-          margin-bottom: 2px;
+          margin-bottom: 1px;
         }
 
         .company-detail {
-          font-size: 8px;
+          font-size: 7.5px;
           color: #6b7280;
-          line-height: 1.6;
+          line-height: 1.5;
         }
 
         .title-block { text-align: right; }
 
         .title-main {
-          font-size: 18px;
-          font-weight: 800;
+          font-size: 15px;
+          font-weight: 700;
           color: #0f2b46;
           line-height: 1.15;
-          letter-spacing: -0.02em;
           text-transform: uppercase;
         }
 
         .title-accent {
-          width: 32px;
+          width: 28px;
           height: 2px;
           background: #2563eb;
           margin-left: auto;
-          margin-top: 4px;
-          margin-bottom: 5px;
+          margin-top: 3px;
+          margin-bottom: 4px;
         }
 
         .cert-meta {
-          font-size: 9px;
+          font-size: 8px;
           color: #6b7280;
-          line-height: 1.5;
+          line-height: 1.4;
         }
 
         /* Separator */
-        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 10px; }
+        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 6px; }
 
         /* Pro bar */
         .pro-bar {
           background: #f9fafb;
           border-radius: 4px;
-          padding: 5px 12px;
+          padding: 4px 10px;
           text-align: center;
-          font-size: 7.5px;
+          font-size: 7px;
           color: #6b7280;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
-        .pro-bar .divider { margin: 0 8px; color: #d1d5db; }
+        .pro-bar .divider { margin: 0 6px; color: #d1d5db; }
 
         /* Section */
-        .section { margin-bottom: 10px; }
+        .section { margin-bottom: 6px; }
         .section-title {
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: #0f2b46;
-          padding-bottom: 4px;
+          padding-bottom: 3px;
           border-bottom: 1px solid #e5e7eb;
-          margin-bottom: 8px;
+          margin-bottom: 5px;
         }
 
         /* Cards */
         .card {
-          border-left: 3px solid #e5e7eb;
-          padding: 8px 12px;
-          margin-bottom: 2px;
+          border-left: 2px solid #e5e7eb;
+          padding: 5px 10px;
+          margin-bottom: 1px;
         }
         .card-filled {
           background: #f9fafb;
@@ -200,12 +204,12 @@ export default async function CertificatePreviewPage({
         }
 
         /* Grid */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 20px; }
 
         /* Fields */
-        .field { margin-bottom: 5px; }
+        .field { margin-bottom: 3px; }
         .field-label {
-          font-size: 7px;
+          font-size: 6.5px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -213,12 +217,12 @@ export default async function CertificatePreviewPage({
           margin-bottom: 0;
         }
         .field-value {
-          font-size: 11px;
+          font-size: 10px;
           color: #111827;
           font-weight: 500;
         }
         .field-value-bold {
-          font-size: 11px;
+          font-size: 10px;
           color: #111827;
           font-weight: 700;
         }
@@ -226,9 +230,9 @@ export default async function CertificatePreviewPage({
         /* Badges */
         .badge {
           display: inline-block;
-          padding: 4px 14px;
+          padding: 3px 12px;
           border-radius: 4px;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 800;
           letter-spacing: 0.04em;
           text-transform: uppercase;
@@ -254,11 +258,11 @@ export default async function CertificatePreviewPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 6px 12px;
+          padding: 4px 10px;
         }
         .result-row + .result-row { border-top: 1px solid #f3f4f6; }
         .result-label {
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.06em;
@@ -268,8 +272,8 @@ export default async function CertificatePreviewPage({
         /* Method line */
         .method-line {
           display: flex;
-          gap: 32px;
-          padding: 6px 12px 8px;
+          gap: 24px;
+          padding: 4px 10px 6px;
           border-bottom: 1px solid #f3f4f6;
         }
 
@@ -306,59 +310,60 @@ export default async function CertificatePreviewPage({
         .anomaly-text { font-size: 10px; font-weight: 600; color: #dc2626; }
 
         /* Observations */
-        .obs-text { font-size: 10px; color: #374151; line-height: 1.5; padding: 0 12px; }
+        .obs-text { font-size: 9px; color: #374151; line-height: 1.4; padding: 0 10px; }
         .obs-rec-label {
-          font-size: 7px; font-weight: 700; color: #6b7280;
+          font-size: 6.5px; font-weight: 700; color: #6b7280;
           text-transform: uppercase; letter-spacing: 0.06em;
-          margin: 4px 12px 1px;
+          margin: 3px 10px 1px;
         }
-        .obs-rec-text { font-size: 10px; color: #374151; font-style: italic; line-height: 1.5; padding: 0 12px; }
+        .obs-rec-text { font-size: 9px; color: #374151; font-style: italic; line-height: 1.4; padding: 0 10px; }
 
         .next-visit {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          margin: 6px 12px 0;
-          padding: 4px 10px;
+          gap: 3px;
+          margin: 4px 10px 0;
+          padding: 3px 8px;
           background: #eff6ff;
           border: 1px solid #bfdbfe;
-          border-radius: 4px;
-          font-size: 9px;
+          border-radius: 3px;
+          font-size: 8px;
           font-weight: 700;
           color: #1e40af;
         }
 
         /* Signatures */
         .sig-section {
-          margin-top: 12px;
-          padding-top: 10px;
+          margin-top: 8px;
+          padding-top: 6px;
           border-top: 1px solid #e5e7eb;
         }
-        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .sig-block { text-align: center; }
-        .sig-label { font-size: 8px; font-weight: 700; color: #374151; margin-bottom: 2px; }
-        .sig-sub { font-size: 6.5px; font-style: italic; color: #9ca3af; margin-bottom: 4px; }
+        .sig-label { font-size: 7px; font-weight: 700; color: #374151; margin-bottom: 1px; }
+        .sig-sub { font-size: 6px; font-style: italic; color: #9ca3af; margin-bottom: 3px; }
         .sig-box {
-          border: 1.5px dashed #d1d5db;
-          border-radius: 6px;
-          height: 50px;
+          border: 1px dashed #d1d5db;
+          border-radius: 4px;
+          height: 40px;
           display: flex; align-items: center; justify-content: center;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
           background: #fafbfc;
         }
-        .sig-img { max-width: 150px; max-height: 40px; object-fit: contain; }
-        .sig-name { font-size: 8px; color: #6b7280; }
-        .sig-date { font-size: 7px; color: #9ca3af; margin-top: 1px; }
+        .sig-img { max-width: 120px; max-height: 32px; object-fit: contain; }
+        .sig-name { font-size: 7px; color: #6b7280; }
+        .sig-date { font-size: 6.5px; color: #9ca3af; }
 
         /* Footer */
         .footer {
           text-align: center;
-          padding: 8px 36px 8px;
+          padding: 6px 32px 6px;
           border-top: 1px solid #e5e7eb;
-          margin-top: 8px;
+          margin-top: auto;
+          flex-shrink: 0;
         }
-        .footer-text { font-size: 7px; color: #9ca3af; line-height: 1.7; }
-        .footer-brand { font-size: 6.5px; color: #d1d5db; margin-top: 2px; }
+        .footer-text { font-size: 6.5px; color: #9ca3af; line-height: 1.6; }
+        .footer-brand { font-size: 6px; color: #d1d5db; margin-top: 1px; }
 
         /* Print button bar */
         .print-bar {
