@@ -76,6 +76,11 @@ export async function sendCertificateByEmail(
     return { error: "Erreur lors de l'envoi de l'email. Vérifiez la configuration SMTP." };
   }
 
+  await prisma.certificate.update({
+    where: { id: certificateId },
+    data: { emailSentAt: new Date() },
+  });
+
   revalidatePath(`/certificates/${certificateId}`);
   return { success: true };
 }

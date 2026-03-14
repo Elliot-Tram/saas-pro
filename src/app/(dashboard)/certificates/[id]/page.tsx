@@ -98,6 +98,7 @@ export default async function CertificateDetailPage({
               action={sendCertificateByEmail}
               id={certificate.id}
               email={certificate.client.email}
+              alreadySent={!!certificate.emailSentAt}
             />
             <RequestReviewButton
               clientId={certificate.client.id}
@@ -107,6 +108,12 @@ export default async function CertificateDetailPage({
             <DeleteCertificateButton id={certificate.id} />
           </div>
         </div>
+        {certificate.emailSentAt && (
+          <p className="text-sm text-green-600 text-right mt-1">
+            {"✓ Envoyé par email le "}
+            {formatDate(certificate.emailSentAt)}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl">

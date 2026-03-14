@@ -153,11 +153,15 @@ function drawSectionHeader(
   title: string,
   y: number,
   fontBold: PDFFont,
-  width: number
+  width: number,
+  centerX?: number
 ): number {
   const text = sanitize(title.toUpperCase());
+  const textX = centerX != null
+    ? centerX - fontBold.widthOfTextAtSize(text, 8.5) / 2
+    : MARGIN_L;
   page.drawText(text, {
-    x: MARGIN_L,
+    x: textX,
     y,
     size: 8.5,
     font: fontBold,
@@ -504,7 +508,9 @@ export async function GET(
     // Left column
     let leftY = curY;
     leftY = drawField(page, "TYPE D'APPAREIL", safe(cert.chimneyType), MARGIN_L + 14, leftY, fontR, fontB, true);
-    leftY = drawField(page, "MARQUE / MODELE", safe(brandModel), MARGIN_L + 14, leftY, fontR, fontB);
+    if (brandModel) {
+      leftY = drawField(page, "MARQUE / MODELE", brandModel, MARGIN_L + 14, leftY, fontR, fontB);
+    }
     drawField(page, "COMBUSTIBLE", safe(cert.fuelType), MARGIN_L + 14, leftY, fontR, fontB);
 
     // Right column
@@ -683,7 +689,7 @@ export async function GET(
 
       if (cert.nextVisit) {
         // Blue next visit badge
-        const nextText = sanitize(`Prochain passage recommande : ${fmtDate(cert.nextVisit)}`);
+        const nextText = sanitize(`Prochain passage recommand\u00e9 : ${fmtDate(cert.nextVisit)}`);
         const nextW = fontB.widthOfTextAtSize(nextText, 8.5) + 24;
         page.drawRectangle({
           x: MARGIN_L + 14,
@@ -716,16 +722,16 @@ export async function GET(
 
     // ═══════ 10. SIGNATURES ═══════
     curY -= 4;
-    curY = drawSectionHeader(page, "Signatures", curY, fontB, CONTENT_W);
+    curY = drawSectionHeader(page, "Signatures", curY, fontB, CONTENT_W, MARGIN_L + CONTENT_W / 2);
 
     const sigBoxW = (CONTENT_W - 40) / 2;
-    const sigBoxH = 80;
+    const sigBoxH = 65;
     const sigLeftX = MARGIN_L;
     const sigRightX = MARGIN_L + sigBoxW + 40;
 
     // Ensure we don't go off page
-    if (curY - sigBoxH - 40 < 60) {
-      curY = sigBoxH + 100;
+    if (curY - sigBoxH - 40 < 44) {
+      curY = sigBoxH + 84;
     }
 
     // Pro signature
@@ -841,7 +847,7 @@ export async function GET(
     });
 
     // ═══════ 11. LEGAL FOOTER ═══════
-    const footerY = 52;
+    const footerY = 36;
     page.drawLine({
       start: { x: MARGIN_L, y: footerY + 14 },
       end: { x: PAGE_W - MARGIN_R, y: footerY + 14 },

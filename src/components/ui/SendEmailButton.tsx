@@ -8,9 +8,10 @@ interface SendEmailButtonProps {
   action: (id: string) => Promise<{ success?: boolean; error?: string }>;
   id: string;
   email: string | null;
+  alreadySent?: boolean;
 }
 
-export function SendEmailButton({ action, id, email }: SendEmailButtonProps) {
+export function SendEmailButton({ action, id, email, alreadySent }: SendEmailButtonProps) {
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,7 +41,7 @@ export function SendEmailButton({ action, id, email }: SendEmailButtonProps) {
       <div className="relative group">
         <Button variant="secondary" disabled>
           <Mail className="h-4 w-4" />
-          Envoyer par email
+          {alreadySent ? "Renvoyer par email" : "Envoyer par email"}
         </Button>
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           Pas d&apos;email client
@@ -73,7 +74,7 @@ export function SendEmailButton({ action, id, email }: SendEmailButtonProps) {
   return (
     <Button variant="secondary" onClick={handleClick} loading={state === "loading"}>
       <Mail className="h-4 w-4" />
-      {state === "loading" ? "Envoi..." : "Envoyer par email"}
+      {state === "loading" ? "Envoi..." : alreadySent ? "Renvoyer par email" : "Envoyer par email"}
     </Button>
   );
 }
