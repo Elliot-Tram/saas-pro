@@ -73,16 +73,24 @@ export default async function CertificatePreviewPage({
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          body { margin: 0; padding: 0; background: white !important; }
+          body { margin: 0 !important; padding: 0 !important; background: white !important; }
           .certificate { box-shadow: none !important; margin: 0 !important; }
-          /* Hide dashboard layout */
-          aside, nav, [class*="Sidebar"], [class*="sidebar"],
-          [class*="QuickActions"], [class*="quick-action"],
-          header:not(.certificate *) {
-            display: none !important;
+          /* Hide ALL dashboard chrome */
+          aside, nav,
+          div[class*="lg:pl-"], div[class*="pl-64"],
+          .fixed { display: none !important; position: static !important; }
+          main, main > div, body > div {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: none !important;
+            padding-top: 0 !important;
           }
-          main { padding-left: 0 !important; margin: 0 !important; }
-          main > div { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+          body > div > div > main { padding-left: 0 !important; }
+        }
+
+        /* Also hide mobile header bar on screen for preview */
+        .preview-wrapper .fixed:not(.print-bar) {
+          display: none !important;
         }
 
         @page {
@@ -97,8 +105,8 @@ export default async function CertificatePreviewPage({
           background: #fff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #111827;
-          font-size: 10.5px;
-          line-height: 1.4;
+          font-size: 12.5px;
+          line-height: 1.5;
           position: relative;
           box-shadow: 0 4px 24px rgba(0,0,0,0.08);
           overflow: hidden;
@@ -113,7 +121,7 @@ export default async function CertificatePreviewPage({
         }
 
         .content {
-          padding: 18px 34px 10px;
+          padding: 22px 36px 12px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -147,23 +155,13 @@ export default async function CertificatePreviewPage({
           line-height: 1.5;
         }
 
-        .title-block { text-align: right; }
-
         .title-main {
-          font-size: 15px;
+          font-size: 20px;
           font-weight: 700;
           color: #0f2b46;
           line-height: 1.15;
           text-transform: uppercase;
-        }
-
-        .title-accent {
-          width: 28px;
-          height: 2px;
-          background: #2563eb;
-          margin-left: auto;
-          margin-top: 3px;
-          margin-bottom: 4px;
+          letter-spacing: 0.05em;
         }
 
         .cert-meta {
@@ -188,23 +186,23 @@ export default async function CertificatePreviewPage({
         .pro-bar .divider { margin: 0 6px; color: #d1d5db; }
 
         /* Section */
-        .section { margin-bottom: 6px; }
+        .section { margin-bottom: 14px; }
         .section-title {
-          font-size: 8px;
+          font-size: 10.5px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: #0f2b46;
-          padding-bottom: 3px;
+          padding-bottom: 4px;
           border-bottom: 1px solid #e5e7eb;
-          margin-bottom: 5px;
+          margin-bottom: 8px;
         }
 
         /* Cards */
         .card {
           border-left: 2px solid #e5e7eb;
-          padding: 5px 10px;
-          margin-bottom: 1px;
+          padding: 10px 14px;
+          margin-bottom: 2px;
         }
         .card-filled {
           background: #f9fafb;
@@ -212,12 +210,12 @@ export default async function CertificatePreviewPage({
         }
 
         /* Grid */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; }
 
         /* Fields */
-        .field { margin-bottom: 3px; }
+        .field { margin-bottom: 6px; }
         .field-label {
-          font-size: 7px;
+          font-size: 8px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -225,12 +223,12 @@ export default async function CertificatePreviewPage({
           margin-bottom: 0;
         }
         .field-value {
-          font-size: 10.5px;
+          font-size: 12.5px;
           color: #111827;
           font-weight: 500;
         }
         .field-value-bold {
-          font-size: 10.5px;
+          font-size: 12.5px;
           color: #111827;
           font-weight: 700;
         }
@@ -238,9 +236,9 @@ export default async function CertificatePreviewPage({
         /* Badges */
         .badge {
           display: inline-block;
-          padding: 3px 12px;
+          padding: 5px 16px;
           border-radius: 4px;
-          font-size: 9px;
+          font-size: 11px;
           font-weight: 800;
           letter-spacing: 0.04em;
           text-transform: uppercase;
@@ -266,7 +264,7 @@ export default async function CertificatePreviewPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 4px 10px;
+          padding: 7px 14px;
         }
         .result-row + .result-row { border-top: 1px solid #f3f4f6; }
         .result-label {
@@ -280,8 +278,8 @@ export default async function CertificatePreviewPage({
         /* Method line */
         .method-line {
           display: flex;
-          gap: 24px;
-          padding: 4px 10px 6px;
+          gap: 32px;
+          padding: 7px 14px 8px;
           border-bottom: 1px solid #f3f4f6;
         }
 
@@ -353,7 +351,7 @@ export default async function CertificatePreviewPage({
         .sig-box {
           border: 1.5px dashed #d1d5db;
           border-radius: 5px;
-          height: 45px;
+          height: 50px;
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 2px;
           background: #fafbfc;
@@ -410,6 +408,9 @@ export default async function CertificatePreviewPage({
         @media print { body { background: white; padding-top: 0; } }
       `}</style>
 
+      {/* Dynamic page title for PDF filename */}
+      <title>{`Certificat-Ramonage-${cert.client.lastName}-${cert.client.firstName}-${fmtDate(cert.date).replace(/\//g, "-")}`}</title>
+
       {/* Print bar */}
       <div className="print-bar no-print">
         <a href={`/certificates/${cert.id}`}>← Retour au certificat</a>
@@ -419,11 +420,19 @@ export default async function CertificatePreviewPage({
         </div>
       </div>
 
+      <div className="preview-wrapper">
       <div className="certificate">
         <div className="accent-bar" />
         <div className="content">
 
-          {/* Header */}
+          {/* Title centered */}
+          <div style={{ textAlign: "center", marginBottom: 10, marginTop: 4 }}>
+            <div className="title-main">Certificat de ramonage</div>
+            <div style={{ width: 32, height: 2, background: "#2563eb", margin: "4px auto 6px" }} />
+            <div className="cert-meta">N° {cert.number} — {fmtDate(cert.date)}</div>
+          </div>
+
+          {/* Company + N° row */}
           <div className="header">
             <div>
               {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
@@ -436,12 +445,7 @@ export default async function CertificatePreviewPage({
               )}
               {cert.team.phone && <div className="company-detail">Tél. {cert.team.phone}</div>}
             </div>
-            <div className="title-block">
-              <div className="title-main">Certificat de ramonage</div>
-              <div className="title-accent" />
-              <div className="cert-meta">N° {cert.number}</div>
-              <div className="cert-meta">Date : {fmtDate(cert.date)}</div>
-            </div>
+            <div />
           </div>
 
           <hr className="sep" />
@@ -645,6 +649,7 @@ export default async function CertificatePreviewPage({
           </div>
           <div className="footer-brand">Bistry – Logiciel de gestion pour ramoneurs</div>
         </div>
+      </div>
       </div>
     </>
   );
