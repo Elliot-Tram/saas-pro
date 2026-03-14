@@ -63,7 +63,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center justify-between gap-2.5 px-6 py-5 border-b border-gray-100">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-          <img src="/logo-concept-2.svg" alt="Bistry" className="h-9 w-9 rounded-lg" />
+          <img src="/logo-white.svg" alt="Bistry" className="h-9 w-9 rounded-lg" />
           <span className="text-lg font-bold text-gray-900">Bistry</span>
         </Link>
         {/* Close button on mobile */}
@@ -153,7 +153,7 @@ export function Sidebar() {
           <Menu className="h-5 w-5" />
         </button>
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo-concept-2.svg" alt="Bistry" className="h-8 w-8 rounded-md" />
+          <img src="/logo-white.svg" alt="Bistry" className="h-8 w-8 rounded-md" />
           <span className="text-base font-bold text-gray-900">Bistry</span>
         </Link>
       </div>

@@ -1,3 +1,4 @@
+import { CertificateAnimation } from "@/components/landing/CertificateAnimation";
 import {
   ClipboardCheck,
   FileText,
@@ -27,7 +28,7 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a href="/landing" className="flex items-center gap-2.5">
-          <img src="/logo-concept-2.svg" alt="Bistry" className="h-9 w-9 rounded-xl shadow-lg shadow-blue-500/25" />
+          <img src="/logo-concept-2.svg" alt="Bistry" className="h-9 w-9 rounded-xl" />
           <span className="text-xl font-bold tracking-tight text-white">
             Bistry
           </span>
@@ -78,73 +79,50 @@ function Navbar() {
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-[#0c2444] to-slate-900 pt-32 pb-24 lg:pt-44 lg:pb-32">
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl" />
-        <div className="absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-blue-400/8 blur-3xl" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
-      </div>
+    <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-[#0c2444] to-slate-900 pt-32 pb-20 lg:pt-40 lg:pb-28">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-      {/* Grid pattern overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
+          {/* Left — Text */}
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
+              <Shield className="h-4 w-4" />
+              Conforme au d&eacute;cret 2023-641
+            </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
-        {/* Badge */}
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
-          <Shield className="h-4 w-4" />
-          Conforme au decret 2023-641
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
+              Le seul outil dont votre entreprise de ramonage a besoin
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
+              Certificats en 30 secondes, factures automatiques, planning par secteur, rappels annuels &mdash; tout est inclus. Z&eacute;ro paperasse, plus de clients.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <a
+                href="/register"
+                className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-blue-600 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-blue-500 hover:-translate-y-0.5"
+              >
+                Essai gratuit 14 jours
+                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href="#certificate"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
+              >
+                Voir la d&eacute;mo
+              </a>
+            </div>
+
+            <p className="mt-4 text-sm text-slate-500">
+              Pas besoin de carte bancaire
+            </p>
+          </div>
+
+          {/* Right — Certificate animation */}
+          <CertificateAnimation />
+
         </div>
-
-        {/* Headline */}
-        <h1 className="mx-auto max-w-5xl text-4xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.1]">
-          Creez vos certificats de ramonage{" "}
-          <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-            en 30 secondes
-          </span>
-        </h1>
-
-        {/* Subheadline */}
-        <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-300 sm:text-xl">
-          Fini le carnet papier. Bistry genere vos certificats, factures et
-          rappels automatiquement. Conforme au decret 2023-641.
-        </p>
-
-        {/* CTAs */}
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <a
-            href="/register"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-2xl shadow-blue-600/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/40 hover:-translate-y-0.5"
-          >
-            Essai gratuit 14 jours
-            <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
-          </a>
-          <a
-            href="#certificate"
-            className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/10"
-          >
-            Voir un exemple de certificat
-            <ChevronDown className="h-4.5 w-4.5" />
-          </a>
-        </div>
-
-        {/* Sub-CTA text */}
-        <p className="mt-4 text-sm text-slate-400">
-          Pas besoin de carte bancaire
-        </p>
-
-        {/* Phone line */}
-        <p className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
-          <Phone className="h-4 w-4" />
-          Une question ? Appelez-nous au 04 XX XX XX XX
-        </p>
       </div>
     </section>
   );
@@ -152,7 +130,7 @@ function HeroSection() {
 
 function CertificateShowcase() {
   return (
-    <section id="certificate" className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
+    <section id="certificate" className="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -375,7 +353,7 @@ const colorMap = {
 
 function FeaturesSection() {
   return (
-    <section id="fonctionnalites" className="bg-white py-24 lg:py-32">
+    <section id="fonctionnalites" className="bg-white py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -422,71 +400,45 @@ function FeaturesSection() {
 }
 
 function BeforeAfterSection() {
-  const beforeItems = [
-    "Carnet papier",
-    "Certificats a la main",
-    "Factures oubliees",
-    "Clients perdus",
-    "Pas d'avis Google",
-  ];
-
-  const afterItems = [
-    "Certificats en 30 secondes",
-    "Factures automatiques",
-    "Rappels par email",
-    "Clients fideles",
-    "Avis Google en un clic",
+  const comparisons = [
+    { before: "Carnet papier et stylo", after: "Certificats num\u00e9riques en 30 secondes" },
+    { before: "Certificats remplis \u00e0 la main", after: "G\u00e9n\u00e9r\u00e9s et sign\u00e9s sur votre t\u00e9l\u00e9phone" },
+    { before: "Factures oubli\u00e9es ou en retard", after: "Factures automatiques avec relances" },
+    { before: "Clients qui ne reviennent pas", after: "Rappels annuels envoy\u00e9s automatiquement" },
+    { before: "Pas de visibilit\u00e9 en ligne", after: "Avis Google demand\u00e9s apr\u00e8s chaque intervention" },
   ];
 
   return (
-    <section className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
+    <section className="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            Avant / Apres
+            Ce qui change avec{" "}
+            <span className="text-blue-600">Bistry</span>
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-gray-500">
-            Ce qui change quand vous passez a Bistry.
-          </p>
         </div>
 
-        {/* Two columns */}
-        <div className="mx-auto mt-16 grid max-w-4xl gap-8 lg:mt-20 lg:grid-cols-2">
-          {/* Before */}
-          <div className="rounded-2xl border border-red-100 bg-gradient-to-b from-red-50/80 to-slate-50 p-8 sm:p-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-1.5 text-sm font-semibold text-red-700">
-              <X className="h-4 w-4" />
-              Avant Bistry
-            </div>
-            <ul className="space-y-4">
-              {beforeItems.map((item) => (
-                <li key={item} className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-100">
-                    <X className="h-3.5 w-3.5 text-red-500" />
-                  </div>
-                  <span className="text-base text-gray-700">{item}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="mx-auto mt-16 max-w-3xl lg:mt-20">
+          {/* Table header */}
+          <div className="grid grid-cols-2 gap-4 mb-2 px-4">
+            <div className="text-sm font-bold text-red-400 uppercase tracking-wider">Avant</div>
+            <div className="text-sm font-bold text-emerald-500 uppercase tracking-wider">Avec Bistry</div>
           </div>
 
-          {/* After */}
-          <div className="rounded-2xl border border-green-100 bg-gradient-to-b from-green-50/80 to-blue-50/50 p-8 sm:p-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-1.5 text-sm font-semibold text-green-700">
-              <Check className="h-4 w-4" />
-              Avec Bistry
-            </div>
-            <ul className="space-y-4">
-              {afterItems.map((item) => (
-                <li key={item} className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100">
-                    <Check className="h-3.5 w-3.5 text-green-600" />
-                  </div>
-                  <span className="text-base text-gray-700">{item}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Rows */}
+          <div className="space-y-2">
+            {comparisons.map((row, i) => (
+              <div key={i} className="grid grid-cols-2 gap-4 rounded-xl overflow-hidden">
+                <div className="bg-red-50 border border-red-100 rounded-l-xl px-5 py-4 flex items-center gap-3">
+                  <X className="h-4 w-4 text-red-400 flex-shrink-0" />
+                  <span className="text-[15px] text-gray-500 line-through decoration-red-200">{row.before}</span>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-100 rounded-r-xl px-5 py-4 flex items-center gap-3">
+                  <Check className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                  <span className="text-[15px] text-gray-900 font-medium">{row.after}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -494,31 +446,21 @@ function BeforeAfterSection() {
   );
 }
 
-const essentialFeatures = [
-  "1 utilisateur inclus",
-  "Fiches clients",
+const planFeatures = [
+  "Clients illimit\u00e9s",
   "Certificats de ramonage PDF",
+  "Signature \u00e9lectronique",
   "Facturation & devis",
+  "Planning par secteur",
   "Rappels annuels automatiques",
-];
-
-const proFeatures = [
-  "Tout Essentiel, plus :",
-  "Site vitrine personnalise",
-  "Avis Google automatiques",
-  "Statistiques avancees",
-];
-
-const boostFeatures = [
-  "Tout Pro, plus :",
-  "Photos Google My Business",
-  "Setup Google My Business inclus",
-  "Support prioritaire",
+  "Statistiques",
+  "Export comptable CSV",
+  "Support par email",
 ];
 
 function PricingSection() {
   return (
-    <section id="tarifs" className="bg-white py-24 lg:py-32">
+    <section id="tarifs" className="bg-white py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -535,31 +477,24 @@ function PricingSection() {
           </p>
         </div>
 
-        {/* Pricing cards */}
-        <div className="mx-auto mt-16 grid max-w-6xl gap-8 lg:mt-20 lg:grid-cols-3">
-          {/* Essentiel */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
-            <div className="h-1.5 bg-gradient-to-r from-slate-400 to-slate-500" />
+        {/* Single pricing card */}
+        <div className="mx-auto mt-16 max-w-md lg:mt-20">
+          <div className="relative overflow-hidden rounded-3xl border-2 border-blue-500 bg-white shadow-xl shadow-blue-200/40">
+            <div className="h-1.5 bg-gradient-to-r from-[#0f2b46] to-blue-600" />
             <div className="p-8 sm:p-10">
               <div className="mb-8 text-center">
-                <div className="mb-2 text-sm font-semibold tracking-wide text-slate-600 uppercase">
-                  Essentiel
-                </div>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
-                    29
-                  </span>
-                  <span className="text-xl font-semibold text-gray-400">
-                    &euro;
-                  </span>
+                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">29</span>
+                  <span className="text-xl font-semibold text-gray-400">&euro;</span>
                   <span className="ml-1 text-lg text-gray-400">/mois</span>
                 </div>
+                <p className="mt-2 text-sm text-gray-500">1 utilisateur inclus &middot; +19&euro;/mois par utilisateur suppl&eacute;mentaire</p>
               </div>
 
-              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+              <div className="h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
 
               <ul className="mt-8 space-y-4">
-                {essentialFeatures.map((feat) => (
+                {planFeatures.map((feat) => (
                   <li key={feat} className="flex items-center gap-3">
                     <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
                       <Check className="h-3.5 w-3.5 text-green-600" />
@@ -571,127 +506,15 @@ function PricingSection() {
 
               <a
                 href="/register"
-                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
+                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:-translate-y-0.5"
               >
-                Essai gratuit
+                Essai gratuit 14 jours
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
               </a>
-            </div>
-          </div>
-
-          {/* Pro — Populaire */}
-          <div className="relative overflow-hidden rounded-3xl border-2 border-blue-500 bg-white shadow-xl shadow-blue-200/40">
-            {/* Badge */}
-            <div className="absolute top-0 right-0 rounded-bl-2xl bg-blue-600 px-4 py-1.5 text-xs font-bold tracking-wide text-white uppercase">
-              Populaire
-            </div>
-            <div className="h-1.5 bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500" />
-            <div className="p-8 sm:p-10">
-              <div className="mb-8 text-center">
-                <div className="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase">
-                  Pro
-                </div>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
-                    49
-                  </span>
-                  <span className="text-xl font-semibold text-gray-400">
-                    &euro;
-                  </span>
-                  <span className="ml-1 text-lg text-gray-400">/mois</span>
-                </div>
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
-
-              <ul className="mt-8 space-y-4">
-                {proFeatures.map((feat, i) => (
-                  <li key={feat} className="flex items-center gap-3">
-                    {i === 0 ? (
-                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-blue-100">
-                        <Check className="h-3.5 w-3.5 text-blue-600" />
-                      </div>
-                    ) : (
-                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
-                        <Check className="h-3.5 w-3.5 text-green-600" />
-                      </div>
-                    )}
-                    <span
-                      className={`text-[15px] ${i === 0 ? "font-medium text-blue-700" : "text-gray-700"}`}
-                    >
-                      {feat}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href="/register"
-                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:from-blue-500 hover:to-blue-600 hover:shadow-blue-500/30 hover:-translate-y-0.5"
-              >
-                Essai gratuit
-                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
-              </a>
-            </div>
-          </div>
-
-          {/* Boost */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
-            <div className="h-1.5 bg-gradient-to-r from-purple-500 to-purple-600" />
-            <div className="p-8 sm:p-10">
-              <div className="mb-8 text-center">
-                <div className="mb-2 text-sm font-semibold tracking-wide text-purple-600 uppercase">
-                  Boost
-                </div>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-extrabold tracking-tight text-gray-900">
-                    79
-                  </span>
-                  <span className="text-xl font-semibold text-gray-400">
-                    &euro;
-                  </span>
-                  <span className="ml-1 text-lg text-gray-400">/mois</span>
-                </div>
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-
-              <ul className="mt-8 space-y-4">
-                {boostFeatures.map((feat, i) => (
-                  <li key={feat} className="flex items-center gap-3">
-                    {i === 0 ? (
-                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-purple-100">
-                        <Check className="h-3.5 w-3.5 text-purple-600" />
-                      </div>
-                    ) : (
-                      <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-green-100">
-                        <Check className="h-3.5 w-3.5 text-green-600" />
-                      </div>
-                    )}
-                    <span
-                      className={`text-[15px] ${i === 0 ? "font-medium text-purple-700" : "text-gray-700"}`}
-                    >
-                      {feat}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href="/register"
-                className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-8 py-4 text-base font-semibold text-gray-900 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5"
-              >
-                Essai gratuit
-                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
-              </a>
+              <p className="mt-3 text-center text-xs text-gray-400">Sans carte bancaire</p>
             </div>
           </div>
         </div>
-
-        {/* Extra seat note */}
-        <p className="mt-10 text-center text-sm text-gray-500">
-          Siege supplementaire : +19&euro;/mois par utilisateur
-        </p>
 
         <p className="mt-3 text-center text-sm text-gray-400">
           14 jours d&apos;essai gratuit &middot; Aucune carte bancaire requise
@@ -731,7 +554,7 @@ const faqItems = [
 
 function FaqSection() {
   return (
-    <section id="faq" className="bg-gradient-to-b from-slate-50 to-white py-24 lg:py-32">
+    <section id="faq" className="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -769,7 +592,7 @@ function FaqSection() {
 
 function CtaSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#0c2444] to-slate-900 py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#0c2444] to-slate-900 py-16 lg:py-20">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/8 blur-3xl" />
