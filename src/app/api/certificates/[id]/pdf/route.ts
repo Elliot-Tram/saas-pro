@@ -725,13 +725,15 @@ export async function GET(
     curY = drawSectionHeader(page, "Signatures", curY, fontB, CONTENT_W, MARGIN_L + CONTENT_W / 2);
 
     const sigBoxW = (CONTENT_W - 40) / 2;
-    const sigBoxH = 65;
+    const sigBoxH = 50;
     const sigLeftX = MARGIN_L;
     const sigRightX = MARGIN_L + sigBoxW + 40;
 
-    // Ensure we don't go off page
-    if (curY - sigBoxH - 40 < 44) {
-      curY = sigBoxH + 84;
+    // Ensure signatures + names + dates + footer all fit above bottom
+    // Need: sigBox(50) + labels(14) + name(12) + date(12) + gap(10) + footer(40) = ~138
+    const minY = 138;
+    if (curY - 14 - sigBoxH - 24 < minY) {
+      curY = minY + 14 + sigBoxH + 24;
     }
 
     // Pro signature
@@ -847,7 +849,8 @@ export async function GET(
     });
 
     // ═══════ 11. LEGAL FOOTER ═══════
-    const footerY = 36;
+    const lowestSigElement = Math.min(proBoxY, clientBoxY) - 26;
+    const footerY = Math.min(lowestSigElement - 20, 36);
     page.drawLine({
       start: { x: MARGIN_L, y: footerY + 14 },
       end: { x: PAGE_W - MARGIN_R, y: footerY + 14 },
