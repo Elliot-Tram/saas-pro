@@ -62,31 +62,12 @@ function statusLabel(status: string): string {
   }
 }
 
-// ── Helper: strip accents for Helvetica (Latin-1 only) ───────────────────────
-function stripAccents(str: string): string {
+// ── Helper: sanitize text for Helvetica (WinAnsi/Latin-1 encoding) ──────────
+function sanitize(str: string): string {
   return str
-    .replace(/[\u00e9\u00e8\u00ea\u00eb]/g, "e")
-    .replace(/[\u00c9\u00c8\u00ca\u00cb]/g, "E")
-    .replace(/[\u00e0\u00e2\u00e4]/g, "a")
-    .replace(/[\u00c0\u00c2\u00c4]/g, "A")
-    .replace(/[\u00f9\u00fb\u00fc]/g, "u")
-    .replace(/[\u00d9\u00db\u00dc]/g, "U")
-    .replace(/[\u00ee\u00ef]/g, "i")
-    .replace(/[\u00ce\u00cf]/g, "I")
-    .replace(/[\u00f4\u00f6]/g, "o")
-    .replace(/[\u00d4\u00d6]/g, "O")
-    .replace(/[\u00e7]/g, "c")
-    .replace(/[\u00c7]/g, "C")
-    .replace(/[\u2014\u2013]/g, "--")
-    .replace(/[\u00b0]/g, "deg")
-    .replace(/[\u00d8]/g, "O")
-    .replace(/[\u00f8]/g, "o")
-    .replace(/[\u2019\u2018]/g, "'")
-    .replace(/[\u201c\u201d]/g, '"')
-    .replace(/[\u00ab\u00bb]/g, '"')
+    .replace(/\u2014/g, "\u2013")
     .replace(/\u00a0/g, " ")
-    .replace(/[\u20ac]/g, "EUR")
-    .replace(/[^\x00-\x7F]/g, "");
+    .replace(/\u20ac/g, "EUR");
 }
 
 // ── Helper: embed image from data URL ────────────────────────────────────────
@@ -119,7 +100,7 @@ function wrapText(
   let current = "";
   for (const word of words) {
     const test = current ? `${current} ${word}` : word;
-    if (font.widthOfTextAtSize(stripAccents(test), size) > maxWidth && current) {
+    if (font.widthOfTextAtSize(sanitize(test), size) > maxWidth && current) {
       lines.push(current);
       current = word;
     } else {
@@ -154,7 +135,7 @@ function drawSectionHeader(
   fontBold: PDFFont,
   width: number
 ): number {
-  const text = stripAccents(title.toUpperCase());
+  const text = sanitize(title.toUpperCase());
   page.drawText(text, {
     x: MARGIN_L,
     y,
@@ -182,7 +163,7 @@ function drawField(
   fontB: PDFFont,
   bold = false
 ): number {
-  const labelText = stripAccents(label.toUpperCase());
+  const labelText = sanitize(label.toUpperCase());
   page.drawText(labelText, {
     x,
     y,
@@ -190,7 +171,7 @@ function drawField(
     font: fontR,
     color: GRAY,
   });
-  const valText = stripAccents(value);
+  const valText = sanitize(value);
   page.drawText(valText, {
     x,
     y: y - 12,
@@ -212,7 +193,7 @@ function drawBadge(
   bgColor: ReturnType<typeof rgb>,
   borderColor: ReturnType<typeof rgb>
 ): number {
-  const displayText = stripAccents(text);
+  const displayText = sanitize(text);
   const textWidth = font.widthOfTextAtSize(displayText, 9);
   const padding = 10;
   const height = 18;
@@ -329,7 +310,7 @@ export async function GET(
     }
 
     // Company name
-    page.drawText(stripAccents(companyName), {
+    page.drawText(sanitize(companyName), {
       x: logoEndX,
       y: curY,
       size: 14,
@@ -340,7 +321,7 @@ export async function GET(
     // Company address lines
     let compY = curY - 14;
     for (const line of companyLines) {
-      page.drawText(stripAccents(line), {
+      page.drawText(sanitize(line), {
         x: logoEndX,
         y: compY,
         size: 7.5,
@@ -362,7 +343,7 @@ export async function GET(
     });
 
     // Invoice number and date
-    const numText = stripAccents(`N ${safe(invoice.number)}`);
+    const numText = sanitize(`N\u00b0 ${safe(invoice.number)}`);
     const numWidth = fontR.widthOfTextAtSize(numText, 9);
     page.drawText(numText, {
       x: PAGE_W - MARGIN_R - numWidth,
@@ -372,7 +353,7 @@ export async function GET(
       color: GRAY,
     });
 
-    const dateText = stripAccents(`Date : ${fmtDate(invoice.date)}`);
+    const dateText = sanitize(`Date : ${fmtDate(invoice.date)}`);
     const dateWidth = fontR.widthOfTextAtSize(dateText, 9);
     page.drawText(dateText, {
       x: PAGE_W - MARGIN_R - dateWidth,
@@ -394,7 +375,7 @@ export async function GET(
     // ═══════ 4. PRO INFO BAR ═══════
     if (proParts.length > 0) {
       curY -= 20;
-      const proText = stripAccents(proParts.join("  |  "));
+      const proText = sanitize(proParts.join("  |  "));
       const proWidth = fontR.widthOfTextAtSize(proText, 7);
       const proBarW = CONTENT_W;
       page.drawRectangle({
@@ -432,7 +413,7 @@ export async function GET(
     });
 
     // Client name (bold)
-    page.drawText(stripAccents(clientName), {
+    page.drawText(sanitize(clientName), {
       x: MARGIN_L + 14,
       y: curY,
       size: 10,
@@ -538,7 +519,7 @@ export async function GET(
 
       // Description (wrap if needed)
       const descLines = wrapText(item.description, fontR, 9, colQty - colDesc - 20);
-      page.drawText(stripAccents(descLines[0]), {
+      page.drawText(sanitize(descLines[0]), {
         x: colDesc + 12,
         y: textY,
         size: 9,
@@ -558,8 +539,8 @@ export async function GET(
 
       // Unit price
       const unitStr = fmtCurrency(item.unitPrice);
-      page.drawText(stripAccents(unitStr), {
-        x: colTotal - fontR.widthOfTextAtSize(stripAccents(unitStr), 9) - 4,
+      page.drawText(sanitize(unitStr), {
+        x: colTotal - fontR.widthOfTextAtSize(sanitize(unitStr), 9) - 4,
         y: textY,
         size: 9,
         font: fontR,
@@ -568,8 +549,8 @@ export async function GET(
 
       // Total
       const totalStr = fmtCurrency(item.total);
-      page.drawText(stripAccents(totalStr), {
-        x: tableRight - fontB.widthOfTextAtSize(stripAccents(totalStr), 9) - 8,
+      page.drawText(sanitize(totalStr), {
+        x: tableRight - fontB.widthOfTextAtSize(sanitize(totalStr), 9) - 8,
         y: textY,
         size: 9,
         font: fontB,
@@ -594,7 +575,7 @@ export async function GET(
       font: fontR,
       color: GRAY,
     });
-    const subtotalStr = stripAccents(fmtCurrency(invoice.subtotal));
+    const subtotalStr = sanitize(fmtCurrency(invoice.subtotal));
     page.drawText(subtotalStr, {
       x: tableRight - fontR.widthOfTextAtSize(subtotalStr, 9) - 8,
       y: curY,
@@ -614,14 +595,14 @@ export async function GET(
 
     // TVA row
     const tvaLabel = `TVA (${invoice.taxRate}%)`;
-    page.drawText(stripAccents(tvaLabel), {
+    page.drawText(sanitize(tvaLabel), {
       x: totalsX,
       y: curY,
       size: 9,
       font: fontR,
       color: GRAY,
     });
-    const taxStr = stripAccents(fmtCurrency(invoice.tax));
+    const taxStr = sanitize(fmtCurrency(invoice.tax));
     page.drawText(taxStr, {
       x: tableRight - fontR.widthOfTextAtSize(taxStr, 9) - 8,
       y: curY,
@@ -650,7 +631,7 @@ export async function GET(
       color: WHITE,
     });
 
-    const totalTtcStr = stripAccents(fmtCurrency(invoice.total));
+    const totalTtcStr = sanitize(fmtCurrency(invoice.total));
     page.drawText(totalTtcStr, {
       x: tableRight - fontB.widthOfTextAtSize(totalTtcStr, 13) - 14,
       y: curY + 4,
@@ -736,7 +717,7 @@ export async function GET(
     if (invoice.team.address) footerParts.push(invoice.team.address);
     const cpCity = [invoice.team.postalCode, invoice.team.city].filter(Boolean).join(" ");
     if (cpCity) footerParts.push(cpCity);
-    const footerLine1 = stripAccents(footerParts.join(" -- "));
+    const footerLine1 = sanitize(footerParts.join(" \u2013 "));
     const footerLine1W = fontR.widthOfTextAtSize(footerLine1, 7);
     page.drawText(footerLine1, {
       x: PAGE_W / 2 - footerLine1W / 2,
@@ -747,7 +728,7 @@ export async function GET(
     });
 
     if (invoice.team.phone) {
-      const phoneLine = stripAccents(`Tel. ${invoice.team.phone}`);
+      const phoneLine = sanitize(`Tel. ${invoice.team.phone}`);
       const phoneW = fontR.widthOfTextAtSize(phoneLine, 7);
       page.drawText(phoneLine, {
         x: PAGE_W / 2 - phoneW / 2,
@@ -764,7 +745,7 @@ export async function GET(
     return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="Facture-${stripAccents(safe(invoice.client.lastName, ""))}-${stripAccents(safe(invoice.client.firstName, ""))}-${fmtDate(invoice.date).replace(/\//g, "-")}.pdf"`,
+        "Content-Disposition": `inline; filename="Facture-${sanitize(safe(invoice.client.lastName, ""))}-${sanitize(safe(invoice.client.firstName, ""))}-${fmtDate(invoice.date).replace(/\//g, "-")}.pdf"`,
       },
     });
   } catch (error) {

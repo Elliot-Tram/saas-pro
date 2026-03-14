@@ -33,29 +33,29 @@ const CONTENT_W = PAGE_W - MARGIN_L - MARGIN_R;
 
 // ── Label translations ───────────────────────────────────────────────────────
 const labels: Record<string, string> = {
-  mecanique_haut: "Mecanique par le haut",
-  mecanique_bas: "Mecanique par le bas",
+  mecanique_haut: "M\u00e9canique par le haut",
+  mecanique_bas: "M\u00e9canique par le bas",
   chimique: "Chimique",
   mixte: "Mixte",
-  bon_etat: "Bon etat",
-  a_surveiller: "A surveiller",
+  bon_etat: "Bon \u00e9tat",
+  a_surveiller: "\u00c0 surveiller",
   dangereux: "Dangereux",
-  proprietaire: "Proprietaire",
+  proprietaire: "Propri\u00e9taire",
   locataire: "Locataire",
   syndic: "Syndic",
   annuel: "Annuel",
   semestriel: "Semestriel",
   anomaly_distance_plancher:
-    "Distance de securite aux traversees de plancher non conforme",
+    "Distance de s\u00e9curit\u00e9 aux travers\u00e9es de plancher non conforme",
   anomaly_distance_toiture:
-    "Distance de securite au niveau de la toiture non conforme",
-  anomaly_etancheite: "Defaut d'etancheite du conduit",
-  anomaly_coudes: "Coudes non conformes (>2 coudes a 90 degres par DTU 24.1)",
+    "Distance de s\u00e9curit\u00e9 au niveau de la toiture non conforme",
+  anomaly_etancheite: "D\u00e9faut d'\u00e9tanch\u00e9it\u00e9 du conduit",
+  anomaly_coudes: "Coudes non conformes (>2 coudes \u00e0 90\u00b0 par DTU 24.1)",
   anomaly_section_horizontale: "Section horizontale excessive (>3m)",
-  anomaly_plaque: "Absence de plaque signaletique",
-  anomaly_bistre: "Presence de bistre importante",
+  anomaly_plaque: "Absence de plaque signal\u00e9tique",
+  anomaly_bistre: "Pr\u00e9sence de bistre importante",
   anomaly_autre: "Autre anomalie",
-  anomaly_souche: "Souche de cheminee defectueuse",
+  anomaly_souche: "Souche de chemin\u00e9e d\u00e9fectueuse",
 };
 
 function t(key: string | null | undefined): string {
@@ -76,30 +76,18 @@ function fmtDate(date: Date | null | undefined): string {
   }).format(new Date(date));
 }
 
-// ── Helper: strip accents for Helvetica (Latin-1 only) ───────────────────────
-function stripAccents(str: string): string {
+// ── Helper: sanitize text for Helvetica (WinAnsi/Latin-1 encoding) ──────────
+// Helvetica supports all standard French accents (é, è, ê, à, ç, ô, etc.)
+// Only replace characters outside WinAnsi encoding
+function sanitize(str: string): string {
   return str
-    .replace(/[\u00e9\u00e8\u00ea\u00eb]/g, "e")
-    .replace(/[\u00c9\u00c8\u00ca\u00cb]/g, "E")
-    .replace(/[\u00e0\u00e2\u00e4]/g, "a")
-    .replace(/[\u00c0\u00c2\u00c4]/g, "A")
-    .replace(/[\u00f9\u00fb\u00fc]/g, "u")
-    .replace(/[\u00d9\u00db\u00dc]/g, "U")
-    .replace(/[\u00ee\u00ef]/g, "i")
-    .replace(/[\u00ce\u00cf]/g, "I")
-    .replace(/[\u00f4\u00f6]/g, "o")
-    .replace(/[\u00d4\u00d6]/g, "O")
-    .replace(/[\u00e7]/g, "c")
-    .replace(/[\u00c7]/g, "C")
-    .replace(/[\u2014\u2013]/g, "--")
-    .replace(/[\u00b0]/g, "deg")
-    .replace(/[\u00d8]/g, "O")
-    .replace(/[\u00f8]/g, "o")
-    .replace(/[\u2019\u2018]/g, "'")
-    .replace(/[\u201c\u201d]/g, '"')
-    .replace(/[\u00ab\u00bb]/g, '"')
-    .replace(/\u00a0/g, " ")
-    .replace(/[^\x00-\x7F]/g, "");
+    .replace(/\u2014/g, "\u2013") // em dash → en dash (supported in WinAnsi)
+    .replace(/\u2019/g, "\u2019") // right single quote (supported)
+    .replace(/\u2018/g, "\u2018") // left single quote (supported)
+    .replace(/\u201c/g, "\u00ab") // left double quote → guillemet
+    .replace(/\u201d/g, "\u00bb") // right double quote → guillemet
+    .replace(/\u00a0/g, " ")      // non-breaking space → space
+    .replace(/\u20ac/g, "EUR");   // euro sign → EUR (not in all fonts)
 }
 
 // ── Helper: embed image from data URL ────────────────────────────────────────
@@ -132,7 +120,7 @@ function wrapText(
   let current = "";
   for (const word of words) {
     const test = current ? `${current} ${word}` : word;
-    if (font.widthOfTextAtSize(stripAccents(test), size) > maxWidth && current) {
+    if (font.widthOfTextAtSize(sanitize(test), size) > maxWidth && current) {
       lines.push(current);
       current = word;
     } else {
@@ -167,7 +155,7 @@ function drawSectionHeader(
   fontBold: PDFFont,
   width: number
 ): number {
-  const text = stripAccents(title.toUpperCase());
+  const text = sanitize(title.toUpperCase());
   page.drawText(text, {
     x: MARGIN_L,
     y,
@@ -195,7 +183,7 @@ function drawField(
   fontB: PDFFont,
   bold = false
 ): number {
-  const labelText = stripAccents(label.toUpperCase());
+  const labelText = sanitize(label.toUpperCase());
   page.drawText(labelText, {
     x,
     y,
@@ -203,7 +191,7 @@ function drawField(
     font: fontR,
     color: GRAY,
   });
-  const valText = stripAccents(value);
+  const valText = sanitize(value);
   page.drawText(valText, {
     x,
     y: y - 12,
@@ -225,7 +213,7 @@ function drawBadge(
   bgColor: ReturnType<typeof rgb>,
   borderColor: ReturnType<typeof rgb>
 ): number {
-  const displayText = stripAccents(text);
+  const displayText = sanitize(text);
   const textWidth = font.widthOfTextAtSize(displayText, 10);
   const padding = 12;
   const height = 22;
@@ -316,7 +304,7 @@ export async function GET(
     const proParts = [
       cert.team.siret ? `SIRET : ${cert.team.siret}` : null,
       cert.team.insurerName
-        ? `Assurance RC : ${cert.team.insurerName}${cert.team.insuranceNumber ? ` -- Police n${cert.team.insuranceNumber}` : ""}`
+        ? `Assurance RC : ${cert.team.insurerName}${cert.team.insuranceNumber ? ` \u2013 Police n\u00b0${cert.team.insuranceNumber}` : ""}`
         : null,
       cert.team.qualification
         ? `Qualification : ${cert.team.qualification}`
@@ -326,7 +314,7 @@ export async function GET(
     const anomalies = (cert.anomalies as string[] | null) || [];
     const brandModel = [cert.applianceBrand, cert.applianceModel]
       .filter(Boolean)
-      .join(" -- ");
+      .join(" \u2013 ");
 
     // ═══════ 1. TOP BAR ═══════
     drawAccentBar(page, 0, PAGE_H - 6, PAGE_W);
@@ -352,7 +340,7 @@ export async function GET(
     }
 
     // Company name
-    page.drawText(stripAccents(companyName), {
+    page.drawText(sanitize(companyName), {
       x: logoEndX,
       y: curY,
       size: 14,
@@ -363,7 +351,7 @@ export async function GET(
     // Company address lines
     let compY = curY - 14;
     for (const line of companyLines) {
-      page.drawText(stripAccents(line), {
+      page.drawText(sanitize(line), {
         x: logoEndX,
         y: compY,
         size: 7.5,
@@ -393,7 +381,7 @@ export async function GET(
     });
 
     // Certificate number and date
-    const numText = stripAccents(`N ${safe(cert.number)}`);
+    const numText = sanitize(`N\u00b0 ${safe(cert.number)}`);
     const numWidth = fontR.widthOfTextAtSize(numText, 9);
     page.drawText(numText, {
       x: PAGE_W - MARGIN_R - numWidth,
@@ -403,7 +391,7 @@ export async function GET(
       color: GRAY,
     });
 
-    const dateText = stripAccents(`Date : ${fmtDate(cert.date)}`);
+    const dateText = sanitize(`Date : ${fmtDate(cert.date)}`);
     const dateWidth = fontR.widthOfTextAtSize(dateText, 9);
     page.drawText(dateText, {
       x: PAGE_W - MARGIN_R - dateWidth,
@@ -425,7 +413,7 @@ export async function GET(
     // ═══════ 4. PRO INFO BAR ═══════
     if (proParts.length > 0) {
       curY -= 20;
-      const proText = stripAccents(proParts.join("  |  "));
+      const proText = sanitize(proParts.join("  |  "));
       const proWidth = fontR.widthOfTextAtSize(proText, 7);
       const proBarX = MARGIN_L;
       const proBarW = CONTENT_W;
@@ -472,7 +460,7 @@ export async function GET(
     const colMid = MARGIN_L + CONTENT_W / 2 + 10;
 
     // Client name (bold)
-    page.drawText(stripAccents(clientName), {
+    page.drawText(sanitize(clientName), {
       x: MARGIN_L + 14,
       y: curY,
       size: 10,
@@ -523,7 +511,7 @@ export async function GET(
     let rightY = curY;
     rightY = drawField(page, "TYPE DE CONDUIT", safe(cert.conduitType), colMid, rightY, fontR, fontB);
     const diamStr = cert.conduitDiameter ? `diam. ${cert.conduitDiameter}` : "--";
-    const lengthStr = cert.conduitLength ? ` -- Long. ${cert.conduitLength}` : "";
+    const lengthStr = cert.conduitLength ? ` \u2013 Long. ${cert.conduitLength}` : "";
     rightY = drawField(page, "DIAMETRE / LONGUEUR", `${diamStr}${lengthStr}`, colMid, rightY, fontR, fontB);
     drawField(page, "LOCALISATION", safe(cert.chimneyLocation), colMid, rightY, fontR, fontB);
 
@@ -564,7 +552,7 @@ export async function GET(
 
     // Vacuite badge row
     let badgeY = sepY - 20;
-    const vacLabel = stripAccents("VACUITE DU CONDUIT");
+    const vacLabel = sanitize("VACUITE DU CONDUIT");
     page.drawText(vacLabel, {
       x: MARGIN_L + 14,
       y: badgeY + 3,
@@ -577,11 +565,11 @@ export async function GET(
     const vacTextColor = cert.vacuumTest ? EMERALD : RED;
     const vacBg = cert.vacuumTest ? EMERALD_BG : RED_BG;
     const vacBorder = cert.vacuumTest ? EMERALD_BORDER : RED_BORDER;
-    drawBadge(page, vacText, PAGE_W - MARGIN_R - fontB.widthOfTextAtSize(stripAccents(vacText), 10) - 34, badgeY - 5, fontB, vacTextColor, vacBg, vacBorder);
+    drawBadge(page, vacText, PAGE_W - MARGIN_R - fontB.widthOfTextAtSize(sanitize(vacText), 10) - 34, badgeY - 5, fontB, vacTextColor, vacBg, vacBorder);
 
     // Etat badge row
     badgeY -= 28;
-    const etatLabel = stripAccents("ETAT GENERAL");
+    const etatLabel = sanitize("ETAT GENERAL");
     page.drawText(etatLabel, {
       x: MARGIN_L + 14,
       y: badgeY + 3,
@@ -597,7 +585,7 @@ export async function GET(
       cert.condition === "bon_etat" ? EMERALD_BG : cert.condition === "a_surveiller" ? AMBER_BG : RED_BG;
     const condBorder =
       cert.condition === "bon_etat" ? EMERALD_BORDER : cert.condition === "a_surveiller" ? AMBER_BORDER : RED_BORDER;
-    drawBadge(page, condText, PAGE_W - MARGIN_R - fontB.widthOfTextAtSize(stripAccents(condText), 10) - 34, badgeY - 5, fontB, condTextColor, condBg, condBorder);
+    drawBadge(page, condText, PAGE_W - MARGIN_R - fontB.widthOfTextAtSize(sanitize(condText), 10) - 34, badgeY - 5, fontB, condTextColor, condBg, condBorder);
 
     curY -= interCardH + 8;
 
@@ -613,7 +601,7 @@ export async function GET(
     });
 
     if (anomalies.length === 0) {
-      page.drawText(stripAccents("Aucune anomalie constatee"), {
+      page.drawText(sanitize("Aucune anomalie constatee"), {
         x: MARGIN_L + 14,
         y: curY,
         size: 10,
@@ -630,7 +618,7 @@ export async function GET(
           size: 3,
           color: RED,
         });
-        page.drawText(stripAccents(t(a)), {
+        page.drawText(sanitize(t(a)), {
           x: MARGIN_L + 28,
           y: curY,
           size: 9,
@@ -658,7 +646,7 @@ export async function GET(
       if (cert.observations) {
         const obsLines = wrapText(cert.observations, fontR, 9, CONTENT_W - 28);
         for (const line of obsLines) {
-          page.drawText(stripAccents(line), {
+          page.drawText(sanitize(line), {
             x: MARGIN_L + 14,
             y: curY,
             size: 9,
@@ -681,7 +669,7 @@ export async function GET(
         curY -= 13;
         const recLines = wrapText(cert.recommendations, fontI, 9, CONTENT_W - 28);
         for (const line of recLines) {
-          page.drawText(stripAccents(line), {
+          page.drawText(sanitize(line), {
             x: MARGIN_L + 14,
             y: curY,
             size: 9,
@@ -695,7 +683,7 @@ export async function GET(
 
       if (cert.nextVisit) {
         // Blue next visit badge
-        const nextText = stripAccents(`Prochain passage recommande : ${fmtDate(cert.nextVisit)}`);
+        const nextText = sanitize(`Prochain passage recommande : ${fmtDate(cert.nextVisit)}`);
         const nextW = fontB.widthOfTextAtSize(nextText, 8.5) + 24;
         page.drawRectangle({
           x: MARGIN_L + 14,
@@ -748,8 +736,8 @@ export async function GET(
       font: fontB,
       color: DARK,
     });
-    page.drawText(stripAccents("Lu et approuve"), {
-      x: sigLeftX + sigBoxW / 2 - fontI.widthOfTextAtSize(stripAccents("Lu et approuve"), 6.5) / 2,
+    page.drawText(sanitize("Lu et approuve"), {
+      x: sigLeftX + sigBoxW / 2 - fontI.widthOfTextAtSize(sanitize("Lu et approuve"), 6.5) / 2,
       y: curY - 12,
       size: 6.5,
       font: fontI,
@@ -780,7 +768,7 @@ export async function GET(
       });
     }
     // Name under box
-    const proNameText = stripAccents(companyName);
+    const proNameText = sanitize(companyName);
     page.drawText(proNameText, {
       x: sigLeftX + sigBoxW / 2 - fontR.widthOfTextAtSize(proNameText, 8) / 2,
       y: proBoxY - 12,
@@ -788,7 +776,7 @@ export async function GET(
       font: fontR,
       color: GRAY,
     });
-    const proDateText = stripAccents(`Date : ${fmtDate(cert.date)}`);
+    const proDateText = sanitize(`Date : ${fmtDate(cert.date)}`);
     page.drawText(proDateText, {
       x: sigLeftX + sigBoxW / 2 - fontR.widthOfTextAtSize(proDateText, 7) / 2,
       y: proBoxY - 22,
@@ -805,8 +793,8 @@ export async function GET(
       font: fontB,
       color: DARK,
     });
-    page.drawText(stripAccents("Lu et approuve"), {
-      x: sigRightX + sigBoxW / 2 - fontI.widthOfTextAtSize(stripAccents("Lu et approuve"), 6.5) / 2,
+    page.drawText(sanitize("Lu et approuve"), {
+      x: sigRightX + sigBoxW / 2 - fontI.widthOfTextAtSize(sanitize("Lu et approuve"), 6.5) / 2,
       y: curY - 12,
       size: 6.5,
       font: fontI,
@@ -835,7 +823,7 @@ export async function GET(
         height: sh,
       });
     }
-    const clientNameText = stripAccents(clientName);
+    const clientNameText = sanitize(clientName);
     page.drawText(clientNameText, {
       x: sigRightX + sigBoxW / 2 - fontR.widthOfTextAtSize(clientNameText, 8) / 2,
       y: clientBoxY - 12,
@@ -843,7 +831,7 @@ export async function GET(
       font: fontR,
       color: GRAY,
     });
-    const clientDateText = stripAccents(`Date : ${fmtDate(cert.date)}`);
+    const clientDateText = sanitize(`Date : ${fmtDate(cert.date)}`);
     page.drawText(clientDateText, {
       x: sigRightX + sigBoxW / 2 - fontR.widthOfTextAtSize(clientDateText, 7) / 2,
       y: clientBoxY - 22,
@@ -861,7 +849,7 @@ export async function GET(
       color: LIGHT_GRAY,
     });
 
-    const footerLine1 = "Etabli conformement au decret n2023-641 du 20 juillet 2023 relatif a l'entretien des foyers, appareils et conduits de fumee";
+    const footerLine1 = "\u00c9tabli conform\u00e9ment au d\u00e9cret n\u00b02023-641 du 20 juillet 2023 relatif \u00e0 l'entretien des foyers, appareils et conduits de fum\u00e9e";
     const footerLine1W = fontR.widthOfTextAtSize(footerLine1, 7);
     page.drawText(footerLine1, {
       x: PAGE_W / 2 - footerLine1W / 2,
@@ -871,7 +859,7 @@ export async function GET(
       color: GRAY,
     });
 
-    const footerLine2 = stripAccents(`Ce document doit etre conserve pendant une duree minimale de 2 ans -- Validite : ${t(cert.periodicity).toLowerCase()}`);
+    const footerLine2 = sanitize(`Ce document doit \u00eatre conserv\u00e9 pendant une dur\u00e9e minimale de 2 ans \u2013 Validit\u00e9 : ${t(cert.periodicity).toLowerCase()}`);
     const footerLine2W = fontR.widthOfTextAtSize(footerLine2, 7);
     page.drawText(footerLine2, {
       x: PAGE_W / 2 - footerLine2W / 2,
@@ -881,7 +869,7 @@ export async function GET(
       color: GRAY,
     });
 
-    const footerBrand = "Bistry -- Logiciel de gestion pour ramoneurs";
+    const footerBrand = "Bistry \u2013 Logiciel de gestion pour ramoneurs";
     const footerBrandW = fontR.widthOfTextAtSize(footerBrand, 6.5);
     page.drawText(footerBrand, {
       x: PAGE_W / 2 - footerBrandW / 2,
@@ -897,7 +885,7 @@ export async function GET(
     return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="Certificat-Ramonage-${stripAccents(safe(cert.client.lastName, ""))}-${stripAccents(safe(cert.client.firstName, ""))}-${fmtDate(cert.date).replace(/\//g, "-")}.pdf"`,
+        "Content-Disposition": `inline; filename="Certificat-Ramonage-${sanitize(safe(cert.client.lastName, ""))}-${sanitize(safe(cert.client.firstName, ""))}-${fmtDate(cert.date).replace(/\//g, "-")}.pdf"`,
       },
     });
   } catch (error) {
