@@ -16,11 +16,11 @@ export default function RegisterPage() {
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 mb-4">
           <Flame className="h-6 w-6 text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
-        <p className="mt-1 text-sm text-gray-500">Commencez à gérer votre activité</p>
+        <h1 className="text-2xl font-bold text-white">Créer un compte</h1>
+        <p className="mt-1 text-sm text-slate-400">Créez votre compte Bistry</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-xl p-6">
         {state?.error && (
           <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
             {state.error}
@@ -66,9 +66,9 @@ export default function RegisterPage() {
         </form>
       </div>
 
-      <p className="mt-4 text-center text-sm text-gray-500">
+      <p className="mt-4 text-center text-sm text-slate-400">
         Déjà un compte ?{" "}
-        <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+        <Link href="/login" className="font-medium text-blue-400 hover:text-blue-300">
           Se connecter
         </Link>
       </p>

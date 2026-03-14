@@ -42,7 +42,7 @@ export default async function ContractsPage() {
           <EmptyState
             icon={FileSignature}
             title="Aucun contrat"
-            description="Créez votre premier contrat d'entretien pour commencer."
+            description="Ajoutez votre premier contrat d'entretien annuel pour fidéliser vos clients."
             actionLabel="Créer un contrat"
             actionHref="/contracts/new"
           />

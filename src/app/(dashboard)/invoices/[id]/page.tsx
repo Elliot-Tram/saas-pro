@@ -98,12 +98,12 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               />
             </>
           )}
-          <a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+          <Link href={`/invoices/${invoice.id}/preview`}>
             <Button variant="secondary">
               <Download className="h-4 w-4" />
-              Télécharger PDF
+              Aperçu / PDF
             </Button>
-          </a>
+          </Link>
           <SendEmailButton
             action={sendInvoiceByEmail}
             id={invoice.id}

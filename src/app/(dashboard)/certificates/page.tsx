@@ -42,7 +42,7 @@ export default async function CertificatesPage() {
           <EmptyState
             icon={ClipboardCheck}
             title="Aucun certificat"
-            description="Créez votre premier certificat de ramonage pour commencer."
+            description="Ajoutez votre premier certificat de ramonage pour garder une trace de vos interventions."
             actionLabel="Créer un certificat"
             actionHref="/certificates/new"
           />

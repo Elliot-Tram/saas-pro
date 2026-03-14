@@ -187,7 +187,10 @@ export default async function DashboardPage() {
             <Clock className="h-4.5 w-4.5 text-blue-600" />
             <h2 className="font-semibold text-gray-900">Ma journée</h2>
             <span className="text-sm text-gray-400">
-              {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(now)}
+              {(() => {
+                const formatted = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(now);
+                return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+              })()}
             </span>
             <Badge variant="info">{todayAppointments.length} RDV</Badge>
           </div>
@@ -198,7 +201,8 @@ export default async function DashboardPage() {
         <CardContent className="p-0">
           {todayAppointments.length === 0 ? (
             <div className="px-6 py-10 text-center">
-              <p className="text-sm text-gray-500 mb-3">Aucun rendez-vous aujourd&apos;hui</p>
+              <p className="text-sm text-gray-900 font-medium mb-1">Journée libre</p>
+              <p className="text-sm text-gray-500 mb-3">Profitez-en pour planifier vos prochaines interventions.</p>
               <Link href="/calendar">
                 <Button size="sm" variant="secondary">
                   <Plus className="h-4 w-4" />
@@ -275,7 +279,7 @@ export default async function DashboardPage() {
           <CardContent className="p-0">
             {upcomingAppointments.length === 0 ? (
               <div className="px-6 py-8 text-center text-sm text-gray-500">
-                Aucun rendez-vous à venir
+                Aucun rendez-vous à venir — planifiez vos prochaines interventions depuis le calendrier.
               </div>
             ) : (
               <ul className="divide-y divide-gray-50">
@@ -308,7 +312,7 @@ export default async function DashboardPage() {
           <CardContent className="p-0">
             {recentClients.length === 0 ? (
               <div className="px-6 py-8 text-center text-sm text-gray-500">
-                Aucun client pour le moment
+                Ajoutez votre premier client pour commencer.
               </div>
             ) : (
               <ul className="divide-y divide-gray-50">
