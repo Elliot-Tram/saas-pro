@@ -4,6 +4,9 @@ import { getSession } from "@/lib/auth";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 // ── Helpers ─────────────────────────────────────────────────────────────────────
 
 function safe(val: string | null | undefined, fallback = "\u2014"): string {
@@ -763,8 +766,8 @@ export async function GET(
     } else {
       // Production (Vercel): use @sparticuz/chromium
       browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: { width: 1920, height: 1080 },
+        args: [...chromium.args, "--disable-gpu", "--single-process"],
+        defaultViewport: { width: 800, height: 600 },
         executablePath: await chromium.executablePath(),
         headless: true,
       });

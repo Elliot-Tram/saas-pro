@@ -855,6 +855,12 @@ function buildCertificateHtml(cert: {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ROUTE CONFIG — increase memory for Chromium
+// ═══════════════════════════════════════════════════════════════════════════════
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ROUTE HANDLER
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -910,8 +916,8 @@ export async function GET(
     } else {
       // Production (Vercel): use @sparticuz/chromium
       browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: { width: 1920, height: 1080 },
+        args: [...chromium.args, "--disable-gpu", "--single-process"],
+        defaultViewport: { width: 800, height: 600 },
         executablePath: await chromium.executablePath(),
         headless: true,
       });
