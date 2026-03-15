@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { createProspectAccount } from "@/app/actions/admin";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -17,6 +18,7 @@ function generatePassword() {
 }
 
 export function CreateProspectForm() {
+  const searchParams = useSearchParams();
   const [state, formAction, isPending] = useActionState(
     createProspectAccount,
     null
@@ -26,6 +28,13 @@ export function CreateProspectForm() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoBase64, setLogoBase64] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  // Pre-fill from URL params (from prospect tracker)
+  const defaultCompany = searchParams.get("company") || "";
+  const defaultEmail = searchParams.get("email") || "";
+  const defaultPhone = searchParams.get("phone") || "";
+  const defaultCity = searchParams.get("city") || "";
+  const defaultAddress = searchParams.get("address") || "";
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -158,6 +167,7 @@ export function CreateProspectForm() {
             label="Nom de l'entreprise"
             required
             placeholder="Ex: Ramonage Express"
+            defaultValue={defaultCompany}
           />
 
           <Input
@@ -167,6 +177,7 @@ export function CreateProspectForm() {
             label="Email du prospect"
             required
             placeholder="prospect@exemple.fr"
+            defaultValue={defaultEmail}
           />
 
           <div className="space-y-1">
@@ -236,6 +247,7 @@ export function CreateProspectForm() {
             name="phone"
             label="Telephone"
             placeholder="06 12 34 56 78"
+            defaultValue={defaultPhone}
           />
 
           <Input
@@ -243,6 +255,7 @@ export function CreateProspectForm() {
             name="address"
             label="Adresse"
             placeholder="12 rue des Artisans"
+            defaultValue={defaultAddress}
           />
 
           <div className="grid grid-cols-2 gap-3">
@@ -251,6 +264,7 @@ export function CreateProspectForm() {
               name="city"
               label="Ville"
               placeholder="Lille"
+              defaultValue={defaultCity}
             />
             <Input
               id="postalCode"

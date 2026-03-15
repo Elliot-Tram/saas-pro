@@ -16,6 +16,7 @@ import {
   Activity,
   UserPlus,
   Target,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -237,12 +238,20 @@ export default async function AdminPage() {
             Tableau de bord SaaS — vue fondateur
           </p>
         </div>
-        <Link href="/admin/create">
-          <Button size="sm">
-            <Plus className="h-4 w-4" />
-            Creer un compte prospect
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/prospects">
+            <Button size="sm" variant="secondary">
+              <Search className="h-4 w-4" />
+              Prospects
+            </Button>
+          </Link>
+          <Link href="/admin/create">
+            <Button size="sm">
+              <Plus className="h-4 w-4" />
+              Creer un compte prospect
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Revenue Hero */}

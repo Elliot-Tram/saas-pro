@@ -1,11 +1,10 @@
-import { Suspense } from "react";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { CreateProspectForm } from "@/components/admin/CreateProspectForm";
+import { ImportProspectsForm } from "@/components/admin/ImportProspectsForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default async function CreateProspectPage() {
+export default async function ImportProspectsPage() {
   const session = await getSession();
   if (!session) redirect("/login");
   if (session.email !== process.env.ADMIN_EMAIL) redirect("/");
@@ -14,25 +13,20 @@ export default async function CreateProspectPage() {
     <>
       <div className="mb-8">
         <Link
-          href="/admin"
+          href="/admin/prospects"
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
-          Retour
+          Retour aux prospects
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Creer un compte prospect
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900">Importer des prospects</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Creez un compte pour un nouveau prospect avec un mot de passe
-          temporaire
+          Importez un fichier CSV contenant vos prospects
         </p>
       </div>
 
-      <div className="max-w-xl">
-        <Suspense fallback={<div className="animate-pulse bg-gray-100 rounded-xl h-96" />}>
-          <CreateProspectForm />
-        </Suspense>
+      <div className="max-w-2xl">
+        <ImportProspectsForm />
       </div>
     </>
   );
