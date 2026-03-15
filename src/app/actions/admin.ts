@@ -16,8 +16,11 @@ export async function createProspectAccount(
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const phone = formData.get("phone") as string;
+  const address = formData.get("address") as string;
   const city = formData.get("city") as string;
+  const postalCode = formData.get("postalCode") as string;
   const siret = formData.get("siret") as string;
+  const logo = formData.get("logo") as string;
   const seedDemo = formData.get("seedDemo") === "on";
 
   if (!company || !email || !password) {
@@ -37,8 +40,11 @@ export async function createProspectAccount(
         name: company,
         company,
         phone: phone || null,
+        address: address || null,
         city: city || null,
+        postalCode: postalCode || null,
         siret: siret || null,
+        logo: logo || null,
         source: "prospect",
       },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, useRef } from "react";
 import { createProspectAccount } from "@/app/actions/admin";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -23,6 +23,21 @@ export function CreateProspectForm() {
   );
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoBase64, setLogoBase64] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setLogoPreview(result);
+      setLogoBase64(result);
+    };
+    reader.readAsDataURL(file);
+  }
 
   useEffect(() => {
     setPassword(generatePassword());
@@ -189,6 +204,33 @@ export function CreateProspectForm() {
             </div>
           </div>
 
+          {/* Logo upload */}
+          <div className="space-y-1">
+            <label className="block text-sm sm:text-base font-medium text-gray-700">
+              Logo de l&apos;entreprise
+            </label>
+            <div className="flex items-center gap-3">
+              {logoPreview && (
+                <img src={logoPreview} alt="Logo" className="h-12 w-12 rounded-lg border border-gray-200 object-contain" />
+              )}
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                {logoPreview ? "Changer" : "Ajouter un logo"}
+              </button>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg"
+                className="hidden"
+                onChange={handleLogoChange}
+              />
+            </div>
+            <input type="hidden" name="logo" value={logoBase64 || ""} />
+          </div>
+
           <Input
             id="phone"
             name="phone"
@@ -197,11 +239,26 @@ export function CreateProspectForm() {
           />
 
           <Input
-            id="city"
-            name="city"
-            label="Ville"
-            placeholder="Paris"
+            id="address"
+            name="address"
+            label="Adresse"
+            placeholder="12 rue des Artisans"
           />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              id="city"
+              name="city"
+              label="Ville"
+              placeholder="Lille"
+            />
+            <Input
+              id="postalCode"
+              name="postalCode"
+              label="Code postal"
+              placeholder="59000"
+            />
+          </div>
 
           <Input
             id="siret"
