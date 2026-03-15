@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { CompleteAndCertifyButton } from "@/components/workflow/CompleteAndCertifyButton";
+import { BookingLinkCard } from "@/components/booking/BookingLinkCard";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -341,6 +342,13 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Booking link card (admin only) */}
+      {isAdmin && (
+        <div className="mt-6">
+          <BookingLinkCard teamId={session.teamId} />
+        </div>
+      )}
     </>
   );
 }
