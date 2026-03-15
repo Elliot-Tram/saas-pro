@@ -87,11 +87,11 @@ export default async function CertificateDetailPage({
               Certificat du {formatDate(certificate.date)} — {qualityLabels[certificate.clientQuality] || certificate.clientQuality}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <a href={`/certificates/${certificate.id}/preview`} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary">
-                <Download className="h-4 w-4" />
-                Aperçu / PDF
+              <Button variant="secondary" size="sm">
+                <Download className="h-3.5 w-3.5" />
+                PDF
               </Button>
             </a>
             <SendEmailButton

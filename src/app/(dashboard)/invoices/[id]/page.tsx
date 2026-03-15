@@ -75,21 +75,21 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {invoice.status === "draft" && (
             <form action={markAsSent}>
-              <Button variant="secondary" type="submit">
-                <Send className="h-4 w-4" />
-                Marquer envoyée
+              <Button variant="secondary" size="sm" type="submit">
+                <Send className="h-3.5 w-3.5" />
+                Envoyée
               </Button>
             </form>
           )}
           {invoice.status === "sent" && (
             <>
               <form action={markAsPaid}>
-                <Button variant="primary" type="submit">
-                  <CheckCircle className="h-4 w-4" />
-                  Marquer payée
+                <Button variant="primary" size="sm" type="submit">
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Payée
                 </Button>
               </form>
               <PaymentReminderButton
@@ -99,9 +99,9 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             </>
           )}
           <Link href={`/invoices/${invoice.id}/preview`}>
-            <Button variant="secondary">
-              <Download className="h-4 w-4" />
-              Aperçu / PDF
+            <Button variant="secondary" size="sm">
+              <Download className="h-3.5 w-3.5" />
+              PDF
             </Button>
           </Link>
           <SendEmailButton
@@ -110,9 +110,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             email={invoice.client.email}
           />
           <form action={handleDelete}>
-            <Button variant="danger" type="submit">
-              <Trash2 className="h-4 w-4" />
-              Supprimer
+            <Button variant="danger" size="sm" type="submit">
+              <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </form>
         </div>
