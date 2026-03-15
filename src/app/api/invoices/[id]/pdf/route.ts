@@ -253,8 +253,19 @@ export async function GET(
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([PAGE_W, PAGE_H]);
 
-    const fontR = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    // Load Plus Jakarta Sans font
+    const fs = await import("fs");
+    const path = await import("path");
+    let fontR, fontB;
+    try {
+      const fontPath = path.join(process.cwd(), "public/fonts/PlusJakartaSans-Regular.ttf");
+      const fontBytes = fs.readFileSync(fontPath);
+      fontR = await pdfDoc.embedFont(fontBytes);
+      fontB = await pdfDoc.embedFont(fontBytes);
+    } catch {
+      fontR = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      fontB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    }
 
     // Embed images
     const logoImg = await embedImage(pdfDoc, invoice.team.logo);

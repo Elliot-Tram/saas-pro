@@ -103,7 +103,7 @@ export default async function CertificatePreviewPage({
           height: 297mm;
           margin: 0 auto;
           background: #fff;
-          font-family: Helvetica, Arial, sans-serif;
+          font-family: "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
           color: #111827;
           font-size: 12.5px;
           line-height: 1.5;
