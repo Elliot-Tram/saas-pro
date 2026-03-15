@@ -10,14 +10,10 @@ import {
   Calendar,
   FileText,
   ClipboardCheck,
-  FileSignature,
-  Bell,
-  BarChart3,
+  Building2,
   Settings,
   Menu,
   X,
-  MapPin,
-  UsersRound,
 } from "lucide-react";
 
 interface NavItem {
@@ -27,21 +23,14 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
-const mainNavItems: NavItem[] = [
+const navItems: NavItem[] = [
   { name: "Accueil", href: "/", icon: LayoutDashboard },
   { name: "Mes clients", href: "/clients", icon: Users },
   { name: "Planning", href: "/calendar", icon: Calendar },
   { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
   { name: "Facturation", href: "/invoices", icon: FileText },
-  { name: "Mes zones", href: "/sectors", icon: MapPin, adminOnly: true },
-];
-
-const secondaryNavItems: NavItem[] = [
-  { name: "Rappels", href: "/reminders", icon: Bell, adminOnly: true },
-  { name: "Contrats", href: "/contracts", icon: FileSignature, adminOnly: true },
-  { name: "Mon chiffre", href: "/stats", icon: BarChart3, adminOnly: true },
-  { name: "Équipe", href: "/team", icon: UsersRound, adminOnly: true },
-  { name: "Mon entreprise", href: "/settings", icon: Settings, adminOnly: true },
+  { name: "Mon entreprise", href: "/company", icon: Building2, adminOnly: true },
+  { name: "Paramètres", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar({ role = "admin" }: { role?: string }) {
@@ -66,6 +55,8 @@ export function Sidebar({ role = "admin" }: { role?: string }) {
     };
   }, [mobileOpen]);
 
+  const visibleItems = navItems.filter((item) => isAdmin || !item.adminOnly);
+
   const sidebarContent = (
     <>
       {/* Logo */}
@@ -86,9 +77,8 @@ export function Sidebar({ role = "admin" }: { role?: string }) {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        {/* Main items */}
         <div className="space-y-1">
-          {mainNavItems.filter((item) => isAdmin || !item.adminOnly).map((item) => {
+          {visibleItems.map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"
@@ -111,38 +101,6 @@ export function Sidebar({ role = "admin" }: { role?: string }) {
             );
           })}
         </div>
-
-        {/* Separator + Secondary items (admin only) */}
-        {secondaryNavItems.some((item) => isAdmin || !item.adminOnly) && (
-          <>
-        <div className="mx-3 my-3 h-px bg-gray-200" />
-
-        <div className="space-y-0.5">
-          {secondaryNavItems.filter((item) => isAdmin || !item.adminOnly).map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                  isActive
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
-                )}
-              >
-                <item.icon className="h-4 w-4 shrink-0" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-          </>
-        )}
       </nav>
 
       {/* Bottom spacer */}
