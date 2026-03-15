@@ -431,15 +431,28 @@ export default async function CertificatePreviewPage({
         <div className="accent-bar" />
         <div className="content">
 
-          {/* Company info - logo above name */}
-          <div className="company-block">
-            {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
-            <div className="company-name">{companyName}</div>
-            {companyAddr && <div className="company-detail">{companyAddr}</div>}
-            {cert.team.phone && <div className="company-detail">Tél. {cert.team.phone}</div>}
+          {/* Header: company left + title centered */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "start", marginBottom: 8 }}>
+            {/* Left: logo + company */}
+            <div>
+              {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
+              <div className="company-name">{companyName}</div>
+              {companyAddr && <div className="company-detail">{companyAddr}</div>}
+              {cert.team.phone && <div className="company-detail">Tél. {cert.team.phone}</div>}
+            </div>
+
+            {/* Center: title */}
+            <div className="title-block" style={{ marginBottom: 0 }}>
+              <div className="title-main">Certificat de ramonage</div>
+              <div className="title-bar" />
+              <div className="cert-meta">N° {cert.number} — {fmtDate(cert.date)}</div>
+            </div>
+
+            {/* Right: empty for balance */}
+            <div />
           </div>
 
-          {/* Pro info bar */}
+          {/* Pro info bar — below title */}
           {proParts.length > 0 && (
             <div className="pro-bar">
               {proParts.map((p, i) => (
@@ -447,13 +460,6 @@ export default async function CertificatePreviewPage({
               ))}
             </div>
           )}
-
-          {/* Title centered */}
-          <div className="title-block">
-            <div className="title-main">Certificat de ramonage</div>
-            <div className="title-bar" />
-            <div className="cert-meta">N° {cert.number} — {fmtDate(cert.date)}</div>
-          </div>
 
           <hr className="sep" />
 
