@@ -217,7 +217,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <ul className="divide-y divide-gray-50">
-              {todayAppointments.map((apt) => {
+              {todayAppointments.slice(0, 3).map((apt) => {
                 const isCompleted = apt.status === "completed";
                 const isCancelled = apt.status === "cancelled";
                 return (
@@ -268,6 +268,13 @@ export default async function DashboardPage() {
                 );
               })}
             </ul>
+          )}
+          {todayAppointments.length > 3 && (
+            <div className="px-6 py-3 border-t border-gray-100 text-center">
+              <Link href="/calendar" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                Voir les {todayAppointments.length - 3} autres RDV →
+              </Link>
+            </div>
           )}
         </CardContent>
       </Card>
