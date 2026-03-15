@@ -3,25 +3,24 @@
 import { useEffect } from "react";
 import posthog from "posthog-js";
 
-interface PostHogIdentifyProps {
-  userId: string;
-  email: string;
-  name: string;
-  role: string;
-  teamId: string;
-}
-
-export function PostHogIdentify({ userId, email, name, role, teamId }: PostHogIdentifyProps) {
+export function PostHogIdentify() {
   useEffect(() => {
-    if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
-      posthog.identify(userId, {
-        email,
-        name,
-        role,
-        teamId,
-      });
-    }
-  }, [userId, email, name, role, teamId]);
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((session) => {
+        if (session?.userId) {
+          posthog.identify(session.userId, {
+            email: session.email,
+            name: session.name,
+            role: session.role,
+            teamId: session.teamId,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return null;
 }
