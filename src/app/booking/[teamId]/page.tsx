@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
   if (!team) return { title: "Page introuvable" };
   return {
-    title: `Prendre rendez-vous — ${team.company || "Ramoneur"}`,
-    description: `Demandez un rendez-vous de ramonage en ligne avec ${team.company || "votre ramoneur"}.`,
+    title: `Demander un devis gratuit — ${team.company || "Ramoneur"}`,
+    description: `Demandez un devis de ramonage gratuit en ligne avec ${team.company || "votre ramoneur"}.`,
   };
 }
 
@@ -77,9 +77,12 @@ export default async function BookingPage({ params }: Props) {
         </div>
 
         {/* Title */}
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          Demander un rendez-vous
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          Demander un devis gratuit
         </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Remplissez le formulaire ci-dessous, nous vous recontacterons rapidement.
+        </p>
 
         {/* Form */}
         <BookingForm teamId={team.id} companyName={companyName} />

@@ -60,8 +60,8 @@ export async function submitBookingRequest(
 
   // Create the client
   const noteText = message
-    ? `Demande de RDV en ligne: ${message}`
-    : "Demande de RDV en ligne";
+    ? `Demande de devis en ligne: ${message}`
+    : "Demande de devis en ligne";
 
   const client = await prisma.client.create({
     data: {
@@ -88,7 +88,7 @@ export async function submitBookingRequest(
 
   await prisma.appointment.create({
     data: {
-      title: `Demande en ligne — ${firstName} ${lastName}`,
+      title: `Demande de devis — ${firstName} ${lastName}`,
       description: message || null,
       date: tomorrow,
       endDate: tomorrowEnd,

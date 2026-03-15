@@ -125,7 +125,7 @@ export function BookingForm({ teamId, companyName }: BookingFormProps) {
         id="message"
         name="message"
         label="Message / precisions"
-        placeholder="Decrivez votre besoin, vos disponibilites..."
+        placeholder="Decrivez votre besoin, le nombre de conduits, vos disponibilites..."
       />
 
       <Button
@@ -134,7 +134,7 @@ export function BookingForm({ teamId, companyName }: BookingFormProps) {
         loading={isPending}
         className="w-full"
       >
-        Envoyer ma demande
+        Demander un devis gratuit
       </Button>
     </form>
   );

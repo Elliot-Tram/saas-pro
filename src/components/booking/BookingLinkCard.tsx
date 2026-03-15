@@ -29,7 +29,7 @@ export function BookingLinkCard({ teamId }: BookingLinkCardProps) {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-gray-900">
-              Votre page de prise de RDV
+              Votre page de demande de devis
             </h3>
             <p className="text-xs text-gray-500 mt-0.5 truncate">
               {bookingUrl}
