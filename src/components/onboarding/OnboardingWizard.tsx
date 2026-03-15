@@ -13,7 +13,16 @@ const steps = [
   { number: 3, label: "Votre premier secteur", icon: MapPin },
 ];
 
-export function OnboardingWizard() {
+interface DefaultValues {
+  company?: string;
+  siret?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+}
+
+export function OnboardingWizard({ defaultValues = {} }: { defaultValues?: DefaultValues }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [state, formAction, pending] = useActionState(completeOnboarding, null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -21,14 +30,14 @@ export function OnboardingWizard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Store field values across steps
+  // Store field values across steps — pre-fill from registration
   const [formData, setFormData] = useState({
-    company: "",
-    siret: "",
-    phone: "",
-    address: "",
-    city: "",
-    postalCode: "",
+    company: defaultValues.company || "",
+    siret: defaultValues.siret || "",
+    phone: defaultValues.phone || "",
+    address: defaultValues.address || "",
+    city: defaultValues.city || "",
+    postalCode: defaultValues.postalCode || "",
     qualification: "",
     insuranceNumber: "",
     insurerName: "",

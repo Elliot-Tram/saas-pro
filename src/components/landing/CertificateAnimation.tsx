@@ -32,15 +32,15 @@ export function CertificateAnimation() {
               transform: step >= 6 ? "translateY(8px)" : "translateY(-60px)",
             }}
           >
-            <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-gray-200 shadow-xl px-3 py-2.5 flex items-center gap-2.5">
+            <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-gray-200 shadow-xl px-3 py-2.5 flex items-center gap-3">
               <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-0">
                 <div className="text-[10px] font-bold text-gray-900">Certificat envoy&eacute;</div>
                 <div className="text-[8px] text-gray-500 truncate">sophie.durand@gmail.com</div>
               </div>
-              <div className="text-[8px] text-gray-400 flex-shrink-0">maintenant</div>
+              <div className="text-[8px] text-gray-400 flex-shrink-0 ml-auto">maintenant</div>
             </div>
           </div>
 

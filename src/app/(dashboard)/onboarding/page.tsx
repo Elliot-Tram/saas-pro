@@ -10,12 +10,19 @@ export default async function OnboardingPage() {
   // Check if team has already completed onboarding
   const team = await prisma.team.findUnique({
     where: { id: session.teamId },
-    select: { company: true, siret: true },
+    select: { company: true, siret: true, phone: true, address: true, city: true, postalCode: true },
   });
 
   if (team?.company && team?.siret) {
     redirect("/");
   }
 
-  return <OnboardingWizard />;
+  return <OnboardingWizard defaultValues={{
+    company: team?.company || "",
+    siret: team?.siret || "",
+    phone: team?.phone || "",
+    address: team?.address || "",
+    city: team?.city || "",
+    postalCode: team?.postalCode || "",
+  }} />;
 }
