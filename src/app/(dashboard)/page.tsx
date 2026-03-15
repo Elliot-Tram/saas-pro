@@ -165,23 +165,23 @@ export default async function DashboardPage() {
 
       {/* Overdue Invoices Alert (admin only) */}
       {isAdmin && overdueInvoices.length > 0 && (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
-            <h3 className="font-semibold text-red-800">
-              {overdueInvoices.length} facture{overdueInvoices.length > 1 ? "s" : ""} en retard
-            </h3>
-          </div>
-          <ul className="space-y-2">
-            {overdueInvoices.map((inv) => (
-              <li key={inv.id} className="flex items-center justify-between">
-                <Link href={`/invoices/${inv.id}`} className="text-sm text-red-700 hover:text-red-900 font-medium">
-                  {inv.number} — {inv.client.firstName} {inv.client.lastName}
-                </Link>
-                <span className="text-sm font-bold text-red-700">{formatCurrency(inv.total)}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="mb-6 space-y-1.5">
+          {overdueInvoices.map((inv) => (
+            <Link
+              key={inv.id}
+              href={`/invoices/${inv.id}`}
+              className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 hover:bg-red-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                <span className="text-sm font-medium text-red-700">
+                  {inv.client.firstName} {inv.client.lastName}
+                </span>
+                <span className="text-xs text-red-400">{inv.number}</span>
+              </div>
+              <span className="text-sm font-bold text-red-700">{formatCurrency(inv.total)}</span>
+            </Link>
+          ))}
         </div>
       )}
 
