@@ -432,7 +432,7 @@ export default async function CertificatePreviewPage({
         <div className="content">
 
           {/* Header: company left + title centered */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "start", marginBottom: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", marginBottom: 8 }}>
             {/* Left: logo + company */}
             <div>
               {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
