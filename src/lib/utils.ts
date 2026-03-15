@@ -32,5 +32,6 @@ export function formatDateTime(date: Date | string) {
 
 export function generateNumber(prefix: string, count: number) {
   const year = new Date().getFullYear();
-  return `${prefix}-${year}-${String(count + 1).padStart(4, "0")}`;
+  const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
+  return `${prefix}-${year}-${String(count + 1).padStart(4, "0")}-${rand}`;
 }
