@@ -20,24 +20,32 @@ import {
   UsersRound,
 } from "lucide-react";
 
-const mainNavItems = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  adminOnly?: boolean;
+}
+
+const mainNavItems: NavItem[] = [
   { name: "Accueil", href: "/", icon: LayoutDashboard },
   { name: "Mes clients", href: "/clients", icon: Users },
   { name: "Planning", href: "/calendar", icon: Calendar },
   { name: "Certificats", href: "/certificates", icon: ClipboardCheck },
   { name: "Facturation", href: "/invoices", icon: FileText },
-  { name: "Mes zones", href: "/sectors", icon: MapPin },
+  { name: "Mes zones", href: "/sectors", icon: MapPin, adminOnly: true },
 ];
 
-const secondaryNavItems = [
-  { name: "Rappels", href: "/reminders", icon: Bell },
-  { name: "Contrats", href: "/contracts", icon: FileSignature },
-  { name: "Mon chiffre", href: "/stats", icon: BarChart3 },
-  { name: "Équipe", href: "/team", icon: UsersRound },
-  { name: "Mon entreprise", href: "/settings", icon: Settings },
+const secondaryNavItems: NavItem[] = [
+  { name: "Rappels", href: "/reminders", icon: Bell, adminOnly: true },
+  { name: "Contrats", href: "/contracts", icon: FileSignature, adminOnly: true },
+  { name: "Mon chiffre", href: "/stats", icon: BarChart3, adminOnly: true },
+  { name: "Équipe", href: "/team", icon: UsersRound, adminOnly: true },
+  { name: "Mon entreprise", href: "/settings", icon: Settings, adminOnly: true },
 ];
 
-export function Sidebar() {
+export function Sidebar({ role = "admin" }: { role?: string }) {
+  const isAdmin = role === "admin";
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -80,7 +88,7 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         {/* Main items */}
         <div className="space-y-1">
-          {mainNavItems.map((item) => {
+          {mainNavItems.filter((item) => isAdmin || !item.adminOnly).map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"
@@ -104,12 +112,13 @@ export function Sidebar() {
           })}
         </div>
 
-        {/* Separator */}
+        {/* Separator + Secondary items (admin only) */}
+        {secondaryNavItems.some((item) => isAdmin || !item.adminOnly) && (
+          <>
         <div className="mx-3 my-3 h-px bg-gray-200" />
 
-        {/* Secondary items */}
         <div className="space-y-0.5">
-          {secondaryNavItems.map((item) => {
+          {secondaryNavItems.filter((item) => isAdmin || !item.adminOnly).map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"
@@ -132,6 +141,8 @@ export function Sidebar() {
             );
           })}
         </div>
+          </>
+        )}
       </nav>
 
       {/* Bottom spacer */}

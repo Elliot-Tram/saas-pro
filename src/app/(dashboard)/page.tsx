@@ -91,11 +91,15 @@ export default async function DashboardPage() {
     .filter((inv) => inv.status === "sent")
     .reduce((sum, inv) => sum + inv.total, 0);
 
+  const isAdmin = session.role === "admin";
+
   const stats = [
     { label: "Clients", value: clientCount.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "RDV ce mois", value: appointmentsThisMonth.toString(), icon: Calendar, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "En attente", value: formatCurrency(pendingAmount), icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: "CA du mois", value: formatCurrency(caThisMonth), icon: Euro, color: "text-green-600", bg: "bg-green-50" },
+    ...(isAdmin ? [
+      { label: "En attente", value: formatCurrency(pendingAmount), icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
+      { label: "CA du mois", value: formatCurrency(caThisMonth), icon: Euro, color: "text-green-600", bg: "bg-green-50" },
+    ] : []),
   ];
 
   const formatTime = (date: Date) =>
@@ -158,8 +162,8 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Overdue Invoices Alert */}
-      {overdueInvoices.length > 0 && (
+      {/* Overdue Invoices Alert (admin only) */}
+      {isAdmin && overdueInvoices.length > 0 && (
         <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
