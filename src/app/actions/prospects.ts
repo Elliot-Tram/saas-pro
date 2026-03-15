@@ -45,16 +45,14 @@ export async function importProspects(
     // Map column names to indices
     const colMap: Record<string, number> = {};
     headers.forEach((h, i) => {
-      if (h.includes("nom") || h.includes("entreprise")) colMap.company = i;
-      if (h.includes("adresse") && !h.includes("email")) colMap.address = i;
-      if (h.includes("ville")) colMap.city = i;
-      if (h.includes("code postal") || h.includes("postal")) colMap.postalCode = i;
-      if (h.includes("telephone principal") || h.includes("telephone") || h.includes("phone")) colMap.phone = colMap.phone ?? i;
+      if (h === "nom" || h === "entreprise" || h === "company") colMap.company = i;
+      if ((h.includes("adresse") || h === "address") && !h.includes("email")) colMap.address = colMap.address ?? i;
+      if (h === "ville" || h === "city") colMap.city = i;
+      if (h.includes("code postal") || h === "postal") colMap.postalCode = i;
+      if (h.includes("telephone principal") || h === "telephone" || h === "phone") colMap.phone = colMap.phone ?? i;
       if (h.includes("email")) colMap.email = colMap.email ?? i;
-      if (h.includes("site web") || h.includes("website")) colMap.website = i;
+      if (h === "site web" || h === "website") colMap.website = i;
       if (h.includes("url google") || h.includes("google maps")) colMap.googleMapsUrl = i;
-      if (h.includes("note google") || h.includes("rating")) colMap.rating = i;
-      if (h.includes("nombre d") || h.includes("avis")) colMap.reviews = i;
     });
 
     if (colMap.company === undefined) {
