@@ -229,20 +229,3 @@ model Contract {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
-model Prospect {
-  id            String   @id @default(cuid())
-  company       String
-  phone         String?
-  email         String?
-  address       String?
-  city          String?
-  postalCode    String?
-  googleMapsUrl String?
-  website       String?
-  notes         String?
-  status        String   @default("a_contacter") // a_contacter, appele, interesse, compte_cree, pas_interesse
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
