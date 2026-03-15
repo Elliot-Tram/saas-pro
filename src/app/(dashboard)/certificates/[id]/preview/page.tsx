@@ -68,13 +68,15 @@ export default async function CertificatePreviewPage({
     cert.team.qualification ? `Qualification : ${cert.team.qualification}` : null,
   ].filter(Boolean);
 
+  const companyAddr = [cert.team.address, [cert.team.postalCode, cert.team.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+
   return (
     <>
       <style>{`
         @media print {
           .no-print { display: none !important; }
           body { margin: 0 !important; padding: 0 !important; background: white !important; }
-          .certificate { box-shadow: none !important; margin: 0 !important; }
+          .certificate { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
           /* Hide ALL dashboard chrome */
           aside, nav,
           div[class*="lg:pl-"], div[class*="pl-64"],
@@ -94,114 +96,117 @@ export default async function CertificatePreviewPage({
         }
 
         @page {
-          margin: 0;
+          margin: 10mm 15mm;
           size: A4;
         }
 
         .certificate {
           width: 210mm;
-          height: 297mm;
           margin: 0 auto;
           background: #fff;
           font-family: "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
           color: #111827;
-          font-size: 12.5px;
-          line-height: 1.5;
+          font-size: 10px;
+          line-height: 1.45;
           position: relative;
           box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
         }
 
         .accent-bar {
-          height: 5px;
+          height: 4px;
           background: linear-gradient(90deg, #0f2b46, #1e40af);
-          flex-shrink: 0;
         }
 
         .content {
-          padding: 22px 36px 12px;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
+          padding: 16px 32px 10px;
         }
 
-        /* Header */
-        .header {
-          display: grid;
-          grid-template-columns: auto 1fr auto;
-          gap: 10px;
-          align-items: start;
-          margin-bottom: 10px;
+        /* Company info - stacked layout */
+        .company-block {
+          margin-bottom: 8px;
         }
 
         .logo {
           max-height: 40px;
-          max-width: 70px;
+          max-width: 80px;
           object-fit: contain;
+          margin-bottom: 4px;
+          display: block;
         }
 
         .company-name {
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 700;
           color: #0f2b46;
-          margin-bottom: 1px;
+          line-height: 1.3;
         }
 
         .company-detail {
-          font-size: 7.5px;
+          font-size: 8px;
           color: #6b7280;
           line-height: 1.5;
         }
 
-        .title-main {
-          font-size: 20px;
-          font-weight: 700;
-          color: #0f2b46;
-          line-height: 1.15;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .cert-meta {
-          font-size: 8px;
-          color: #6b7280;
-          line-height: 1.4;
-        }
-
-        /* Separator */
-        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 6px; }
-
         /* Pro bar */
         .pro-bar {
           background: #f9fafb;
-          border-radius: 4px;
-          padding: 4px 10px;
+          border-radius: 3px;
+          padding: 3px 10px;
           text-align: center;
-          font-size: 7px;
+          font-size: 6.5px;
           color: #6b7280;
           margin-bottom: 8px;
         }
         .pro-bar .divider { margin: 0 6px; color: #d1d5db; }
 
+        /* Title */
+        .title-block {
+          text-align: center;
+          margin-bottom: 8px;
+        }
+
+        .title-main {
+          font-size: 16px;
+          font-weight: 700;
+          color: #0f2b46;
+          line-height: 1.2;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .title-bar {
+          width: 28px;
+          height: 2px;
+          background: #2563eb;
+          margin: 3px auto 4px;
+        }
+
+        .cert-meta {
+          font-size: 9px;
+          color: #6b7280;
+          line-height: 1.3;
+        }
+
+        /* Separator */
+        .sep { border: none; border-top: 1px solid #e5e7eb; margin: 0 0 6px; }
+
         /* Section */
-        .section { margin-bottom: 14px; }
+        .section { margin-bottom: 8px; }
         .section-title {
-          font-size: 10.5px;
+          font-size: 8px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: #0f2b46;
-          padding-bottom: 4px;
+          padding-bottom: 3px;
           border-bottom: 1px solid #e5e7eb;
-          margin-bottom: 8px;
+          margin-bottom: 4px;
         }
 
         /* Cards */
         .card {
           border-left: 2px solid #e5e7eb;
-          padding: 10px 14px;
+          padding: 6px 10px;
           margin-bottom: 2px;
         }
         .card-filled {
@@ -210,12 +215,12 @@ export default async function CertificatePreviewPage({
         }
 
         /* Grid */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
 
         /* Fields */
-        .field { margin-bottom: 6px; }
+        .field { margin-bottom: 4px; }
         .field-label {
-          font-size: 8px;
+          font-size: 6.5px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -223,12 +228,12 @@ export default async function CertificatePreviewPage({
           margin-bottom: 0;
         }
         .field-value {
-          font-size: 12.5px;
+          font-size: 10px;
           color: #111827;
           font-weight: 500;
         }
         .field-value-bold {
-          font-size: 12.5px;
+          font-size: 10px;
           color: #111827;
           font-weight: 700;
         }
@@ -236,9 +241,9 @@ export default async function CertificatePreviewPage({
         /* Badges */
         .badge {
           display: inline-block;
-          padding: 5px 16px;
-          border-radius: 4px;
-          font-size: 11px;
+          padding: 3px 10px;
+          border-radius: 3px;
+          font-size: 9px;
           font-weight: 800;
           letter-spacing: 0.04em;
           text-transform: uppercase;
@@ -246,17 +251,17 @@ export default async function CertificatePreviewPage({
         .badge-green {
           background: #ecfdf5;
           color: #059669;
-          border: 2px solid #a7f3d0;
+          border: 1.5px solid #a7f3d0;
         }
         .badge-red {
           background: #fef2f2;
           color: #dc2626;
-          border: 2px solid #fecaca;
+          border: 1.5px solid #fecaca;
         }
         .badge-amber {
           background: #fffbeb;
           color: #d97706;
-          border: 2px solid #fde68a;
+          border: 1.5px solid #fde68a;
         }
 
         /* Result rows */
@@ -264,11 +269,11 @@ export default async function CertificatePreviewPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 7px 14px;
+          padding: 5px 10px;
         }
         .result-row + .result-row { border-top: 1px solid #f3f4f6; }
         .result-label {
-          font-size: 8px;
+          font-size: 6.5px;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.06em;
@@ -278,8 +283,8 @@ export default async function CertificatePreviewPage({
         /* Method line */
         .method-line {
           display: flex;
-          gap: 32px;
-          padding: 7px 14px 8px;
+          gap: 24px;
+          padding: 5px 10px 6px;
           border-bottom: 1px solid #f3f4f6;
         }
 
@@ -287,33 +292,33 @@ export default async function CertificatePreviewPage({
         .anomaly-ok {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 6px 12px;
+          gap: 6px;
+          padding: 4px 10px;
         }
         .anomaly-ok-icon {
-          width: 22px; height: 22px;
+          width: 18px; height: 18px;
           border-radius: 50%;
           background: #ecfdf5;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
-        .anomaly-ok-text { font-size: 11px; font-weight: 700; color: #059669; }
+        .anomaly-ok-text { font-size: 9px; font-weight: 700; color: #059669; }
 
         .anomaly-item {
           display: flex;
           align-items: flex-start;
-          gap: 8px;
-          padding: 2px 12px;
+          gap: 6px;
+          padding: 2px 10px;
         }
         .anomaly-icon {
-          width: 16px; height: 16px;
+          width: 14px; height: 14px;
           border-radius: 50%;
           background: #fef2f2;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
           margin-top: 1px;
         }
-        .anomaly-text { font-size: 10px; font-weight: 600; color: #dc2626; }
+        .anomaly-text { font-size: 9px; font-weight: 600; color: #dc2626; }
 
         /* Observations */
         .obs-text { font-size: 9px; color: #374151; line-height: 1.4; padding: 0 10px; }
@@ -329,11 +334,11 @@ export default async function CertificatePreviewPage({
           align-items: center;
           gap: 3px;
           margin: 4px 10px 0;
-          padding: 3px 8px;
+          padding: 2px 6px;
           background: #eff6ff;
           border: 1px solid #bfdbfe;
           border-radius: 3px;
-          font-size: 8px;
+          font-size: 7.5px;
           font-weight: 700;
           color: #1e40af;
         }
@@ -343,20 +348,22 @@ export default async function CertificatePreviewPage({
           margin-top: 8px;
           padding-top: 6px;
           border-top: 1px solid #e5e7eb;
+          page-break-inside: avoid;
+          page-break-before: auto;
         }
-        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .sig-block { text-align: center; }
         .sig-label { font-size: 7px; font-weight: 700; color: #374151; margin-bottom: 1px; }
-        .sig-sub { font-size: 6px; font-style: italic; color: #9ca3af; margin-bottom: 3px; }
+        .sig-sub { font-size: 6px; font-style: italic; color: #9ca3af; margin-bottom: 2px; }
         .sig-box {
           border: 1.5px dashed #d1d5db;
-          border-radius: 5px;
-          height: 50px;
+          border-radius: 4px;
+          height: 44px;
           display: flex; align-items: center; justify-content: center;
           margin-bottom: 2px;
           background: #fafbfc;
         }
-        .sig-img { max-width: 120px; max-height: 32px; object-fit: contain; }
+        .sig-img { max-width: 110px; max-height: 30px; object-fit: contain; }
         .sig-name { font-size: 7px; color: #6b7280; }
         .sig-date { font-size: 6.5px; color: #9ca3af; }
 
@@ -365,11 +372,10 @@ export default async function CertificatePreviewPage({
           text-align: center;
           padding: 6px 32px 6px;
           border-top: 1px solid #e5e7eb;
-          margin-top: auto;
-          flex-shrink: 0;
+          margin-top: 8px;
         }
-        .footer-text { font-size: 7px; color: #9ca3af; line-height: 1.6; }
-        .footer-brand { font-size: 6.5px; color: #d1d5db; margin-top: 2px; }
+        .footer-text { font-size: 6.5px; color: #9ca3af; line-height: 1.5; }
+        .footer-brand { font-size: 6px; color: #d1d5db; margin-top: 2px; }
 
         /* Print button bar */
         .print-bar {
@@ -425,30 +431,13 @@ export default async function CertificatePreviewPage({
         <div className="accent-bar" />
         <div className="content">
 
-          {/* Title centered */}
-          <div style={{ textAlign: "center", marginBottom: 10, marginTop: 4 }}>
-            <div className="title-main">Certificat de ramonage</div>
-            <div style={{ width: 32, height: 2, background: "#2563eb", margin: "4px auto 6px" }} />
-            <div className="cert-meta">N° {cert.number} — {fmtDate(cert.date)}</div>
+          {/* Company info - logo above name */}
+          <div className="company-block">
+            {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
+            <div className="company-name">{companyName}</div>
+            {companyAddr && <div className="company-detail">{companyAddr}</div>}
+            {cert.team.phone && <div className="company-detail">Tél. {cert.team.phone}</div>}
           </div>
-
-          {/* Company + N° row */}
-          <div className="header">
-            <div>
-              {cert.team.logo && <img src={cert.team.logo} className="logo" alt="Logo" />}
-            </div>
-            <div>
-              <div className="company-name">{companyName}</div>
-              {cert.team.address && <div className="company-detail">{cert.team.address}</div>}
-              {(cert.team.postalCode || cert.team.city) && (
-                <div className="company-detail">{[cert.team.postalCode, cert.team.city].filter(Boolean).join(" ")}</div>
-              )}
-              {cert.team.phone && <div className="company-detail">Tél. {cert.team.phone}</div>}
-            </div>
-            <div />
-          </div>
-
-          <hr className="sep" />
 
           {/* Pro info bar */}
           {proParts.length > 0 && (
@@ -458,6 +447,15 @@ export default async function CertificatePreviewPage({
               ))}
             </div>
           )}
+
+          {/* Title centered */}
+          <div className="title-block">
+            <div className="title-main">Certificat de ramonage</div>
+            <div className="title-bar" />
+            <div className="cert-meta">N° {cert.number} — {fmtDate(cert.date)}</div>
+          </div>
+
+          <hr className="sep" />
 
           {/* Client */}
           <div className="section">
@@ -576,7 +574,7 @@ export default async function CertificatePreviewPage({
               {anomalies.length === 0 ? (
                 <div className="anomaly-ok">
                   <div className="anomaly-ok-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                   </div>
                   <div className="anomaly-ok-text">Aucune anomalie constatée</div>
                 </div>
@@ -584,7 +582,7 @@ export default async function CertificatePreviewPage({
                 anomalies.map((a) => (
                   <div key={a} className="anomaly-item">
                     <div className="anomaly-icon">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                     </div>
                     <div className="anomaly-text">{t(a)}</div>
                   </div>
@@ -607,7 +605,7 @@ export default async function CertificatePreviewPage({
                 )}
                 {cert.nextVisit && (
                   <div className="next-visit">
-                    📅 Prochain passage recommandé : {fmtDate(cert.nextVisit)}
+                    Prochain passage recommandé : {fmtDate(cert.nextVisit)}
                   </div>
                 )}
               </div>
