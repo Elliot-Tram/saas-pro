@@ -75,7 +75,7 @@ export default async function InvoicePreviewPage({
           height: 297mm;
           margin: 0 auto;
           background: #fff;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          font-family: Helvetica, Arial, sans-serif;
           color: #111827;
           font-size: 12.5px;
           line-height: 1.5;
