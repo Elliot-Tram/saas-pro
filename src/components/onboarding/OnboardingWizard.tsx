@@ -257,7 +257,7 @@ export function OnboardingWizard({ defaultValues = {} }: { defaultValues?: Defau
                 <div>
                   <Input
                     id="googleReviewLink"
-                    label="Lien avis Google"
+                    label="Lien avis Google (facultatif)"
                     placeholder="https://g.page/r/votre-lien/review"
                     value={formData.googleReviewLink}
                     onChange={(e) => updateField("googleReviewLink", e.target.value)}
