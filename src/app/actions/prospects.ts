@@ -37,28 +37,52 @@ export async function importProspects(
       return { error: "Le fichier CSV doit contenir au moins une ligne de donnees" };
     }
 
-    // Skip header row
+    // Detect separator from header
+    const headerRow = rows[0];
+    const separator = headerRow.includes(";") ? ";" : ",";
+    const headers = headerRow.split(separator).map((h) => h.trim().toLowerCase().replace(/[éè]/g, "e").replace(/[àâ]/g, "a").replace(/[ô]/g, "o"));
+
+    // Map column names to indices
+    const colMap: Record<string, number> = {};
+    headers.forEach((h, i) => {
+      if (h.includes("nom") || h.includes("entreprise")) colMap.company = i;
+      if (h.includes("adresse") && !h.includes("email")) colMap.address = i;
+      if (h.includes("ville")) colMap.city = i;
+      if (h.includes("code postal") || h.includes("postal")) colMap.postalCode = i;
+      if (h.includes("telephone principal") || h.includes("telephone") || h.includes("phone")) colMap.phone = colMap.phone ?? i;
+      if (h.includes("email")) colMap.email = colMap.email ?? i;
+      if (h.includes("site web") || h.includes("website")) colMap.website = i;
+      if (h.includes("url google") || h.includes("google maps")) colMap.googleMapsUrl = i;
+      if (h.includes("note google") || h.includes("rating")) colMap.rating = i;
+      if (h.includes("nombre d") || h.includes("avis")) colMap.reviews = i;
+    });
+
+    if (colMap.company === undefined) {
+      return { error: "Colonne 'Nom' ou 'Entreprise' introuvable dans le CSV" };
+    }
+
     const dataRows = rows.slice(1);
     let count = 0;
 
     for (const row of dataRows) {
-      // Support both ; and , separators
-      const separator = row.includes(";") ? ";" : ",";
       const cols = row.split(separator).map((col) => col.trim());
 
-      const company = cols[0];
+      const company = cols[colMap.company];
       if (!company) continue;
+
+      const email = colMap.email !== undefined ? cols[colMap.email]?.split("|")[0]?.trim() : null;
+      const phone = colMap.phone !== undefined ? cols[colMap.phone] : null;
 
       await prisma.prospect.create({
         data: {
           company,
-          phone: cols[1] || null,
-          email: cols[2] || null,
-          address: cols[3] || null,
-          city: cols[4] || null,
-          postalCode: cols[5] || null,
-          googleMapsUrl: cols[6] || null,
-          website: cols[7] || null,
+          phone: phone || null,
+          email: email || null,
+          address: colMap.address !== undefined ? cols[colMap.address] || null : null,
+          city: colMap.city !== undefined ? cols[colMap.city] || null : null,
+          postalCode: colMap.postalCode !== undefined ? cols[colMap.postalCode] || null : null,
+          googleMapsUrl: colMap.googleMapsUrl !== undefined ? cols[colMap.googleMapsUrl] || null : null,
+          website: colMap.website !== undefined ? cols[colMap.website] || null : null,
           status: "a_contacter",
         },
       });
