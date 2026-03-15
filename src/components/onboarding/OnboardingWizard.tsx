@@ -67,7 +67,12 @@ export function OnboardingWizard({ defaultValues = {} }: { defaultValues?: Defau
       return;
     }
     if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      // Pre-fill sector with city from step 1
+      if (nextStep === 3 && !formData.sectorName && formData.city) {
+        setFormData((prev) => ({ ...prev, sectorName: prev.city }));
+      }
+      setCurrentStep(nextStep);
     }
   }
 
@@ -129,7 +134,7 @@ export function OnboardingWizard({ defaultValues = {} }: { defaultValues?: Defau
           </div>
         )}
 
-        <form ref={formRef} action={formAction}>
+        <form ref={formRef} action={formAction} onKeyDown={(e) => { if (e.key === "Enter" && currentStep < 3) e.preventDefault(); }}>
           {/* Hidden fields to carry all data on submission */}
           <input type="hidden" name="company" value={formData.company} />
           <input type="hidden" name="siret" value={formData.siret} />
